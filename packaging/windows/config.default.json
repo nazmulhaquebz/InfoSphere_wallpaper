@@ -1,0 +1,64 @@
+{
+  "brand_name": "InfoSphere Cyber Live Wallpaper Engine",
+  "refresh_interval_seconds": 10,
+  "resolution_width": "auto",
+  "resolution_height": "auto",
+  "display_mode": "primary",
+  "theme": "cyber_dark",
+  "output_path": "output/infosphere_wallpaper.png",
+  "log_path": "logs/wallpaper.log",
+  "show_cpu": true,
+  "show_ram": true,
+  "show_disk": true,
+  "show_ip": true,
+  "show_network": true,
+  "show_firewall_status": true,
+  "show_telemetry": true,
+  "show_weather": true,
+  "simulate_threats": false,
+  "operator_profile": {
+    "enabled": true,
+    "name": "Local Operator",
+    "title": "System Administrator"
+  },
+  "accessibility": {
+    "theme": "default",
+    "density": "comfortable",
+    "reduce_motion": false,
+    "font_scale": 1.0
+  },
+  "weather_city": "auto",
+  "router": {
+    "enabled": false,
+    "ip": "192.168.0.1",
+    "username": "admin",
+    "password_env": "INFOSPHERE_ROUTER_PASSWORD",
+    "refresh_secs": 10
+  },
+  "speedtest": {
+    "enabled": false,
+    "ping_interval_s": 5,
+    "speed_interval_s": 300,
+    "ping_host": "8.8.8.8",
+    "ping_port": 53
+  },
+  "process_optimizer": {
+    "enabled": false,
+    "terminate_updates": false,
+    "throttle_on_load": false
+  },
+  "ethical_footer": "Local system monitoring only  |  No unauthorized scanning  |  Ethical use only",
+  "colors": {
+    "background": "#050A14",
+    "panel_bg": "#070D1A",
+    "panel_border": "#1A3A5C",
+    "accent_cyan": "#00F5FF",
+    "accent_green": "#00FF88",
+    "accent_amber": "#FFB800",
+    "accent_red": "#FF3366",
+    "accent_blue": "#4488FF",
+    "text_primary": "#E0F4FF",
+    "text_secondary": "#7AAABB",
+    "text_dim": "#5D8494"
+  }
+}

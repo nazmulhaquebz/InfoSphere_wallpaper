@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InfoSphere · Antigravity Bioluminescent Pond — Live Aquarium</title>
+  <meta name="description" content="10-Species Bioluminescent Antigravity Pond. Real-time 60 FPS nanosecond color shimmer, spine kinematics, water caustics, and interactive ripple physics."/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #020b18;
+      --panel-bg:    rgba(4, 14, 28, 0.92);
+      --border:      rgba(0, 210, 255, 0.25);
+      --cyan:        #00D2FF;
+      --emerald:     #10B981;
+      --amber:       #F59E0B;
+      --font-mono:   'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+      --font-sans:   'Inter', system-ui, sans-serif;
+    }
+
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg);
+      color: #E2E8F0;
+      font-family: var(--font-sans);
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ─── Header HUD ─────────────────────────────────── */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      background: rgba(2, 11, 24, 0.88);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      gap: 12px;
+    }
+    #hud-left { display: flex; align-items: center; gap: 14px; }
+    #live-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981, 0 0 20px rgba(16,185,129,0.4);
+      animation: pulse-dot 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.55; transform: scale(0.75); }
+    }
+    #title {
+      font-family: var(--font-sans);
+      font-weight: 900;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+    #title span { color: var(--cyan); }
+    #badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: rgba(0,210,255,0.10);
+      border: 1px solid rgba(0,210,255,0.30);
+      color: #7DD3FA;
+      text-transform: uppercase;
+    }
+    #hud-right { display: flex; align-items: center; gap: 10px; }
+    .hud-stat {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(5, 20, 40, 0.80);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .hud-stat .label { color: #475569; }
+    .hud-stat .val   { color: var(--cyan); font-weight: 700; }
+    .hud-stat .val.green { color: var(--emerald); }
+    #fps-val { color: var(--emerald); font-weight: 700; }
+
+    /* ─── Main Canvas ─────────────────────────────────── */
+    #pond-canvas {
+      position: fixed;
+      top: 52px; left: 0; right: 0; bottom: 48px;
+      width: 100%;
+      height: calc(100% - 100px);
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* ─── Footer Telemetry Bar ────────────────────────── */
+    #footer {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 48px;
+      background: rgba(2, 11, 24, 0.90);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 100;
+      gap: 12px;
+      overflow: hidden;
+    }
+    #footer-scroll {
+      flex: 1;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--cyan);
+      letter-spacing: 0.10em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #footer-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: #64748B;
+      letter-spacing: 0.05em;
+    }
+    .legend-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ─── Interaction Hint ────────────────────────────── */
+    #hint {
+      position: fixed;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: rgba(0,210,255,0.55);
+      letter-spacing: 0.12em;
+      pointer-events: none;
+      animation: fade-hint 4s ease-out forwards;
+      z-index: 50;
+    }
+    @keyframes fade-hint {
+      0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; }
+    }
+
+    /* ─── Tactical System Clock Panel (InfoSphere Cyber Style) ────────── */
+    #tactical-clock-panel {
+      position: fixed;
+      top: 64px;
+      right: 20px;
+      width: 324px;
+      background: rgba(4, 14, 28, 0.90);
+      border: 1px solid rgba(0, 210, 255, 0.40);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 210, 255, 0.15);
+      border-radius: 8px;
+      padding: 12px 16px;
+      z-index: 90;
+      backdrop-filter: blur(14px);
+      pointer-events: auto;
+      user-select: none;
+    }
+    .tcp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+      color: #64748B;
+      letter-spacing: 0.12em;
+      margin-bottom: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 4px;
+    }
+    .tcp-title { color: var(--cyan); font-weight: 700; }
+    .tcp-tz { color: #94A3B8; font-size: 8px; }
+    .tcp-time {
+      font-family: var(--font-mono);
+      font-size: 38px;
+      font-weight: 900;
+      color: #00F5FF;
+      text-shadow: 0 0 20px rgba(0, 245, 255, 0.6), 0 0 35px rgba(0, 245, 255, 0.25);
+      text-align: center;
+      letter-spacing: 0.08em;
+      line-height: 1.1;
+    }
+    .tcp-date {
+      font-family: var(--font-mono);
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #E2E8F0;
+      letter-spacing: 0.16em;
+      text-align: center;
+      margin-top: 2px;
+      margin-bottom: 10px;
+    }
+    .tcp-gauge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 5px;
+      font-family: var(--font-mono);
+      font-size: 8.5px;
+    }
+    .tcp-gauge-label {
+      color: #475569;
+      width: 24px;
+      text-align: right;
+      font-weight: 700;
+    }
+    .tcp-gauge-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(6, 14, 26, 0.95);
+      border: 1px solid rgba(15, 38, 62, 0.9);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .tcp-gauge-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10B981, #00D2FF);
+      transition: width 0.05s linear;
+    }
+    .tcp-gauge-bar.ns-bar {
+      background: linear-gradient(90deg, #0284C7, #38BDF8);
+    }
+    .tcp-gauge-val {
+      font-weight: 700;
+      color: var(--cyan);
+      width: 32px;
+      text-align: left;
+    }
+    .tcp-gauge-val.ns-val {
+      width: 110px;
+      color: #7DD3FC;
+      font-size: 8.5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="hud">
+  <div id="hud-left">
+    <div id="live-dot"></div>
+    <div id="title">INFOSPHERE <span>ANTIGRAVITY</span></div>
+    <div id="badge">Bioluminescent Aquatic Sanctuary · v2.2.0</div>
+  </div>
+  <div id="hud-right">
+    <div class="hud-stat"><span class="label">RENDER</span><span class="val green" id="fps-val">60</span><span class="label">FPS</span></div>
+    <div class="hud-stat"><span class="label">SPECIMENS</span><span class="val">10</span></div>
+    <div class="hud-stat"><span class="label">TEMP</span><span class="val">24.5°C</span></div>
+    <div class="hud-stat"><span class="label">PURITY</span><span class="val">99.9%</span></div>
+    <div class="hud-stat"><span class="label">LIVE TIME</span><span class="val green" id="clock-val">00:00:00</span><span class="val" style="color:#7DD3FC;font-size:9px" id="clock-ns">000,000,000 ns</span></div>
+  </div>
+</div>
+
+<!-- InfoSphere Tactical Live System Time Panel -->
+<div id="tactical-clock-panel">
+  <div class="tcp-header">
+    <span class="tcp-title">◆ SYSTEM TIME · MEASURED</span>
+    <span class="tcp-tz" id="tcp-tz">TZ: Bangladesh Standard Time</span>
+  </div>
+  <div class="tcp-time" id="tcp-time">00:00:00</div>
+  <div class="tcp-date" id="tcp-date">18 SEPTEMBER 2026 · FRIDAY</div>
+  
+  <!-- SEC progress track -->
+  <div class="tcp-gauge-row">
+    <span class="tcp-gauge-label">SEC</span>
+    <div class="tcp-gauge-track">
+      <div class="tcp-gauge-bar" id="tcp-sec-bar"></div>
+    </div>
+    <span class="tcp-gauge-val" id="tcp-sec-val">00s</span>
+  </div>
+
+  <!-- Nanoseconds track -->
+  <div class="tcp-gauge-row">
+    <span class="tcp-gauge-label">ns</span>
+    <div class="tcp-gauge-track">
+      <div class="tcp-gauge-bar ns-bar" id="tcp-ns-bar"></div>
+    </div>
+    <span class="tcp-gauge-val ns-val" id="tcp-ns-val">000,000,000 ns</span>
+  </div>
+</div>
+
+<canvas id="pond-canvas"></canvas>
+
+<div id="hint">🖱 CLICK TO FEED · HOVER TO SCATTER FISH</div>
+
+<div id="footer">
+  <div id="footer-scroll">
+    ● 10 LIVE SPECIMENS  ·  NANOSECOND BIOLUMINESCENT ANTIGRAVITY POND  ·  INTERACTIVE RIPPLE PHYSICS  ·  60 FPS GPU ACCELERATED  ·  TEMP: 24.5°C  ·  PURITY: 99.9%  ·  PH: 7.2  ·  SALINITY: 0.0%  ·  STATUS: SERENE
+  </div>
+  <div id="footer-legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#00F5FF;box-shadow:0 0 5px #00F5FF"></div>Neon Cyan</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FFB703;box-shadow:0 0 5px #FFB703"></div>Gold Ogon</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF3B00;box-shadow:0 0 5px #FF3B00"></div>Kohaku</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#10B981;box-shadow:0 0 5px #10B981"></div>Jade Emerald</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#A855F7;box-shadow:0 0 5px #A855F7"></div>Violet Orchid</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#FF2A85;box-shadow:0 0 5px #FF2A85"></div>Sakura Pink</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F8FAFC;box-shadow:0 0 5px #ccc"></div>Pearl Ogon</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#F59E0B;box-shadow:0 0 5px #F59E0B"></div>Solar Amber</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#3B82F6;box-shadow:0 0 5px #3B82F6"></div>Abyss Azure</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#84CC16;box-shadow:0 0 5px #84CC16"></div>Lime Flash</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════════
+//  INFOSPHERE ANTIGRAVITY BIOLUMINESCENT POND  ·  Live 60 FPS Engine
+//  10 Unique Species  ·  Nanosecond Colour Shimmer  ·  Spine Kinematics
+//  Water Caustics  ·  Interactive Ripple Physics
+// ═══════════════════════════════════════════════════════════════════════════
+
+const canvas = document.getElementById('pond-canvas');
+const ctx    = canvas.getContext('2d');
+
+// ─── Fish Species Definitions (10 Unique Colour Genomes) ─────────────────
+const SPECIES = [
+  {
+    name:     'Neon Cyan',
+    body:     [0, 245, 255],
+    fin:      [0, 180, 220],
+    tail:     [100, 240, 255],
+    glow:     [0, 245, 255],
+    shimDeg:  0,       // shimmer hue offset (degrees offset from glow)
+    speed:    1.15,
+    scale:    1.15,
+    phase:    0.2,
+    bx_r:    0.12, by_r: 0.45,
+  },
+  {
+    name:     '24K Gold Ogon',
+    body:     [255, 183, 3],
+    fin:      [255, 220, 80],
+    tail:     [255, 200, 50],
+    glow:     [255, 183, 3],
+    shimDeg:  35,
+    speed:    1.05,
+    scale:    1.18,
+    phase:    1.5,
+    bx_r:    0.22, by_r: 0.12,
+  },
+  {
+    name:     'Kohaku Vermilion',
+    body:     [255, 59, 0],
+    fin:      [255, 130, 80],
+    tail:     [255, 100, 60],
+    glow:     [255, 59, 0],
+    shimDeg:  15,
+    speed:    1.10,
+    scale:    1.12,
+    phase:    2.7,
+    bx_r:    0.30, by_r: 0.60,
+  },
+  {
+    name:     'Jade Emerald',
+    body:     [16, 185, 129],
+    fin:      [52, 211, 153],
+    tail:     [110, 231, 183],
+    glow:     [16, 185, 129],
+    shimDeg:  155,
+    speed:    0.92,
+    scale:    1.05,
+    phase:    3.8,
+    bx_r:    0.42, by_r: 0.28,
+  },
+  {
+    name:     'Violet Orchid',
+    body:     [168, 85, 247],
+    fin:      [192, 132, 252],
+    tail:     [233, 213, 255],
+    glow:     [168, 85, 247],
+    shimDeg:  270,
+    speed:    0.88,
+    scale:    1.10,
+    phase:    4.6,
+    bx_r:    0.52, by_r: 0.70,
+  },
+  {
+    name:     'Sakura Pink',
+    body:     [255, 42, 133],
+    fin:      [255, 107, 170],
+    tail:     [255, 153, 200],
+    glow:     [255, 42, 133],
+    shimDeg:  320,
+    speed:    1.20,
+    scale:    0.95,
+    phase:    5.4,
+    bx_r:    0.62, by_r: 0.18,
+  },
+  {
+    name:     'Pearl Ogon',
+    body:     [240, 248, 255],
+    fin:      [220, 235, 250],
+    tail:     [255, 255, 255],
+    glow:     [200, 225, 255],
+    shimDeg:  210,
+    speed:    1.00,
+    scale:    1.00,
+    phase:    6.2,
+    bx_r:    0.70, by_r: 0.40,
+  },
+  {
+    name:     'Solar Amber',
+    body:     [245, 158, 11],
+    fin:      [251, 191, 36],
+    tail:     [253, 224, 71],
+    glow:     [245, 158, 11],
+    shimDeg:  45,
+    speed:    0.95,
+    scale:    1.05,
+    phase:    7.1,
+    bx_r:    0.78, by_r: 0.82,
+  },
+  {
+    name:     'Abyss Azure',
+    body:     [59, 130, 246],
+    fin:      [96, 165, 250],
+    tail:     [147, 197, 253],
+    glow:     [59, 130, 246],
+    shimDeg:  220,
+    speed:    0.85,
+    scale:    1.08,
+    phase:    8.0,
+    bx_r:    0.86, by_r: 0.55,
+  },
+  {
+    name:     'Lime Flash',
+    body:     [132, 204, 22],
+    fin:      [163, 230, 53],
+    tail:     [190, 242, 100],
+    glow:     [132, 204, 22],
+    shimDeg:  90,
+    speed:    1.30,
+    scale:    0.90,
+    phase:    9.0,
+    bx_r:    0.94, by_r: 0.25,
+  },
+];
+
+// ─── Fish State ──────────────────────────────────────────────────────────
+class Fish {
+  constructor(cfg) {
+    this.cfg   = cfg;
+    this.bx_r  = cfg.bx_r;
+    this.by_r  = cfg.by_r;
+    this.spd   = cfg.speed;
+    this.scale = cfg.scale;
+    this.phase = cfg.phase;
+    // scatter / feeding state
+    this.scatter     = false;
+    this.scatterVx   = 0;
+    this.scatterVy   = 0;
+    this.scatterTime = 0;
+    // feed attraction
+    this.feeding     = false;
+    this.feedX       = 0;
+    this.feedY       = 0;
+    // current world coords (initialised on first frame)
+    this.x = 0;
+    this.y = 0;
+    this.heading = 0;
+    // glow pulse
+    this.glowPulse = Math.random() * Math.PI * 2;
+  }
+}
+
+// Build fish instances
+const fishes = SPECIES.map(s => new Fish(s));
+
+// ─── Ripple Pool ─────────────────────────────────────────────────────────
+const ripples = [];   // { x, y, r, maxR, alpha, speed, color }
+
+// ─── Food Pellets ─────────────────────────────────────────────────────────
+const pellets = [];   // { x, y, eaten, alpha }
+
+// ─── Mouse State ─────────────────────────────────────────────────────────
+let mouseX = -9999, mouseY = -9999;
+let feedPoints = [];   // { x, y, t }
+
+// ─── Performance ─────────────────────────────────────────────────────────
+let lastTime   = 0;
+let fps        = 60;
+let frameCount = 0;
+let fpsTimer   = 0;
+
+// ─── Sizing ───────────────────────────────────────────────────────────────
+let W, H;
+
+function resize() {
+  const hud    = document.getElementById('hud');
+  const footer = document.getElementById('footer');
+  W = canvas.width  = window.innerWidth;
+  H = canvas.height = window.innerHeight - hud.offsetHeight - footer.offsetHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ─── Real-Time Live Clock (updates every second with nanosecond precision) ─────
+const dayNames = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+const monthNames = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+
+try {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const tzEl = document.getElementById('tcp-tz');
+  if (tzEl) {
+    const tzLabel = tz.includes('Dhaka') || tz.includes('Asia/Dhaka') ? 'TZ: Bangladesh Standard Time' : `TZ: ${tz}`;
+    tzEl.textContent = tzLabel;
+  }
+} catch(e) {}
+
+function updateLiveRealTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  const timeStr = `${h}:${m}:${s}`;
+  
+  // High-precision nanoseconds calculation (matching InfoSphere engine)
+  const ms = now.getMilliseconds();
+  const subMs = (performance.now() % 1);
+  const totalNs = Math.floor((ms + subMs) * 1000000);
+  const nsStr = `${totalNs.toLocaleString()} ns`;
+
+  // Update Top HUD
+  const clockEl = document.getElementById('clock-val');
+  if (clockEl) clockEl.textContent = timeStr;
+  const clockNsEl = document.getElementById('clock-ns');
+  if (clockNsEl) clockNsEl.textContent = nsStr;
+
+  // Update Tactical Panel Time & Date
+  const tcpTimeEl = document.getElementById('tcp-time');
+  if (tcpTimeEl) tcpTimeEl.textContent = timeStr;
+  
+  const tcpDateEl = document.getElementById('tcp-date');
+  if (tcpDateEl) {
+    tcpDateEl.textContent = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} · ${dayNames[now.getDay()]}`;
+  }
+
+  // SEC Bar Gauge (0-59s)
+  const secPct = (now.getSeconds() + ms / 1000) / 60;
+  const secBar = document.getElementById('tcp-sec-bar');
+  if (secBar) secBar.style.width = `${(secPct * 100).toFixed(1)}%`;
+  const secVal = document.getElementById('tcp-sec-val');
+  if (secVal) secVal.textContent = `${s}s`;
+
+  // Nanosecond Bar Gauge
+  const nsPct = (ms * 1000000 + subMs * 1000000) / 1000000000;
+  const nsBar = document.getElementById('tcp-ns-bar');
+  if (nsBar) nsBar.style.width = `${(nsPct * 100).toFixed(1)}%`;
+  const nsValEl = document.getElementById('tcp-ns-val');
+  if (nsValEl) nsValEl.textContent = nsStr;
+}
+
+// ─── Colour Utilities ─────────────────────────────────────────────────────
+function rgbStr(r, g, b, a = 1) {
+  return a >= 1 ? `rgb(${r|0},${g|0},${b|0})` : `rgba(${r|0},${g|0},${b|0},${a.toFixed(3)})`;
+}
+
+// Nanosecond shimmer: blends base colour with a shifted hue using perf.now()
+function shimmerColor(base, shimDeg, t_ns, glowPulse) {
+  // t_ns is performance.now() in ms — use high-resolution float
+  const ns    = t_ns * 1e-3;   // seconds
+  const pulse = (0.5 + 0.5 * Math.sin(ns * 3.5  + glowPulse));       // 3.5 Hz brightness pulse
+  const hShim = (shimDeg / 360) * Math.PI * 2;
+  const shimAmnt = 0.28 * (0.5 + 0.5 * Math.sin(ns * 1.8 + hShim)); // nanosecond hue drift
+
+  // Lerp between base and brightened/shifted version
+  const r = base[0] * (1 - shimAmnt) + Math.min(255, base[0] * 1.4) * shimAmnt;
+  const g = base[1] * (1 - shimAmnt) + Math.min(255, base[1] * 1.4) * shimAmnt;
+  const b = base[2] * (1 - shimAmnt) + Math.min(255, base[2] * 1.4) * shimAmnt;
+
+  const br = 0.82 + 0.18 * pulse;
+  return [r * br, g * br, b * br];
+}
+
+// ─── Draw Caustic Gradient Background ─────────────────────────────────────
+function drawBackground(t) {
+  // Deep water gradient: dark teal → indigo-teal → azure
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  // Subtly animated gradient stops using nanosecond time
+  const sway = 0.5 + 0.5 * Math.sin(t * 0.00015);
+  grad.addColorStop(0,            `rgb(${4 + sway*4|0},${20 + sway*8|0},${42 + sway*6|0})`);
+  grad.addColorStop(0.4,          `rgb(${6|0},${55 + sway*10|0},${78 + sway*8|0})`);
+  grad.addColorStop(0.75,         `rgb(${2|0},${80 + sway*12|0},${100 + sway*10|0})`);
+  grad.addColorStop(1,            `rgb(${4|0},${60 + sway*8|0},${90 + sway*6|0})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ─── Caustic Highlights (Dappled Light on Seabed) ─────────────────────────
+const CAUSTIC_SEEDS = Array.from({length: 22}, () => ({
+  x: Math.random(), y: Math.random(),
+  rx: 0.06 + Math.random() * 0.12,
+  ry: 0.025 + Math.random() * 0.06,
+  tilt: (Math.random() - 0.5) * 0.6,
+  phase: Math.random() * Math.PI * 2,
+  spd: 0.15 + Math.random() * 0.25,
+}));
+
+function drawCaustics(t) {
+  ctx.save();
+  ctx.globalAlpha = 0.045;
+  ctx.globalCompositeOperation = 'screen';
+  for (const c of CAUSTIC_SEEDS) {
+    const ts    = t * c.spd * 0.001;
+    const cx    = (c.x * W) + Math.sin(ts + c.phase) * W * 0.045;
+    const cy    = (c.y * H) + Math.cos(ts * 0.7 + c.phase) * H * 0.025;
+    const rx    = c.rx * W;
+    const ry    = c.ry * H;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(c.tilt + Math.sin(ts * 0.3) * 0.15);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, Math.max(rx, ry));
+    g.addColorStop(0,   'rgba(120, 230, 255, 1)');
+    g.addColorStop(0.6, 'rgba(40, 180, 200, 0.4)');
+    g.addColorStop(1,   'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = g;
+    ctx.scale(1, ry / rx);
+    ctx.beginPath();
+    ctx.arc(0, 0, rx, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.restore();
+}
+
+// ─── Depth Pools (3 Translucent Overlay Ellipses) ─────────────────────────
+function drawDepthPools(t) {
+  const pools = [
+    { xr: 0.28, yr: 0.48, rx: W * 0.13, ry: H * 0.22, tilt: -0.25 },
+    { xr: 0.50, yr: 0.42, rx: W * 0.12, ry: H * 0.24, tilt:  0.08 },
+    { xr: 0.74, yr: 0.46, rx: W * 0.13, ry: H * 0.23, tilt:  0.22 },
+  ];
+  ctx.save();
+  ctx.globalCompositeOperation = 'screen';
+  for (const p of pools) {
+    const sway = Math.sin(t * 0.00035 + p.xr * 6) * 20;
+    const cx = p.xr * W + sway;
+    const cy = p.yr * H;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(p.tilt);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, p.rx);
+    g.addColorStop(0,   'rgba(24, 160, 185, 0.18)');
+    g.addColorStop(0.7, 'rgba(10, 100, 130, 0.08)');
+    g.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = g;
+    ctx.scale(1, p.ry / p.rx);
+    ctx.beginPath();
+    ctx.arc(0, 0, p.rx, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.globalCompositeOperation = 'source-over';
+  ctx.restore();
+}
+
+// ─── Surface Ripples ──────────────────────────────────────────────────────
+const AMB_RIPPLES = Array.from({length: 5}, (_, i) => ({
+  xr: [0.18, 0.68, 0.88, 0.42, 0.08][i],
+  yr: [0.25, 0.65, 0.28, 0.48, 0.92][i],
+  maxR: [42, 36, 48, 18, 8][i],
+  phase: [0.75, 0.60, 0.85, 0.45, 0.70][i],
+}));
+
+function drawAmbientRipples(t) {
+  ctx.save();
+  const ts = t * 0.0008;
+  for (const rp of AMB_RIPPLES) {
+    const phase = (ts * 0.8 + rp.phase * 2.0) % 2.5;
+    const prog  = phase / 2.5;
+    const r     = 3 + prog * rp.maxR;
+    const alpha = Math.max(0, (1.0 - prog) * 0.65);
+    ctx.strokeStyle = `rgba(186,230,253,${alpha.toFixed(3)})`;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.ellipse(rp.xr * W, rp.yr * H, r, r * 0.62, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    if (r > 10) {
+      ctx.strokeStyle = `rgba(255,255,255,${(alpha * 0.38).toFixed(3)})`;
+      ctx.lineWidth = 0.7;
+      ctx.beginPath();
+      ctx.ellipse(rp.xr * W, rp.yr * H, r - 7, (r - 7) * 0.62, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+  }
+  ctx.restore();
+}
+
+// ─── Interactive Ripples ──────────────────────────────────────────────────
+function spawnRipple(x, y, color = [0, 210, 255]) {
+  ripples.push({ x, y, r: 2, maxR: 55 + Math.random() * 35, alpha: 0.9, speed: 1.4 + Math.random(), color });
+}
+
+function updateDrawRipples(dt) {
+  for (let i = ripples.length - 1; i >= 0; i--) {
+    const rp = ripples[i];
+    rp.r     += rp.speed * dt * 60;
+    rp.alpha  = Math.max(0, 0.9 * (1 - rp.r / rp.maxR));
+    if (rp.alpha <= 0 || rp.r >= rp.maxR) { ripples.splice(i, 1); continue; }
+    ctx.save();
+    ctx.strokeStyle = rgbStr(...rp.color, rp.alpha);
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.60, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    // inner echo ring
+    if (rp.r > 14) {
+      ctx.strokeStyle = rgbStr(255, 255, 255, rp.alpha * 0.3);
+      ctx.lineWidth   = 0.7;
+      ctx.beginPath();
+      ctx.ellipse(rp.x, rp.y, rp.r - 8, (rp.r - 8) * 0.60, 0, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+}
+
+// ─── Food Pellets ─────────────────────────────────────────────────────────
+function updateDrawPellets(dt) {
+  for (let i = pellets.length - 1; i >= 0; i--) {
+    const p = pellets[i];
+    if (p.eaten) {
+      p.alpha -= dt * 3;
+      if (p.alpha <= 0) { pellets.splice(i, 1); continue; }
+    }
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, p.alpha);
+    ctx.shadowColor = '#F59E0B';
+    ctx.shadowBlur  = 10;
+    ctx.fillStyle   = '#F59E0B';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+}
+
+// ─── Fish Glow Layer (Soft Bloom) ─────────────────────────────────────────
+function drawFishGlow(fish, fx, fy, t_ns) {
+  const sc = fish.cfg;
+  const [gr, gg, gb] = shimmerColor(sc.glow, sc.shimDeg, t_ns, fish.glowPulse);
+  ctx.save();
+  const glowPulseAmt = 0.5 + 0.5 * Math.sin(t_ns * 0.003 + fish.glowPulse);
+
+  const tiers = [
+    { r: 22 * fish.scale, a: 0.07 + 0.04 * glowPulseAmt },
+    { r: 14 * fish.scale, a: 0.14 + 0.08 * glowPulseAmt },
+    { r:  8 * fish.scale, a: 0.26 + 0.12 * glowPulseAmt },
+  ];
+  for (const tier of tiers) {
+    const g = ctx.createRadialGradient(fx, fy, 0, fx, fy, tier.r);
+    g.addColorStop(0,   rgbStr(gr, gg, gb, tier.a * 2));
+    g.addColorStop(0.5, rgbStr(gr, gg, gb, tier.a));
+    g.addColorStop(1,   rgbStr(gr, gg, gb, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(fx, fy, tier.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+// ─── Draw a Single Fish Body ──────────────────────────────────────────────
+function drawFish(fish, fx, fy, heading, L, W_fish, t_ns, cur_t) {
+  const sc = fish.cfg;
+  ctx.save();
+  ctx.translate(fx, fy);
+  ctx.rotate(heading);
+
+  // ── Caudal Tail (crescent fan) ──
+  const tailWave   = Math.sin(cur_t * 8.5) * 0.38;
+  const tailAngle  = Math.PI + tailWave;  // relative to heading (already rotated)
+  const tBase      = -L * 0.38;
+  const tLen       = L * 0.48;
+
+  const [tr, tg, tb] = shimmerColor(sc.tail, sc.shimDeg + 20, t_ns, fish.glowPulse);
+  ctx.fillStyle = rgbStr(tr, tg, tb, 0.92);
+  ctx.beginPath();
+  ctx.moveTo(tBase, 0);
+  ctx.lineTo(
+    tBase + tLen * Math.cos(tailAngle + 0.65),
+    tBase * 0     + tLen * Math.sin(tailAngle + 0.65)
+  );
+  ctx.lineTo(
+    tBase + L * 0.22 * Math.cos(tailAngle),
+    L * 0.22 * Math.sin(tailAngle)
+  );
+  ctx.lineTo(
+    tBase + tLen * Math.cos(tailAngle - 0.65),
+    tLen * Math.sin(tailAngle - 0.65)
+  );
+  ctx.closePath();
+  ctx.fill();
+
+  // ── Pectoral Fins (left & right) ──
+  const [fr, fg, fb] = shimmerColor(sc.fin, sc.shimDeg + 10, t_ns, fish.glowPulse);
+  ctx.fillStyle = rgbStr(fr, fg, fb, 0.82);
+  for (const side of [-1, 1]) {
+    const finDir = side * 1.55;
+    const flx    = W_fish * 0.28 * Math.cos(side * 1.2);
+    const fly    = W_fish * 0.28 * Math.sin(side * 1.2);
+    ctx.save();
+    ctx.translate(flx, fly);
+    ctx.rotate(finDir);
+    ctx.beginPath();
+    ctx.ellipse(L * 0.18, 0, L * 0.17, W_fish * 0.22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ── Main Body (tapered teardrop ellipse) ──
+  const [br, bg_c, bb] = shimmerColor(sc.body, sc.shimDeg, t_ns, fish.glowPulse);
+  ctx.fillStyle = rgbStr(br, bg_c, bb, 0.97);
+  ctx.beginPath();
+  // Draw tapered body with canvas path (quadratic approximation of tapered ellipse)
+  const hl = L * 0.5, hw = W_fish * 0.5;
+  ctx.moveTo(hl, 0);
+  ctx.bezierCurveTo( hl * 0.5,  hw, -hl * 0.6,  hw * 0.9,  -hl * 0.5, 0);
+  ctx.bezierCurveTo(-hl * 0.6, -hw * 0.9,  hl * 0.5, -hw,  hl, 0);
+  ctx.fill();
+
+  // ── Glossy Highlight ──
+  ctx.fillStyle = 'rgba(255,255,255,0.22)';
+  ctx.beginPath();
+  ctx.ellipse(L * 0.1 + W_fish * 0.02, -W_fish * 0.16, L * 0.22, W_fish * 0.16, -0.25, 0, Math.PI * 2);
+  ctx.fill();
+
+  // ── Eyes ──
+  for (const side of [-1, 1]) {
+    const ex = L * 0.30;
+    const ey = side * W_fish * 0.26;
+    // white sclera
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.beginPath();
+    ctx.arc(ex, ey, 2.5 * fish.scale, 0, Math.PI * 2);
+    ctx.fill();
+    // pupil
+    ctx.fillStyle = 'rgba(12,18,28,0.95)';
+    ctx.beginPath();
+    ctx.arc(ex + 0.6, ey, 1.2 * fish.scale, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+// ─── Nanosecond name badge ──────────────────────────────────────────────────
+function drawFishBadge(fish, fx, fy) {
+  ctx.save();
+  ctx.font = '8px JetBrains Mono, monospace';
+  ctx.fillStyle = 'rgba(186,230,253,0.65)';
+  ctx.textAlign = 'center';
+  ctx.fillText(fish.cfg.name, fx, fy - fish.scale * 22);
+  ctx.restore();
+}
+
+// ─── Top-right badge INTERACTIVE ANTIGRAVITY POND ─────────────────────────
+function drawInteractiveBadge() {
+  const bw = 240, bh = 24;
+  const bx1 = W - bw - 14;
+  const by1 = 12;
+  ctx.save();
+  ctx.fillStyle   = 'rgba(15,23,42,0.82)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+  ctx.lineWidth   = 1;
+  // Rounded rect
+  const r = 12;
+  ctx.beginPath();
+  ctx.moveTo(bx1 + r, by1);
+  ctx.lineTo(bx1 + bw - r, by1);
+  ctx.arcTo(bx1 + bw, by1, bx1 + bw, by1 + r, r);
+  ctx.lineTo(bx1 + bw, by1 + bh - r);
+  ctx.arcTo(bx1 + bw, by1 + bh, bx1 + bw - r, by1 + bh, r);
+  ctx.lineTo(bx1 + r, by1 + bh);
+  ctx.arcTo(bx1, by1 + bh, bx1, by1 + bh - r, r);
+  ctx.lineTo(bx1, by1 + r);
+  ctx.arcTo(bx1, by1, bx1 + r, by1, r);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  // Green live dot
+  ctx.fillStyle = '#10B981';
+  ctx.shadowColor = '#10B981';
+  ctx.shadowBlur  = 8;
+  ctx.beginPath();
+  ctx.arc(bx1 + 14, by1 + 12, 4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.shadowBlur  = 0;
+  // Text
+  ctx.font        = '9px JetBrains Mono, monospace';
+  ctx.fillStyle   = 'rgba(224,242,254,0.90)';
+  ctx.textAlign   = 'left';
+  ctx.fillText('INTERACTIVE ANTIGRAVITY POND', bx1 + 26, by1 + 15.5);
+  ctx.restore();
+}
+
+// ─── FPS Counter ──────────────────────────────────────────────────────────
+function updateFPS(dt) {
+  fpsTimer   += dt;
+  frameCount += 1;
+  if (fpsTimer >= 0.5) {
+    fps        = Math.round(frameCount / fpsTimer);
+    frameCount = 0;
+    fpsTimer   = 0;
+    document.getElementById('fps-val').textContent = fps;
+  }
+}
+
+// ─── MAIN ANIMATION LOOP ───────────────────────────────────────────────────
+function animate(now_ms) {
+  requestAnimationFrame(animate);
+
+  const dt = Math.min((now_ms - lastTime) / 1000, 0.05);
+  lastTime = now_ms;
+  if (dt <= 0) return;
+
+  updateFPS(dt);
+  updateLiveRealTime();
+
+  // High-res timestamp for nanosecond shimmer
+  const t_ns = performance.now();   // milliseconds, float64 precision
+  const t_sec = t_ns / 1000;       // seconds
+
+  // ─── Draw Background ────────────────────────────────────
+  drawBackground(t_ns);
+  drawDepthPools(t_ns);
+  drawCaustics(t_ns);
+  drawAmbientRipples(t_ns);
+
+  // ─── Fish Logic & Rendering ──────────────────────────────
+  const swimRx = W * 0.16;
+  const swimRy = H * 0.18;
+
+  // First pass: glow layers (so they composite under fish bodies)
+  for (const fish of fishes) {
+    const sc     = fish.cfg;
+    const cur_t  = t_sec * sc.speed + sc.phase;
+
+    // Base orbital position
+    let fx = W * sc.bx_r + swimRx * Math.sin(cur_t * 0.7);
+    let fy = H * sc.by_r + swimRy * Math.cos(cur_t * 0.9);
+
+    // Scatter impulse (mouse-away)
+    if (fish.scatter) {
+      fish.scatterTime -= dt;
+      if (fish.scatterTime <= 0) {
+        fish.scatter = false;
+      } else {
+        const decay = fish.scatterTime / 0.9;
+        fx += fish.scatterVx * decay;
+        fy += fish.scatterVy * decay;
+      }
+    }
+
+    // Feeding attraction (click to feed)
+    if (fish.feeding) {
+      const dx = fish.feedX - fx;
+      const dy = fish.feedY - fy;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 18) {
+        fish.feeding = false;
+        // eat nearest pellet
+        for (const p of pellets) {
+          if (!p.eaten && Math.hypot(p.x - fx, p.y - fy) < 40) {
+            p.eaten = true;
+            break;
+          }
+        }
+      } else {
+        const pull = Math.min(dist, 120) / 120;
+        fx += dx * pull * 0.3;
+        fy += dy * pull * 0.3;
+      }
+    }
+
+    // Clamp to canvas
+    const L = 23 * fish.scale;
+    const Wf = 10 * fish.scale;
+    fx = Math.max(L, Math.min(W - L, fx));
+    fy = Math.max(Wf, Math.min(H - Wf, fy));
+
+    fish.x = fx;
+    fish.y = fy;
+
+    // Compute heading from velocity direction
+    const vx = swimRx * 0.7 * Math.cos(cur_t * 0.7);
+    const vy = -swimRy * 0.9 * Math.sin(cur_t * 0.9);
+    fish.heading = Math.atan2(vy, vx);
+
+    // Draw glow
+    ctx.save();
+    ctx.globalCompositeOperation = 'screen';
+    drawFishGlow(fish, fx, fy, t_ns);
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.restore();
+  }
+
+  // Second pass: fish bodies
+  for (const fish of fishes) {
+    const sc  = fish.cfg;
+    const cur_t = t_sec * sc.speed + sc.phase;
+    const L   = 23 * fish.scale;
+    const Wf  = 10 * fish.scale;
+    drawFish(fish, fish.x, fish.y, fish.heading, L, Wf, t_ns, cur_t);
+    drawFishBadge(fish, fish.x, fish.y);
+  }
+
+  // ─── Mouse Hover Scatter ─────────────────────────────────
+  for (const fish of fishes) {
+    const dist = Math.hypot(fish.x - mouseX, fish.y - mouseY);
+    if (dist < 70) {
+      fish.scatter    = true;
+      fish.scatterTime = 0.9;
+      const angle     = Math.atan2(fish.y - mouseY, fish.x - mouseX);
+      fish.scatterVx  = Math.cos(angle) * (70 - dist) * 1.4;
+      fish.scatterVy  = Math.sin(angle) * (70 - dist) * 1.4;
+    }
+  }
+
+  // ─── Interactive Ripples & Pellets ──────────────────────
+  updateDrawRipples(dt);
+  updateDrawPellets(dt);
+
+  // ─── UI Overlays ─────────────────────────────────────────
+  drawInteractiveBadge();
+
+  // ─── Vignette Edge ───────────────────────────────────────
+  const vig = ctx.createRadialGradient(W * 0.5, H * 0.5, H * 0.2, W * 0.5, H * 0.5, H * 0.85);
+  vig.addColorStop(0,   'rgba(0,0,0,0)');
+  vig.addColorStop(1,   'rgba(2,11,24,0.55)');
+  ctx.fillStyle = vig;
+  ctx.fillRect(0, 0, W, H);
+}
+
+// ─── Mouse Events ─────────────────────────────────────────────────────────
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  mouseX = e.clientX - rect.left;
+  mouseY = e.clientY - rect.top;
+});
+canvas.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const cx   = e.clientX - rect.left;
+  const cy   = e.clientY - rect.top;
+
+  // Spawn ripple at click
+  spawnRipple(cx, cy, [245, 183, 3]);
+
+  // Drop a food pellet
+  pellets.push({ x: cx, y: cy, eaten: false, alpha: 1 });
+
+  // Attract all fish to this point
+  for (const fish of fishes) {
+    fish.feeding = true;
+    fish.feedX   = cx + (Math.random() - 0.5) * 40;
+    fish.feedY   = cy + (Math.random() - 0.5) * 40;
+  }
+});
+
+// Touch support
+canvas.addEventListener('touchstart', e => {
+  e.preventDefault();
+  const t = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  canvas.dispatchEvent(new MouseEvent('click', {
+    clientX: t.clientX, clientY: t.clientY
+  }));
+}, { passive: false });
+
+// Spawn ambient ripples periodically
+setInterval(() => {
+  const rx = Math.random() * W;
+  const ry = Math.random() * H;
+  const fishColor = SPECIES[Math.floor(Math.random() * SPECIES.length)].glow;
+  spawnRipple(rx, ry, fishColor);
+}, 1200);
+
+// ─── Kick-off ─────────────────────────────────────────────────────────────
+lastTime = performance.now();
+requestAnimationFrame(animate);
+</script>
+</body>
+</html>

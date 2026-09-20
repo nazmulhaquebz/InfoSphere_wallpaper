@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoSphere // Jarvis Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glow-bg"></div>
+    
+    <header>
+        <div class="logo">
+            <div class="dot green"></div>
+            <div class="dot blue"></div>
+            <div class="dot cyan"></div>
+            <h1>INFOSPHERE // JARVIS v1.0</h1>
+        </div>
+        <div class="sys-time" id="sysTime">00:00:00</div>
+    </header>
+
+    <main class="grid-container">
+        <!-- System Health Panel -->
+        <section class="panel glass" id="systemPanel">
+            <div class="panel-header">
+                <div class="indicator green"></div>
+                <h2>SYSTEM HEALTH MONITOR</h2>
+            </div>
+            <div class="panel-content">
+                <div class="stats-dials">
+                    <div class="dial-container">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring__background" stroke="#0f1a30" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                            <circle class="progress-ring__circle" id="cpuRing" stroke="#00F5FF" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                        </svg>
+                        <div class="dial-label">
+                            <span class="value" id="cpuValue">0%</span>
+                            <span class="label">CPU LOAD</span>
+                        </div>
+                    </div>
+
+                    <div class="dial-container">
+                        <svg class="progress-ring" width="120" height="120">
+                            <circle class="progress-ring__background" stroke="#0f1a30" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                            <circle class="progress-ring__circle" id="ramRing" stroke="#00FF88" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                        </svg>
+                        <div class="dial-label">
+                            <span class="value" id="ramValue">0%</span>
+                            <span class="label">RAM LOAD</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="ram-details" id="ramDetails">RAM: -- GB / -- GB</div>
+            </div>
+        </section>
+
+        <!-- Network & Connector Panel -->
+        <section class="panel glass" id="networkPanel">
+            <div class="panel-header">
+                <div class="indicator cyan"></div>
+                <h2>CLAUDE CONNECTOR & NETWORK</h2>
+            </div>
+            <div class="panel-content">
+                <div class="connector-status">
+                    <div class="status-badge active">
+                        <span class="pulse-dot"></span>
+                        <span class="badge-text">MCP CLAUDE CONNECTOR: ACTIVE</span>
+                    </div>
+                    <div class="meta-label">Transport: Standard Input / Output (STDIO)</div>
+                </div>
+                
+                <div class="net-speeds">
+                    <div class="speed-box">
+                        <div class="arrow down">↓</div>
+                        <div class="speed-value" id="dlSpeed">0.00 Mbps</div>
+                        <div class="speed-label">DOWNLOAD SPEED</div>
+                    </div>
+                    <div class="speed-box">
+                        <div class="arrow up">↑</div>
+                        <div class="speed-value" id="ulSpeed">0.00 Mbps</div>
+                        <div class="speed-label">UPLOAD SPEED</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Build Status Panel -->
+        <section class="panel glass" id="buildPanel">
+            <div class="panel-header">
+                <div class="indicator amber"></div>
+                <h2>ACTIVE REPOSITORY BUILD STATUS</h2>
+            </div>
+            <div class="panel-content">
+                <div class="build-info">
+                    <div class="info-row">
+                        <span class="label">Target Repository:</span>
+                        <span class="value cyan-text" id="buildRepo">NEPCS-HR-ERP</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Total Code Files:</span>
+                        <span class="value" id="buildFiles">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Git Branch:</span>
+                        <span class="value green-text" id="buildBranch">--</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="label">Git Status:</span>
+                        <span class="value" id="buildStatus">--</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Social Media Panel -->
+        <section class="panel glass" id="socialPanel">
+            <div class="panel-header">
+                <div class="indicator blue"></div>
+                <h2>JARVIS SOCIAL PUBLISHER (SIMULATED)</h2>
+            </div>
+            <div class="panel-content social-grid">
+                <form class="post-form" id="postForm">
+                    <textarea id="postContent" placeholder="Ask Jarvis to write an update or type your own milestone... (e.g. System CPU at 15% and RAM stable!)" required></textarea>
+                    <div class="form-footer">
+                        <select id="postPlatform">
+                            <option value="Twitter">Twitter / X</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="Mastodon">Mastodon</option>
+                        </select>
+                        <button type="submit" class="glow-button">PUBLISH SNAPSHOT</button>
+                    </div>
+                </form>
+
+                <div class="feed-container">
+                    <h3>LIVE SOCIAL TIMELINE</h3>
+                    <div class="feed" id="socialFeed">
+                        <!-- Posts load here -->
+                        <div class="empty-feed">No published updates yet.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-left">Jarvis System Core v1.0.0  |  Powered by Model Context Protocol</div>
+        <div class="footer-right" id="uptime">Uptime: --:--:--</div>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,2501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cyber-cyan">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.2.0</title>
+  <meta name="description" content="Intelligent Live Cyber Wallpaper for Windows. 60 FPS 10-Fish Antigravity Pond, real-time telemetry, multi-theme CSS, and Go Event Hub."/>
+  <link rel="stylesheet" href="css/wallpaper_theme.css"/>
+</head>
+<body>
+
+<!-- ─── Realistic Water Wave SVG Filter ─────────────────────────────────── -->
+<svg style="width:0; height:0; position:absolute;">
+  <defs>
+    <filter id="water-wave" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015" numOctaves="3" result="noise">
+        <animate attributeName="baseFrequency" values="0.015;0.02;0.015" dur="15s" repeatCount="indefinite" />
+      </feTurbulence>
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="15" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </defs>
+</svg>
+
+<div id="wallpaper-root">
+
+  <!-- ─── Top Header Bar ──────────────────────────────────────────────────── -->
+  <header class="cyber-header">
+    <div class="brand-section">
+      <img src="img/logo.png" class="brand-logo-img" alt="IS Logo" />
+      <div class="brand-title">
+        <h1>INFOSPHERE <span>TACTICAL CYBER LIVE ENGINE</span></h1>
+        <div class="brand-subtitle">v2.2.0 · LOCAL & SECURE · KERNEL SYNC</div>
+      </div>
+    </div>
+
+    <!-- Host Information -->
+    <div class="host-pill">
+      <div>
+        <div class="host-name" id="host-name">DESKTOP-064P85J</div>
+        <div class="host-os" id="host-os">Windows 11 build 26200 · OPERATOR: NAZMU</div>
+      </div>
+    </div>
+
+    <!-- Operator Profile -->
+    <div class="operator-pill">
+      <div>
+        <div style="font-weight:700;font-size:11px;color:#fff;" id="op-name">Local Operator</div>
+        <div style="font-size:9px;color:var(--text-secondary);" id="op-title">SYSTEM ADMINISTRATOR</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px;font-size:8px;">
+        <span style="color:var(--accent-green);">● ACTIVE SESSION</span>
+        <span style="color:var(--accent);">● ENCRYPTED TLS</span>
+      </div>
+    </div>
+
+    <!-- Multi-Theme Palette Picker -->
+    <div class="theme-picker" style="flex-shrink:0;" title="Switch Cyber Theme Palette">
+      <div class="theme-btn active" style="background:#00E5FF;color:#00E5FF;" data-set-theme="cyber-cyan" title="Cyber Cyan"></div>
+      <div class="theme-btn" style="background:#10B981;color:#10B981;" data-set-theme="emerald-matrix" title="Emerald Matrix"></div>
+      <div class="theme-btn" style="background:#F59E0B;color:#F59E0B;" data-set-theme="imperial-gold" title="Imperial Gold"></div>
+      <div class="theme-btn" style="background:#A855F7;color:#A855F7;" data-set-theme="stealth-violet" title="Stealth Violet"></div>
+      <div class="theme-btn" style="background:#EF4444;color:#EF4444;" data-set-theme="crimson-alert" title="Crimson Alert"></div>
+      <div class="theme-btn" style="background:#F8FAFC;color:#F8FAFC;" data-set-theme="titanium-oled" title="Titanium OLED"></div>
+    </div>
+
+    <!-- Top Right Clock & Status -->
+    <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+      <div class="status-beacon">
+        <div class="beacon-dot"></div>
+        <span style="color:var(--accent-green);font-weight:700;" id="sse-status">LIVE HUB</span>
+      </div>
+      <div style="text-align:right;font-family:var(--font-mono);">
+        <div style="font-weight:800;font-size:14px;color:var(--accent);" id="hdr-clock">00:00:00</div>
+        <div style="font-size:8.5px;color:var(--text-secondary);" id="hdr-date">Friday, 18 September 2026</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Main 3-Column Tactical Grid ──────────────────────────────────────── -->
+  <main class="cyber-grid">
+
+    <!-- ── Left Column: Security Posture, System Health, Network & Router ──── -->
+    <div class="cyber-col cyber-col-left">
+
+      <!-- Security Posture Panel -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>◆</span> SECURITY POSTURE</div>
+          <div class="panel-tag measured" id="sec-posture-tag">REAL TIME</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <!-- Circular Score 100/100 -->
+          <div class="security-circle">
+            <svg viewBox="0 0 100 100">
+              <circle class="security-bg-circle" cx="50" cy="50" r="45"></circle>
+              <circle class="security-prog-circle" id="sec-circle" cx="50" cy="50" r="45"></circle>
+            </svg>
+            <div class="security-score-text">
+              <span class="security-score-num" id="sec-score">100</span>
+              <span class="security-score-sub">/ 100 SCORE</span>
+            </div>
+          </div>
+
+          <!-- Security Status Lines -->
+          <div style="display:flex;flex-direction:column;gap:4px;font-family:var(--font-mono);font-size:9.5px;line-height:1.35;min-width:0;flex:1;">
+            <div style="white-space:nowrap;"><span style="color:var(--accent);font-size:8.5px;">● </span><span style="color:#cbd5e1;font-weight:600;letter-spacing:0.2px;">FIREWALL: </span><span style="color:var(--accent-green);font-weight:700;text-shadow:0 0 6px rgba(16,185,129,0.35);" id="sec-fw">ACTIVE</span></div>
+            <div style="white-space:nowrap;"><span style="color:var(--accent);font-size:8.5px;">● </span><span style="color:#cbd5e1;font-weight:600;letter-spacing:0.2px;">ROUTER: </span><span style="color:var(--accent-green);font-weight:700;text-shadow:0 0 6px rgba(16,185,129,0.35);" id="sec-router-status">ONLINE [SCAN]</span></div>
+            <div style="white-space:nowrap;"><span style="color:var(--accent);font-size:8.5px;">● </span><span style="color:#cbd5e1;font-weight:600;letter-spacing:0.2px;">TELEMETRY: </span><span style="color:var(--accent);font-weight:700;text-shadow:0 0 6px rgba(0,229,255,0.35);" id="sec-telem-status">ACTIVE</span></div>
+            <div style="white-space:nowrap;"><span style="color:var(--accent);font-size:8.5px;">● </span><span style="color:#cbd5e1;font-weight:600;letter-spacing:0.2px;">RECENT ALERTS: </span><span style="color:var(--accent-green);font-weight:700;text-shadow:0 0 6px rgba(16,185,129,0.35);" id="sec-alerts">0 DETECTED</span></div>
+            <div style="white-space:nowrap;"><span style="color:var(--accent);font-size:8.5px;">● </span><span style="color:#cbd5e1;font-weight:600;letter-spacing:0.2px;">DEFENSE SHIELD: </span><span style="color:var(--accent);font-weight:700;text-shadow:0 0 6px rgba(0,229,255,0.35);" id="sec-shield">SECURE</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Health Panel -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>◆</span> SYSTEM HEALTH</div>
+          <div class="panel-tag measured">MEASURED</div>
+        </div>
+
+        <!-- CPU Gauge -->
+        <div class="gauge-row">
+          <span class="gauge-label">CPU</span>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="cpu-fill" style="width: 25%;"></div>
+          </div>
+          <span class="gauge-val" id="cpu-val">25.0%</span>
+        </div>
+
+        <!-- RAM Gauge -->
+        <div class="gauge-row">
+          <span class="gauge-label">RAM</span>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="ram-fill" style="width: 43%;"></div>
+          </div>
+          <span class="gauge-val" id="ram-val">14.6 / 31.7 GB</span>
+        </div>
+
+        <!-- DISK Gauge -->
+        <div class="gauge-row">
+          <span class="gauge-label">DISK</span>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="disk-fill" style="width: 87%;"></div>
+          </div>
+          <span class="gauge-val" id="disk-val">416 / 476 GB</span>
+        </div>
+
+        <!-- TEMP Gauge -->
+        <div class="gauge-row">
+          <span class="gauge-label">TEMP EST</span>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="temp-fill" style="width: 65%;"></div>
+          </div>
+          <span class="gauge-val" id="temp-val">65.9°C</span>
+        </div>
+
+        <!-- OS PROC -->
+        <div class="gauge-row" style="margin-bottom:0;">
+          <span class="gauge-label">OS PROC</span>
+          <div class="gauge-track">
+            <div class="gauge-fill" id="proc-fill" style="width: 45%;"></div>
+          </div>
+          <span class="gauge-val" id="proc-val">315 Active</span>
+        </div>
+
+        <!-- Uptime & Processes Stats -->
+        <div style="display:flex;justify-content:space-between;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.06);font-family:var(--font-mono);">
+          <div style="text-align:left;">
+            <div style="font-size:7px;color:var(--text-muted);line-height:1.2;">SYSTEM UPTIME</div>
+            <div style="font-size:10.5px;font-weight:800;color:var(--accent);line-height:1.2;" id="uptime-val">18d 02h 42m</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:7px;color:var(--text-muted);line-height:1.2;">TOTAL PROCESSES</div>
+            <div style="font-size:10.5px;font-weight:800;color:var(--accent-green);line-height:1.2;" id="tot-proc-val">315</div>
+          </div>
+        </div>
+
+        <!-- CPU Frequency Spectrum Bars -->
+        <div style="margin-top:4px;">
+          <div style="font-family:var(--font-mono);font-size:7px;color:var(--text-muted);letter-spacing:0.08em;margin-bottom:2px;">CPU CORE FREQUENCY SPECTRUM</div>
+          <div class="spectrum-bars" id="spectrum-bars">
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:65%;"></div><span class="spectrum-lbl">C0</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:45%;"></div><span class="spectrum-lbl">C1</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:80%;"></div><span class="spectrum-lbl">C2</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:55%;"></div><span class="spectrum-lbl">C3</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:70%;"></div><span class="spectrum-lbl">C4</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:60%;"></div><span class="spectrum-lbl">C5</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:90%;"></div><span class="spectrum-lbl">C6</span></div>
+            <div class="spectrum-col"><div class="spectrum-fill" style="height:50%;"></div><span class="spectrum-lbl">C7</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network & Telemetry Panel -->
+      <div class="cyber-panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>◆</span> NETWORK &amp; TELEMETRY</div>
+          <div class="panel-tag measured">MEASURED</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-mono);font-size:7.5px;margin-bottom:4px;">
+          <div><span style="color:var(--text-muted);">LOCAL IP: </span><span style="color:var(--accent);" id="net-ip">192.168.0.147</span></div>
+          <div><span style="color:var(--text-muted);">HOSTNAME: </span><span style="color:var(--text-primary);" id="net-host">DESKTOP-064P85J</span></div>
+        </div>
+
+        <!-- Wireless Interface Badge -->
+        <div style="background:rgba(0,0,0,0.4);border:1px solid var(--panel-border);border-radius:var(--radius-sm);padding:4px 8px;margin-bottom:4px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:7px;color:var(--text-muted);font-family:var(--font-mono);line-height:1.1;">WIRELESS INTERFACE</div>
+              <div style="font-size:11.5px;font-weight:900;color:var(--text-primary);font-family:var(--font-mono);line-height:1.15;" id="wifi-ssid">Nazmul_5G</div>
+            </div>
+            <span style="font-size:7px;font-weight:700;color:var(--accent-green);font-family:var(--font-mono);" id="wifi-status-pill">● CONNECTED</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px;font-family:var(--font-mono);font-size:7.5px;line-height:1;">
+            <span style="color:var(--text-muted);font-size:7px;">SIGNAL:</span>
+            <div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
+              <div style="width:100%;height:100%;background:var(--accent-green);" id="wifi-sig-bar"></div>
+            </div>
+            <span style="color:var(--accent-green);font-weight:700;font-size:7px;" id="wifi-sig-val">100%</span>
+            <span style="color:var(--accent);margin-left:3px;font-size:7px;" id="wifi-link-speed">LINK: 184 Mbps</span>
+          </div>
+        </div>
+
+        <!-- Throughput Metrics -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-family:var(--font-mono);text-align:center;margin-bottom:4px;">
+          <div style="background:rgba(0,0,0,0.3);padding:2.5px 4px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.05);">
+            <div style="font-size:6.5px;color:var(--text-muted);line-height:1.1;">▲ TX RATE</div>
+            <div style="font-size:10px;font-weight:800;color:var(--accent);line-height:1.2;" id="tx-rate">22.4 KB/s</div>
+          </div>
+          <div style="background:rgba(0,0,0,0.3);padding:2.5px 4px;border-radius:var(--radius-sm);border:1px solid rgba(255,255,255,0.05);">
+            <div style="font-size:6.5px;color:var(--text-muted);line-height:1.1;">▼ RX RATE</div>
+            <div style="font-size:10px;font-weight:800;color:var(--accent-green);line-height:1.2;" id="rx-rate">18.4 KB/s</div>
+          </div>
+        </div>
+
+        <!-- Connection Health Chips -->
+        <div style="display:flex;gap:3px;font-family:var(--font-mono);font-size:6.5px;line-height:1.1;text-align:center;">
+          <div style="flex:1;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:var(--accent-green);padding:2px 1px;border-radius:2px;">LOCAL NET<br>ONLINE</div>
+          <div style="flex:1;background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.3);color:var(--accent-green);padding:2px 1px;border-radius:2px;">WIFI<br>ONLINE</div>
+          <div style="flex:1;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:var(--accent);padding:2px 1px;border-radius:2px;">TX LINK<br>ACTIVE</div>
+          <div style="flex:1;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:var(--accent);padding:2px 1px;border-radius:2px;">RX LINK<br>ACTIVE</div>
+        </div>
+      </div>
+
+      <!-- Router Monitor Panel -->
+      <div class="cyber-panel router-panel">
+        <div class="panel-header">
+          <div class="panel-title"><span>◆</span> ROUTER MONITOR · SOC ANALYZER</div>
+          <div class="panel-tag measured" id="router-soc-tag">SOC ACTIVE</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-family:var(--font-mono);font-size:8px;text-align:center;">
+          <div><span style="color:var(--text-muted);">ONLINE: </span><strong style="color:var(--accent);" id="router-online">5</strong></div>
+          <div><span style="color:var(--text-muted);">5 GHz: </span><strong style="color:var(--accent);" id="router-band-5g">1</strong></div>
+          <div><span style="color:var(--text-muted);">2.4 GHz: </span><strong style="color:var(--accent-amber);" id="router-band-24g">3</strong></div>
+          <div><span style="color:var(--text-muted);">WIRED: </span><strong style="color:var(--accent-green);" id="router-band-wired">1</strong></div>
+        </div>
+
+        <!-- Devices Table Wrapper -->
+        <div class="router-table-wrap" style="flex:1; overflow-y:auto; min-height:0; margin-top:4px;">
+          <table class="router-table">
+            <thead>
+              <tr>
+                <th>DEVICE</th>
+                <th>IP</th>
+                <th>BAND</th>
+                <th style="text-align:right;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="router-tbody">
+              <tr>
+                <td class="device-name">DESKTOP-064P85J</td>
+                <td>192.168.0.147</td>
+                <td><span class="band-pill band-wired">Wired</span></td>
+                <td style="color:var(--accent-green);">100%</td>
+              </tr>
+              <tr>
+                <td class="device-name">TP-Link Router</td>
+                <td>192.168.0.1</td>
+                <td><span class="band-pill band-wired">Router</span></td>
+                <td style="color:var(--accent-green);">100%</td>
+              </tr>
+              <tr>
+                <td class="device-name">macbookair</td>
+                <td>192.168.0.110</td>
+                <td><span class="band-pill band-5g">5G</span></td>
+                <td style="color:var(--accent);">85%</td>
+              </tr>
+              <tr>
+                <td class="device-name">Reolink-Camera</td>
+                <td>192.168.0.152</td>
+                <td><span class="band-pill band-24g">2.4G</span></td>
+                <td style="color:var(--accent-amber);">75%</td>
+              </tr>
+              <tr>
+                <td class="device-name">Huawei-Phone</td>
+                <td>192.168.0.247</td>
+                <td><span class="band-pill band-24g">2.4G</span></td>
+                <td style="color:var(--accent-amber);">65%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Center Column: Clock, 60 FPS Antigravity Pond & Speed/Weather ─── -->
+    <div class="cyber-col">
+
+      <!-- Centerpiece 1: Tactical System Time Clock Panel -->
+      <div class="cyber-panel center-clock-panel">
+        <div class="panel-header" style="border:none;margin-bottom:0;">
+          <div class="panel-title"><span>◆</span> SYSTEM TIME</div>
+          <div class="panel-tag measured" id="tz-badge">TZ: Bangladesh Standard Time</div>
+        </div>
+
+        <!-- Big Glowing Time Digits -->
+        <div class="clock-digits" id="tactical-time">00:00:00</div>
+        <div class="clock-date" id="tactical-date">18 SEPTEMBER 2026 · FRIDAY</div>
+
+        <!-- SEC and Nanosecond Progress Meters -->
+        <div class="clock-gauges">
+          <div class="clock-sec-row">
+            <span style="color:var(--text-muted);font-weight:700;width:24px;">SEC</span>
+            <div class="sec-track">
+              <div class="sec-fill" id="tactical-sec-bar" style="width: 50%;"></div>
+            </div>
+            <span style="color:var(--accent);font-weight:700;width:28px;" id="tactical-sec-val">30s</span>
+          </div>
+
+          <div class="clock-ns-row">
+            <span style="color:var(--text-muted);font-weight:700;width:24px;">ns</span>
+            <div class="ns-track">
+              <div class="ns-fill" id="tactical-ns-bar" style="width: 50%;"></div>
+            </div>
+            <span style="color:#7DD3FC;font-weight:700;width:110px;" id="tactical-ns-val">181,441,000 ns</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Centerpiece 2: 60 FPS Bioluminescent Antigravity Pond -->
+      <div class="pond-container">
+        <!-- Floating Cyber Command HUD Card -->
+        <div class="pond-floating-hud" id="pond-floating-hud" title="Click to cycle security status · Antigravity Buoyancy Active">
+          <div class="hud-left-brand">
+            <div class="hud-shield-badge">
+              <svg viewBox="0 0 24 24" class="hud-shield-svg">
+                <path d="M12 2L3 6v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V6l-9-4zm-1 15l-4-4 1.41-1.41L11 14.17l6.59-6.59L19 9l-8 8z"/>
+              </svg>
+            </div>
+            <div class="hud-title-col">
+              <div class="hud-welcome-title">WELCOME TO THE NAZMUL SECURITY WORLD</div>
+              <div class="hud-ticker-row">
+                <span class="hud-ticker-prefix">STATUS:</span>
+                <span class="hud-ticker-text" id="pond-hud-ticker">● NAZMUL DEFENSE MATRIX · INTEGRITY 100% · ZERO BREACH</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hud-right-badge">
+            <div class="hud-live-dot"></div>
+            <span>ANTIGRAVITY POND · 60 FPS</span>
+          </div>
+        </div>
+
+        <!-- 60 FPS Canvas -->
+        <canvas id="pond-canvas-embedded"></canvas>
+
+        <!-- Aquarium Footer Strip -->
+        <div class="pond-footer-strip">
+          <span>● 10 LIVE SPECIMENS · NANOSECOND BIOLUMINESCENT AQUARIUM</span>
+          <span>TEMP: 24.5°C · PURITY: 99.9% · SERENE</span>
+        </div>
+      </div>
+
+      <!-- Speed Test & Weather Row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <!-- Speed Test -->
+        <div class="cyber-panel" style="padding:8px 12px;">
+          <div class="panel-header" style="margin-bottom:4px;">
+            <div class="panel-title" style="font-size:8.5px;"><span>◆</span> SPEED TEST</div>
+            <div class="panel-tag measured" id="speedtest-tag">REAL TIME · 15s</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:8px;color:var(--text-secondary);">
+            <span>PING: <strong style="color:var(--accent-green);" id="ping-val">46 ms</strong></span>
+            <span>JITTER: <strong style="color:var(--accent-amber);" id="jitter-val">6 ms</strong></span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;margin-top:4px;">
+            <span>↓ <strong style="color:var(--accent);" id="speed-down">29.1 Mbps</strong></span>
+            <span>↑ <strong style="color:var(--accent-green);" id="speed-up">41.7 Mbps</strong></span>
+          </div>
+        </div>
+
+        <!-- Weather -->
+        <div class="cyber-panel" style="padding:8px 12px;">
+          <div class="panel-header" style="margin-bottom:4px;">
+            <div class="panel-title" style="font-size:8.5px;"><span>◆</span> WEATHER</div>
+            <div class="panel-tag measured" id="weather-tag">GOOGLE IP · LIVE</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-size:12px;font-weight:900;color:var(--accent-amber);" id="weather-temp">30°C / 86°F</div>
+              <div style="font-size:8px;color:var(--text-secondary);font-family:var(--font-mono);" id="weather-city">Partly Cloudy, Dhaka, Bangladesh</div>
+              <div style="font-size:7px;color:var(--accent);font-family:var(--font-mono);margin-top:1px;letter-spacing:0.2px;" id="weather-ip">IP: 27.147.233.21 · Link3 Technologies</div>
+            </div>
+            <div style="text-align:right;font-family:var(--font-mono);font-size:7.5px;color:var(--text-muted);line-height:1.4;">
+              <div id="weather-hum">HUM: 78%</div>
+              <div id="weather-wind">WIND: 6 km/h</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Right Column: Worldwide DDoS Surface, Visual Recon & Telemetry ── -->
+    <div class="cyber-col">
+
+      <!-- ─── 3D Antigravity Geospatial Orbital Globe Panel ────────────── -->
+      <div class="cyber-panel geospatial-panel" id="geospatial-panel">
+        <div class="panel-header" style="margin-bottom:6px;">
+          <div class="panel-title"><span>◆</span> WORLDWIDE DDoS SURFACE · BD DEFENSE</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="panel-tag" id="globe-fps">60 FPS</div>
+            <div class="panel-tag measured">CIRT ACTIVE</div>
+          </div>
+        </div>
+
+        <div class="globe-viewport" id="globe-viewport" title="Interactive 3D Globe · Drag to Rotate · Antigravity Field Active">
+          <!-- Corner HUD Targeting Brackets -->
+          <div class="globe-bracket top-left"></div>
+          <div class="globe-bracket bottom-right"></div>
+
+          <!-- 60 FPS HTML5 Canvas -->
+          <canvas id="globe-canvas"></canvas>
+
+          <!-- Top HUD Badges -->
+          <div class="globe-hud-top">
+            <span class="hud-pill" id="globe-threat-badge"><span class="hud-dot red"></span> DDoS: 564.6 Gbps</span>
+            <span class="hud-pill" id="globe-inc-badge">VECTORS: 6 ACTIVE</span>
+          </div>
+
+          <!-- Bottom HUD Metadata Overlay -->
+          <div class="globe-hud-bottom">
+            <div class="hud-loc">
+              <span style="color:var(--accent);font-weight:800;" id="globe-beacon-label">● HABIGANJ BEACON</span>
+              <span style="color:var(--text-muted);" id="globe-beacon-coord">24.37° N · 91.41° E</span>
+            </div>
+            <div class="hud-telemetry-badge" id="globe-velocity-badge">SHIELD: 100% MITIGATED</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── High-Definition Visual Recon Gallery Card ───────────────────── -->
+      <div class="gallery-panel" id="recon-gallery-panel">
+        <div class="panel-header" style="margin-bottom:6px;">
+          <div class="panel-title"><span>◆</span> VISUAL RECON · 4K ARCHIVE</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div class="panel-tag" id="gallery-counter">01 / 29</div>
+            <div class="panel-tag measured">HD 4K</div>
+          </div>
+        </div>
+
+        <div class="gallery-viewport" id="gallery-viewport" title="Click for Next Slide · Hover for Controls">
+          <!-- Holographic Scanline -->
+          <div class="gallery-scanline"></div>
+
+          <!-- Active and Upcoming Image Layers for Multi-Transition -->
+          <img id="gallery-img-curr" class="gallery-img-layer kb-zoom-in" src="Picture/Original%20Picture/IMG_0298.JPG" alt="HD Visual Recon" />
+          <img id="gallery-img-next" class="gallery-img-layer" style="opacity:0; pointer-events:none;" src="" alt="HD Visual Recon Next" />
+
+          <!-- Interactive Hover Controls -->
+          <div class="gallery-controls">
+            <button class="gallery-btn" id="gallery-btn-prev" title="Previous Image">❮</button>
+            <div style="display:flex;gap:6px;">
+              <button class="gallery-btn" id="gallery-btn-play" title="Pause / Resume Slideshow">⏸</button>
+            </div>
+            <button class="gallery-btn" id="gallery-btn-next" title="Next Image">❯</button>
+          </div>
+
+          <!-- Bottom Metadata Overlay & Transition Progress -->
+          <div class="gallery-meta-strip">
+            <div class="gallery-progress-bar" id="gallery-progress-bar"></div>
+            <div style="display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;">
+              <span style="color:var(--accent);font-weight:700;" id="gallery-filename">IMG_0298.JPG</span>
+              <span style="color:var(--text-muted);">|</span>
+              <span id="gallery-res">3672×2066 · RAW</span>
+            </div>
+            <div style="color:var(--accent-green);font-weight:700;white-space:nowrap;" id="gallery-mode-badge">KEN BURNS</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Telemetry Stream Terminal -->
+      <div class="cyber-panel">
+        <div class="panel-header" style="margin-bottom:6px;">
+          <div class="panel-title"><span>◆</span> LIVE TELEMETRY</div>
+          <div class="panel-tag measured">MEASURED</div>
+        </div>
+
+        <div class="terminal-stream" id="terminal-stream">
+          <div class="term-line"><span class="term-time">[09:14:51]</span> <span class="term-tag conn">[SOC]</span> <span class="term-msg">Observed connection to 4.145.11.36:80</span></div>
+          <div class="term-line"><span class="term-time">[09:14:50]</span> <span class="term-tag ok">[CONN]</span> <span class="term-msg">Path open: local -> 4.145.11.36:443 (svchost)</span></div>
+          <div class="term-line"><span class="term-time">[09:14:48]</span> <span class="term-tag warn">[DNS]</span> <span class="term-msg">Query lookup: resolved 13.107.5.93</span></div>
+          <div class="term-line"><span class="term-time">[09:14:40]</span> <span class="term-tag conn">[SOC]</span> <span class="term-msg">Observed connection to 13.107.5.93:80</span></div>
+          <div class="term-line"><span class="term-time">[09:14:38]</span> <span class="term-tag ok">[CONN]</span> <span class="term-msg">Path open: local -> 4.150.223.138:443</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ─── Footer Strip ────────────────────────────────────────────────────── -->
+  <footer class="cyber-footer">
+    <div class="footer-left">
+      <span style="color:var(--accent-amber);font-weight:800;">● ETHICAL USE NOTICE</span>
+      <span style="color:var(--text-secondary);">| Local system monitoring only | No unauthorized scanning | Ethical use only</span>
+    </div>
+    <div class="footer-right">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 6px var(--accent-green);display:inline-block;"></span>
+      <span>InfoSphere v2.2.0 · Intelligent Live Engine · 2026</span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ─── Embedded 60 FPS Antigravity Pond & Live Real-Time Scripts ─────────── -->
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 0. WALLPAPER LOCKDOWN — Kill all browser-page behaviours
+//    No context menu, no text selection, no drag ghost, no text cursor.
+//    Must run before everything else so no child handler can re-enable them.
+// ═══════════════════════════════════════════════════════════════════════════
+(function wallpaperLockdown() {
+  // Block right-click context menu (shows "Inspect", "Save As" etc. in WebView2)
+  document.addEventListener('contextmenu', function(e) { e.preventDefault(); e.stopPropagation(); return false; }, true);
+
+  // Block text/element selection (prevents blue highlight when hovering/dragging)
+  document.addEventListener('selectstart', function(e) { e.preventDefault(); e.stopPropagation(); return false; }, true);
+
+  // Block native drag (prevents ghosting when dragging images or text)
+  document.addEventListener('dragstart',   function(e) { e.preventDefault(); e.stopPropagation(); return false; }, true);
+
+  // Block middle-click scroll (auto-scroll cursor icon)
+  document.addEventListener('mousedown', function(e) { if (e.button === 1) { e.preventDefault(); } }, true);
+
+  // Guarantee the cursor never becomes a text I-beam
+  // (CSS already sets cursor:default !important, this is a JS safety net)
+  document.addEventListener('mouseover', function(e) {
+    if (e.target && e.target.style) {
+      e.target.style.cursor = 'default';
+    }
+  }, true);
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 1. DYNAMIC THEME SYSTEM
+// ═══════════════════════════════════════════════════════════════════════════
+const rootEl = document.documentElement;
+const themeBtns = document.querySelectorAll('.theme-btn');
+
+function setTheme(theme) {
+  rootEl.setAttribute('data-theme', theme);
+  localStorage.setItem('infosphere-theme', theme);
+  themeBtns.forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.setTheme === theme);
+  });
+}
+
+const savedTheme = localStorage.getItem('infosphere-theme') || 'cyber-cyan';
+setTheme(savedTheme);
+
+themeBtns.forEach(btn => {
+  btn.addEventListener('click', () => setTheme(btn.dataset.setTheme));
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 2. EMBEDDED 60 FPS 10-FISH BIOLUMINESCENT POND
+// ═══════════════════════════════════════════════════════════════════════════
+const pCanvas = document.getElementById('pond-canvas-embedded');
+const pCtx    = pCanvas.getContext('2d');
+
+let pW = 0, pH = 0;
+function resizePond() {
+  const rect = pCanvas.parentElement.getBoundingClientRect();
+  pW = pCanvas.width = rect.width;
+  pH = pCanvas.height = rect.height;
+}
+resizePond();
+window.addEventListener('resize', resizePond);
+
+// ── Image Sprites ──
+const realKoiImg = new Image();
+realKoiImg.src = 'img/side_goldfish.png';
+
+
+// ── Dynamic Fish Populations ──
+const POND_SPECIES = [
+  // Large Koi & Goldfish
+  { name: 'Neon Cyan',   body: [0, 245, 255], fin: [0, 180, 220],   tail: [100, 240, 255], glow: [0, 245, 255],   shim: 0,   spd: 1.15, scale: 1.15, phase: 0.2, bx_r: 0.12, by_r: 0.45, isLarge: true },
+  { name: 'Gold Ogon',   body: [255, 183, 3], fin: [255, 220, 80],  tail: [255, 200, 50],  glow: [255, 183, 3],   shim: 35,  spd: 1.05, scale: 1.18, phase: 1.5, bx_r: 0.22, by_r: 0.12, isLarge: true },
+  { name: 'Kohaku',      body: [255, 59, 0],  fin: [255, 130, 80],  tail: [255, 100, 60],  glow: [255, 59, 0],    shim: 15,  spd: 1.10, scale: 1.12, phase: 2.7, bx_r: 0.30, by_r: 0.60, isLarge: true },
+  
+  // Tiny Neon Tetras (Fast, small, blue)
+  { name: 'Neon Tetra',  body: [0, 190, 255], fin: [0, 100, 200],  tail: [0, 150, 255],  glow: [0, 255, 255],   shim: 0,   spd: 1.80, scale: 0.35, phase: 0.5, bx_r: 0.15, by_r: 0.30, isLarge: false },
+  // Tiny Ember Tetras (Fast, small, red/orange)
+  { name: 'Ember Tetra', body: [255, 80, 30], fin: [200, 50, 10],  tail: [255, 100, 50], glow: [255, 120, 50],  shim: 20,  spd: 1.70, scale: 0.30, phase: 1.2, bx_r: 0.45, by_r: 0.80, isLarge: false },
+  // Tiny Emerald Rasboras (Fast, small, green)
+  { name: 'Emerald',     body: [30, 220, 100],fin: [10, 150, 80],  tail: [50, 255, 120], glow: [50, 255, 150],  shim: 140, spd: 1.75, scale: 0.32, phase: 3.1, bx_r: 0.70, by_r: 0.20, isLarge: false },
+];
+
+const pondFishList = [];
+const TOTAL_FISH = 40;
+
+for (let i = 0; i < TOTAL_FISH; i++) {
+  // Determine species: 10 large fish, 30 tiny school fish
+  let cfgTemplate;
+  if (i < 10) {
+    // Pick a random large koi/goldfish
+    const largeSpecies = POND_SPECIES.filter(s => s.isLarge);
+    cfgTemplate = largeSpecies[i % largeSpecies.length];
+  } else {
+    // Pick a random tiny tetra
+    const tinySpecies = POND_SPECIES.filter(s => !s.isLarge);
+    cfgTemplate = tinySpecies[i % tinySpecies.length];
+  }
+
+  // Clone config to allow individual variation
+  const cfg = { ...cfgTemplate };
+  
+  // Add slight individual size and speed variations
+  cfg.scale *= (0.8 + Math.random() * 0.4);
+  cfg.spd *= (0.8 + Math.random() * 0.4);
+
+  const w = Math.max(800, window.innerWidth);
+  const h = Math.max(600, window.innerHeight);
+  const x = w * (0.1 + Math.random() * 0.8);
+  const y = h * (0.1 + Math.random() * 0.8);
+  const segments = Array.from({length: 12}, () => ({x, y}));
+  
+  pondFishList.push({
+    cfg, x, y,
+    vx: (Math.random() - 0.5) * 50,
+    vy: (Math.random() - 0.5) * 50,
+    targetX: x, targetY: y,
+    targetWait: Math.random() * 2,
+    heading: 0,
+    segments,
+    scatter: false, scatterVx: 0, scatterVy: 0, scatterTime: 0,
+    feeding: false, feedX: 0, feedY: 0,
+    glowPulse: Math.random() * Math.PI * 2,
+    wigglePhase: Math.random() * 100
+  });
+}
+
+const pRipples = [];
+const pPellets = [];
+let pMouseX = -9999, pMouseY = -9999;
+
+// Standard HTML mouse events (works in browser but blocked by desktop layer)
+pCanvas.addEventListener('mousemove', e => {
+  const rect = pCanvas.getBoundingClientRect();
+  pMouseX = e.clientX - rect.left;
+  pMouseY = e.clientY - rect.top;
+});
+pCanvas.addEventListener('mouseleave', () => { pMouseX = -9999; pMouseY = -9999; });
+
+// Native Bridge for Global Desktop Mouse Tracking (bypasses Windows desktop block)
+let lastLbtnDown = false;
+let lastHoverEl = null;
+
+setInterval(() => {
+  if (window.pywebview && window.pywebview.api && window.pywebview.api.get_mouse) {
+    window.pywebview.api.get_mouse().then(coords => {
+      if (coords && coords.length >= 3) {
+        const dpr = window.devicePixelRatio || 1;
+        const cssX = coords[0] / dpr;
+        const cssY = coords[1] / dpr;
+        const lbtnDown = Boolean(coords[2]);
+        
+        // Element under cursor
+        const el = document.elementFromPoint(cssX, cssY);
+        
+        // Continuous mousemove dispatch for hover states & drag
+        if (el) {
+          if (el !== lastHoverEl) {
+            if (lastHoverEl) {
+              lastHoverEl.dispatchEvent(new MouseEvent('mouseleave', { bubbles: false, clientX: cssX, clientY: cssY }));
+            }
+            el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: false, clientX: cssX, clientY: cssY }));
+            lastHoverEl = el;
+          }
+          el.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, cancelable: true, clientX: cssX, clientY: cssY }));
+        }
+
+        // Pond canvas coordinate translation
+        if (pCanvas) {
+          const rect = pCanvas.getBoundingClientRect();
+          const localX = cssX - rect.left;
+          const localY = cssY - rect.top;
+          
+          if (localX >= 0 && localY >= 0 && localX <= rect.width && localY <= rect.height) {
+            pMouseX = localX;
+            pMouseY = localY;
+          } else {
+            pMouseX = -9999;
+            pMouseY = -9999;
+          }
+
+          // Handle click simulation (mouse button down edge trigger)
+          if (lbtnDown && !lastLbtnDown) {
+            // 1. Check if clicking inside pond
+            if (localX >= 0 && localY >= 0 && localX <= rect.width && localY <= rect.height) {
+              pRipples.push({ x: localX, y: localY, r: 2, maxR: 45, alpha: 0.9, spd: 1.5, color: [0, 229, 255] });
+              pPellets.push({ x: localX, y: localY, eaten: false, alpha: 1 });
+              pondFishList.forEach(f => {
+                f.feeding = true;
+                f.feedX = localX + (Math.random() - 0.5) * 30;
+                f.feedY = localY + (Math.random() - 0.5) * 30;
+              });
+            }
+
+            // 2. Synthesize click event for any interactive UI element (theme buttons, gallery, globe, HUD)
+            if (el) {
+              el.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true, clientX: cssX, clientY: cssY, button: 0 }));
+              el.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true, clientX: cssX, clientY: cssY, button: 0 }));
+              el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: cssX, clientY: cssY, button: 0 }));
+            }
+          }
+        }
+        
+        lastLbtnDown = lbtnDown;
+      }
+    }).catch(() => {});
+  }
+}, 16);
+
+pCanvas.addEventListener('click', e => {
+  const rect = pCanvas.getBoundingClientRect();
+  const cx = e.clientX - rect.left;
+  const cy = e.clientY - rect.top;
+  pRipples.push({ x: cx, y: cy, r: 2, maxR: 45, alpha: 0.9, spd: 1.5, color: [0, 229, 255] });
+  pPellets.push({ x: cx, y: cy, eaten: false, alpha: 1 });
+  pondFishList.forEach(f => {
+    f.feeding = true;
+    f.feedX = cx + (Math.random() - 0.5) * 30;
+    f.feedY = cy + (Math.random() - 0.5) * 30;
+  });
+});
+
+function drawEmbeddedPond(t_ns, t_sec, dt) {
+  if (pW <= 0 || pH <= 0) return;
+
+  // Clear canvas to let the CSS aquarium background show through
+  pCtx.clearRect(0, 0, pW, pH);
+
+  // Interactive Ripples
+  for (let i = pRipples.length - 1; i >= 0; i--) {
+    const rp = pRipples[i];
+    rp.r += rp.spd * dt * 60;
+    rp.alpha = Math.max(0, 0.9 * (1 - rp.r / rp.maxR));
+    if (rp.alpha <= 0 || rp.r >= rp.maxR) { pRipples.splice(i, 1); continue; }
+    pCtx.strokeStyle = `rgba(${rp.color.join(',')}, ${rp.alpha.toFixed(2)})`;
+    pCtx.lineWidth = 1.2;
+    pCtx.beginPath();
+    pCtx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.6, 0, 0, Math.PI * 2);
+    pCtx.stroke();
+  }
+
+  // Pellets
+  for (let i = pPellets.length - 1; i >= 0; i--) {
+    const p = pPellets[i];
+    if (p.eaten) {
+      p.alpha -= dt * 3;
+      if (p.alpha <= 0) { pPellets.splice(i, 1); continue; }
+    }
+    pCtx.fillStyle = '#f59e0b';
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    pCtx.fill();
+  }
+
+  // Ultra-Realistic Fluid Kinematics
+  for (const f of pondFishList) {
+    const sc = f.cfg;
+    const baseSpd = sc.spd * 45; // Pixels per second
+    
+    // Scatter logic (avoid mouse pointer)
+    const dMouse = Math.hypot(f.x - pMouseX, f.y - pMouseY);
+    if (dMouse < 150) {
+      f.scatter = true;
+      f.scatterTime = 1.2;
+      const ang = Math.atan2(f.y - pMouseY, f.x - pMouseX);
+      f.scatterVx = Math.cos(ang) * baseSpd * 5;
+      f.scatterVy = Math.sin(ang) * baseSpd * 5;
+    }
+
+    if (f.scatter) {
+      f.scatterTime -= dt;
+      if (f.scatterTime <= 0) f.scatter = false;
+    }
+
+    // Feeding logic
+    if (f.feeding) {
+      const dx = f.feedX - f.x, dy = f.feedY - f.y;
+      const d = Math.hypot(dx, dy);
+      if (d < 15) {
+        f.feeding = false;
+        pPellets.forEach(p => { if (!p.eaten && Math.hypot(p.x - f.x, p.y - f.y) < 30) p.eaten = true; });
+      }
+    }
+
+    // Autonomous Wandering target selection
+    if (!f.scatter && !f.feeding) {
+      if (f.targetWait > 0) {
+        f.targetWait -= dt;
+      } else {
+        const dx = f.targetX - f.x;
+        const dy = f.targetY - f.y;
+        if (Math.hypot(dx, dy) < 25) {
+          const pad = 60;
+          f.targetX = pad + Math.random() * (pW - pad * 2);
+          f.targetY = pad + Math.random() * (pH - pad * 2);
+          f.targetWait = Math.random() * 2.5; // Rest briefly
+        }
+      }
+    }
+
+    // Steering behavior
+    let desiredVx = 0;
+    let desiredVy = 0;
+    
+    if (f.scatter) {
+      desiredVx = f.scatterVx;
+      desiredVy = f.scatterVy;
+    } else if (f.feeding) {
+      const dx = f.feedX - f.x, dy = f.feedY - f.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 0) { desiredVx = (dx/d) * baseSpd * 2.0; desiredVy = (dy/d) * baseSpd * 2.0; }
+    } else if (f.targetWait <= 0) {
+      const dx = f.targetX - f.x, dy = f.targetY - f.y;
+      const d = Math.hypot(dx, dy);
+      if (d > 0) { desiredVx = (dx/d) * baseSpd; desiredVy = (dy/d) * baseSpd; }
+    } else {
+      // Gliding while resting
+      desiredVx = Math.cos(f.heading) * baseSpd * 0.15;
+      desiredVy = Math.sin(f.heading) * baseSpd * 0.15;
+    }
+
+    // Apply steering
+    const steerForce = f.scatter ? 5.0 * dt : 1.5 * dt;
+    f.vx += (desiredVx - f.vx) * steerForce;
+    f.vy += (desiredVy - f.vy) * steerForce;
+
+    // Update Head Position
+    f.x += f.vx * dt;
+    f.y += f.vy * dt;
+    
+    // Hard boundary bounce to prevent sticking
+    if (f.x <= 20 || f.x >= pW - 20) {
+      f.vx *= -1.2;
+      f.x = Math.max(25, Math.min(pW-25, f.x));
+      f.targetX = pW/2;
+      f.targetWait = 0;
+    }
+    if (f.y <= 20 || f.y >= pH - 20) {
+      f.vy *= -1.2;
+      f.y = Math.max(25, Math.min(pH-25, f.y));
+      f.targetY = pH/2;
+      f.targetWait = 0;
+    }
+
+    // Wiggle logic (adds natural side-to-side oscillation based on swimming speed)
+    const vSpeed = Math.hypot(f.vx, f.vy);
+    if (vSpeed > 1.0) f.heading = Math.atan2(f.vy, f.vx);
+    const speedRatio = Math.min(1.0, vSpeed / baseSpd);
+    
+    // Add nanosecond shimmer and wiggle wave to the trajectory
+    f.wigglePhase += dt * (speedRatio * 15 + 2);
+    const wiggle = Math.sin(f.wigglePhase) * 0.25 * speedRatio;
+    const drawHeading = f.heading + wiggle;
+
+    // ── Inverse Kinematics (IK) Segment Update ──
+    f.segments[0] = { x: f.x, y: f.y };
+    const segDist = 4.0 * sc.scale;
+    for (let i = 1; i < f.segments.length; i++) {
+      const prev = f.segments[i - 1];
+      const curr = f.segments[i];
+      const dx = prev.x - curr.x;
+      const dy = prev.y - curr.y;
+      const d = Math.hypot(dx, dy);
+      if (d > segDist) {
+        curr.x = prev.x - (dx / d) * segDist;
+        curr.y = prev.y - (dy / d) * segDist;
+      }
+    }
+
+    // ── Drawing the True Procedural Fish ──
+    // ── Drawing the Side-View Aquarium Fish Sprite ──
+    pCtx.save();
+    
+    // Draw Drop Shadow
+    pCtx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+    pCtx.shadowBlur = 15;
+    pCtx.shadowOffsetX = 10;
+    pCtx.shadowOffsetY = 15;
+    
+    pCtx.translate(f.x, f.y);
+    
+    // Side-view logic: The fish sprite naturally faces LEFT.
+    // If swimming right (vx > 0), flip horizontally.
+    const isSwimmingRight = f.vx > 0;
+    
+    // Add a slight pitch based on vertical velocity
+    let pitch = Math.atan2(f.vy, Math.abs(f.vx)) * 0.5; // subtle pitch up/down
+    
+    // Add a subtle wobble to simulate fin strokes
+    pitch += Math.sin(f.wigglePhase) * 0.05;
+    
+    if (isSwimmingRight) {
+      pCtx.scale(-1, 1);
+      pCtx.rotate(-pitch); // invert pitch because we scaled X
+    } else {
+      pCtx.rotate(pitch);
+    }
+    
+    // Size is scaled appropriately for the side view - small fish!
+    const spriteW = 45 * sc.scale;
+    const spriteH = 45 * sc.scale;
+    
+    if (realKoiImg.complete && realKoiImg.naturalWidth > 0) {
+      pCtx.drawImage(realKoiImg, -spriteW/2, -spriteH/2, spriteW, spriteH);
+      
+      // Dynamic Tinting based on the species color
+      // 'hue' keeps the vibrant brightness of the orange sprite but shifts its hue!
+      pCtx.globalCompositeOperation = 'hue';
+      pCtx.fillStyle = `rgb(${sc.body.join(',')})`; 
+      
+      // Draw an ellipse over the body to colorize it
+      pCtx.beginPath();
+      pCtx.ellipse(0, 0, spriteW*0.35, spriteH*0.2, 0, 0, Math.PI*2);
+      pCtx.fill();
+    }
+    
+    pCtx.restore();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3. REAL-TIME CLOCK & CONTINUOUS ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════════════════════
+const monthNames = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+const dayNames   = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+
+let lastLoopTime = performance.now();
+
+function mainLoop(now_ms) {
+  requestAnimationFrame(mainLoop);
+
+  const dt = Math.min((now_ms - lastLoopTime) / 1000, 0.05);
+  lastLoopTime = now_ms;
+  if (dt <= 0) return;
+
+  const t_sec = now_ms / 1000;
+  const now   = new Date();
+
+  // 1. Clock Updates
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  const s = String(now.getSeconds()).padStart(2, '0');
+  const timeStr = `${h}:${m}:${s}`;
+
+  const ms = now.getMilliseconds();
+  const subMs = (performance.now() % 1);
+  const totalNs = Math.floor((ms + subMs) * 1000000);
+  const nsStr = `${totalNs.toLocaleString()} ns`;
+
+  // Center Tactical Clock
+  document.getElementById('tactical-time').textContent = timeStr;
+  document.getElementById('hdr-clock').textContent = timeStr;
+  document.getElementById('tactical-date').textContent =
+    `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} · ${dayNames[now.getDay()]}`;
+
+  // Gauge Bars
+  const secPct = (now.getSeconds() + ms / 1000) / 60;
+  document.getElementById('tactical-sec-bar').style.width = `${(secPct * 100).toFixed(1)}%`;
+  document.getElementById('tactical-sec-val').textContent = `${s}s`;
+
+  const nsPct = (ms * 1000000 + subMs * 1000000) / 1000000000;
+  document.getElementById('tactical-ns-bar').style.width = `${(nsPct * 100).toFixed(1)}%`;
+  document.getElementById('tactical-ns-val').textContent = nsStr;
+
+  // 2. Draw Pond
+  drawEmbeddedPond(now_ms, t_sec, dt);
+}
+requestAnimationFrame(mainLoop);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 4. REAL-TIME GO HUB SSE TELEMETRY STREAM & REACTIVE AUTO-UPDATE
+// ═══════════════════════════════════════════════════════════════════════════
+// Pre-cached DOM Registry for zero DOM lookups in hot loop (RAM & CPU Optimization)
+const dom = {
+  // System Health
+  cpuFill: document.getElementById('cpu-fill'),
+  cpuVal: document.getElementById('cpu-val'),
+  ramFill: document.getElementById('ram-fill'),
+  ramVal: document.getElementById('ram-val'),
+  diskFill: document.getElementById('disk-fill'),
+  diskVal: document.getElementById('disk-val'),
+  tempFill: document.getElementById('temp-fill'),
+  tempVal: document.getElementById('temp-val'),
+  procFill: document.getElementById('proc-fill'),
+  procVal: document.getElementById('proc-val'),
+  uptimeVal: document.getElementById('uptime-val'),
+  totProcVal: document.getElementById('tot-proc-val'),
+  spectrumBars: document.getElementById('spectrum-bars'),
+
+  // Network & Telemetry
+  netIp: document.getElementById('net-ip'),
+  netHost: document.getElementById('net-host'),
+  wifiSsid: document.getElementById('wifi-ssid'),
+  wifiSigBar: document.getElementById('wifi-sig-bar'),
+  wifiSigVal: document.getElementById('wifi-sig-val'),
+  wifiLinkSpeed: document.getElementById('wifi-link-speed'),
+  wifiStatusPill: document.getElementById('wifi-status-pill'),
+  txRate: document.getElementById('tx-rate'),
+  rxRate: document.getElementById('rx-rate'),
+
+  // Header Host Info
+  hostName: document.getElementById('host-name'),
+  hostOs: document.getElementById('host-os'),
+
+  // Speed Test
+  speedtestTag: document.getElementById('speedtest-tag'),
+  pingVal: document.getElementById('ping-val'),
+  jitterVal: document.getElementById('jitter-val'),
+  speedDown: document.getElementById('speed-down'),
+  speedUp: document.getElementById('speed-up'),
+
+  // Weather
+  weatherTag: document.getElementById('weather-tag'),
+  weatherTemp: document.getElementById('weather-temp'),
+  weatherCity: document.getElementById('weather-city'),
+  weatherIp: document.getElementById('weather-ip'),
+  weatherHum: document.getElementById('weather-hum'),
+  weatherWind: document.getElementById('weather-wind'),
+
+  // Security Posture
+  secScore: document.getElementById('sec-score'),
+  secCircle: document.getElementById('sec-circle'),
+  secFw: document.getElementById('sec-fw'),
+  secRouterStatus: document.getElementById('sec-router-status'),
+  secTelemStatus: document.getElementById('sec-telem-status'),
+  secAlerts: document.getElementById('sec-alerts'),
+  secShield: document.getElementById('sec-shield'),
+
+  // Router Monitor
+  routerOnline: document.getElementById('router-online'),
+  routerBand5g: document.getElementById('router-band-5g'),
+  routerBand24g: document.getElementById('router-band-24g'),
+  routerBandWired: document.getElementById('router-band-wired'),
+  routerTbody: document.getElementById('router-tbody'),
+
+  // Live Telemetry
+  terminalStream: document.getElementById('terminal-stream')
+};
+
+// Dirty-checking helpers to prevent unnecessary browser layout reflows and minimize RAM
+function updateText(el, val) {
+  if (el && el.textContent !== String(val)) {
+    el.textContent = val;
+  }
+}
+
+function updateWidth(el, pct) {
+  if (el) {
+    const w = `${pct}%`;
+    if (el.style.width !== w) el.style.width = w;
+  }
+}
+
+function applySnapshot(data) {
+  if (!data) return;
+  if (data.geospatial) {
+    window.__geospatialData = data.geospatial;
+  }
+  const m = data.metrics || {};
+  const s = data.system || {};
+
+  // ── 1. System Health Panel ────────────────────────────────────────────────
+  // CPU
+  if (m.cpu !== undefined || s.cpu_percent !== undefined) {
+    const cpuPct = Number(m.cpu !== undefined ? m.cpu : s.cpu_percent).toFixed(1);
+    updateWidth(dom.cpuFill, cpuPct);
+    updateText(dom.cpuVal, `${cpuPct}%`);
+  }
+
+  // RAM
+  if (m.ram && m.ram.total) {
+    const usedGB = (m.ram.used / (1024 ** 3)).toFixed(1);
+    const totGB  = (m.ram.total / (1024 ** 3)).toFixed(1);
+    const ramPct = (m.ram.pct || (m.ram.used / m.ram.total * 100)).toFixed(1);
+    updateWidth(dom.ramFill, ramPct);
+    updateText(dom.ramVal, `${usedGB} / ${totGB} GB`);
+  } else if (s.ram_used_gb !== undefined && s.ram_total_gb !== undefined) {
+    const ramPct = (s.ram_percent || (s.ram_used_gb / s.ram_total_gb * 100)).toFixed(1);
+    updateWidth(dom.ramFill, ramPct);
+    updateText(dom.ramVal, `${s.ram_used_gb.toFixed(1)} / ${s.ram_total_gb.toFixed(1)} GB`);
+  }
+
+  // Disk
+  if (m.disks && m.disks.length > 0) {
+    const d = m.disks[0];
+    const diskPct = Number(d.pct || 0).toFixed(1);
+    updateWidth(dom.diskFill, diskPct);
+    if (d.total_gb && s.disk_used_gb) {
+      updateText(dom.diskVal, `${s.disk_used_gb.toFixed(0)} / ${d.total_gb.toFixed(0)} GB`);
+    } else {
+      updateText(dom.diskVal, `${diskPct}%`);
+    }
+  }
+
+  // Temperature Estimate
+  const temp = (m.temperature && m.temperature.value_c) || s.cpu_temp || 0;
+  if (temp > 0) {
+    const tempNum = Number(temp).toFixed(1);
+    updateText(dom.tempVal, `${tempNum}°C`);
+    const tempPct = Math.min(100, Math.max(0, (temp / 100) * 100)).toFixed(1);
+    updateWidth(dom.tempFill, tempPct);
+    if (dom.tempFill) {
+      if (temp > 78) dom.tempFill.style.background = 'var(--accent-red)';
+      else if (temp > 62) dom.tempFill.style.background = 'var(--accent-amber)';
+      else dom.tempFill.style.background = 'linear-gradient(90deg, var(--accent-green), var(--accent))';
+    }
+  }
+
+  // OS Processes & Total Processes
+  const procCount = s.process_count || 0;
+  if (procCount > 0) {
+    updateText(dom.procVal, `${procCount} Active`);
+    updateText(dom.totProcVal, procCount);
+    const procPct = Math.min(100, Math.max(5, (procCount / 500) * 100)).toFixed(1);
+    updateWidth(dom.procFill, procPct);
+  }
+
+  // System Uptime
+  const uptime = s.uptime || '';
+  if (uptime) {
+    updateText(dom.uptimeVal, uptime);
+  }
+
+  // CPU Core Frequency Spectrum (C0–C7)
+  const cores = s.cpu_cores || [];
+  if (cores.length > 0 && dom.spectrumBars) {
+    const fills = dom.spectrumBars.querySelectorAll('.spectrum-fill');
+    for (let i = 0; i < fills.length; i++) {
+      const cVal = cores[i % cores.length] || 0;
+      const h = `${Math.max(10, Math.min(100, cVal))}%`;
+      if (fills[i].style.height !== h) {
+        fills[i].style.height = h;
+        if (cVal > 85) fills[i].style.background = 'var(--accent-red)';
+        else if (cVal > 65) fills[i].style.background = 'var(--accent-amber)';
+        else fills[i].style.background = 'var(--accent)';
+      }
+    }
+  }
+
+  // ── 2. Network & Telemetry Panel ──────────────────────────────────────────
+  if (s.local_ip) updateText(dom.netIp, s.local_ip);
+  if (s.hostname) {
+    updateText(dom.netHost, s.hostname);
+    updateText(dom.hostName, s.hostname);
+  }
+  if (s.os_name) {
+    const op = s.username ? s.username.toUpperCase() : 'NAZMU';
+    updateText(dom.hostOs, `${s.os_name} · OPERATOR: ${op}`);
+  }
+
+  // Wireless Interface & Signal
+  if (s.wifi_ssid && s.wifi_ssid !== 'N/A') {
+    updateText(dom.wifiSsid, s.wifi_ssid);
+  }
+  if (s.wifi_signal && s.wifi_signal !== 'N/A') {
+    const sigPct = parseInt(s.wifi_signal) || 100;
+    updateWidth(dom.wifiSigBar, sigPct);
+    updateText(dom.wifiSigVal, `${sigPct}%`);
+  }
+  if (s.wifi_speed && s.wifi_speed !== 'N/A') {
+    updateText(dom.wifiLinkSpeed, `LINK: ${s.wifi_speed}`);
+  }
+  if (s.wifi_status) {
+    updateText(dom.wifiStatusPill, `● ${s.wifi_status}`);
+    if (dom.wifiStatusPill) {
+      dom.wifiStatusPill.style.color = s.wifi_status === 'CONNECTED' ? 'var(--accent-green)' : 'var(--accent-amber)';
+    }
+  }
+
+  // Throughput Rates
+  if (s.net_tx_speed) {
+    updateText(dom.txRate, s.net_tx_speed);
+  } else if (s.net_tx_kbps !== undefined) {
+    updateText(dom.txRate, `${s.net_tx_kbps.toFixed(1)} KB/s`);
+  }
+  if (s.net_rx_speed) {
+    updateText(dom.rxRate, s.net_rx_speed);
+  } else if (s.net_rx_kbps !== undefined) {
+    updateText(dom.rxRate, `${s.net_rx_kbps.toFixed(1)} KB/s`);
+  }
+
+  // ── 3. Speed Test Panel ───────────────────────────────────────────────────
+  if (data.speedtest) {
+    const st = data.speedtest;
+    const tagText = (st._next_in_s !== undefined && st._next_in_s > 0)
+      ? `REAL TIME · ${st._next_in_s}s`
+      : 'REAL TIME · 15s';
+    updateText(dom.speedtestTag, tagText);
+    if (st.ping_ms !== undefined && Number(st.ping_ms) > 0) updateText(dom.pingVal, `${Number(st.ping_ms).toFixed(0)} ms`);
+    if (st.jitter_ms !== undefined) updateText(dom.jitterVal, `${Number(st.jitter_ms).toFixed(0)} ms`);
+    if (st.download_mbps !== undefined) updateText(dom.speedDown, `${Number(st.download_mbps).toFixed(1)} Mbps`);
+    if (st.upload_mbps !== undefined) updateText(dom.speedUp, `${Number(st.upload_mbps).toFixed(1)} Mbps`);
+  }
+
+  // ── 4. Weather Panel ──────────────────────────────────────────────────────
+  if (data.weather) {
+    const w = data.weather;
+    updateText(dom.weatherTag, 'GOOGLE IP · LIVE');
+    if (w.temp) updateText(dom.weatherTemp, w.temp);
+    if (w.condition || w.location) {
+      updateText(dom.weatherCity, `${w.condition || 'Clear'}, ${w.location || 'Local'}`);
+    }
+    if (w.ip_summary) {
+      updateText(dom.weatherIp, w.ip_summary);
+    } else if (w.ip) {
+      const cleanIsp = (w.isp || 'Link3 Technologies').replace('Limited','').replace('Ltd','').trim();
+      updateText(dom.weatherIp, `IP: ${w.ip} · ${cleanIsp}`);
+    }
+    if (w.humidity) updateText(dom.weatherHum, `HUM: ${w.humidity}`);
+    if (w.wind) updateText(dom.weatherWind, `WIND: ${w.wind}`);
+  }
+
+  // ── 5. Security Posture Panel ─────────────────────────────────────────────
+  const secScore = (s.security_score !== undefined) ? s.security_score : 100;
+  updateText(dom.secScore, secScore);
+  if (dom.secCircle) {
+    // Circle circumference = 2 * PI * 45 = 282.74
+    const offset = Math.max(0, 283 * (1 - secScore / 100));
+    dom.secCircle.style.strokeDashoffset = offset;
+    if (secScore >= 90) {
+      dom.secCircle.style.stroke = 'var(--accent-green)';
+      if (dom.secScore) dom.secScore.style.color = 'var(--accent-green)';
+    } else if (secScore >= 70) {
+      dom.secCircle.style.stroke = 'var(--accent-amber)';
+      if (dom.secScore) dom.secScore.style.color = 'var(--accent-amber)';
+    } else {
+      dom.secCircle.style.stroke = 'var(--accent-red)';
+      if (dom.secScore) dom.secScore.style.color = 'var(--accent-red)';
+    }
+  }
+  if (s.firewall_status) {
+    updateText(dom.secFw, s.firewall_status);
+    if (dom.secFw) {
+      dom.secFw.style.color = s.firewall_status === 'ACTIVE' ? 'var(--accent-green)' : 'var(--accent-red)';
+    }
+  }
+  if (data.router && data.router.status) {
+    updateText(dom.secRouterStatus, data.router.status);
+  }
+  if (s.threat_count !== undefined) {
+    updateText(dom.secAlerts, `${s.threat_count} DETECTED`);
+    if (dom.secAlerts) {
+      dom.secAlerts.style.color = s.threat_count === 0 ? 'var(--accent-green)' : 'var(--accent-amber)';
+      dom.secAlerts.style.fontWeight = '700';
+    }
+  }
+  if (s.shield_status) {
+    updateText(dom.secShield, s.shield_status);
+    if (dom.secShield) {
+      dom.secShield.style.color = s.shield_status === 'SECURE' ? 'var(--accent)' : 'var(--accent-amber)';
+      dom.secShield.style.fontWeight = '700';
+    }
+  }
+
+  // ── 6. Router Monitor Panel ───────────────────────────────────────────────
+  if (data.router) {
+    const r = data.router;
+    if (r.total_online !== undefined) updateText(dom.routerOnline, r.total_online);
+    if (r.band_5_count !== undefined) updateText(dom.routerBand5g, r.band_5_count);
+    if (r.band_24_count !== undefined) updateText(dom.routerBand24g, r.band_24_count);
+    if (r.wired_count !== undefined) updateText(dom.routerBandWired, r.wired_count);
+
+    const socTag = document.getElementById('router-soc-tag');
+    let hasRogue = false;
+
+    if (r.clients && Array.isArray(r.clients) && r.clients.length > 0) {
+      dom.routerTbody.innerHTML = r.clients.slice(0, 10).map(c => {
+        const isRogue = Boolean(c.is_rogue || (c.soc_status && (c.soc_status.includes('ROGUE') || c.soc_status.includes('NEW'))));
+        if (isRogue) hasRogue = true;
+
+        const devType = (c.device_type || '').toLowerCase();
+        const icon = c.is_self ? '💻 ' :
+                     devType === 'router' ? '🌐 ' :
+                     devType === 'mobile' || (c.name && c.name.toLowerCase().includes('phone')) ? '📱 ' :
+                     devType === 'camera' || (c.name && c.name.toLowerCase().includes('cam')) ? '📹 ' :
+                     devType === 'laptop' || (c.name && c.name.toLowerCase().includes('mac')) ? '💻 ' : '▫ ';
+
+        const statusBadge = isRogue
+          ? `<span class="soc-rogue-badge">● ROGUE</span>`
+          : `<span class="soc-verified-badge" style="color:${c.rssi > 70 ? 'var(--accent-green)' : 'var(--accent-amber)'};">● ${c.rssi ? c.rssi + '%' : 'OK'}</span>`;
+
+        const bandClass = c.band && c.band.includes('5') ? 'band-5g' :
+                          c.band && (c.band.includes('2.4') || c.band.includes('WLAN')) ? 'band-24g' : 'band-wired';
+
+        return `
+          <tr class="${isRogue ? 'rogue-row' : ''}">
+            <td class="device-name ${isRogue ? 'rogue-device' : ''}" title="${c.mac || ''}">${icon}${c.name || 'Unknown'}</td>
+            <td style="${isRogue ? 'color:var(--accent-red);font-weight:800;' : ''}">${c.ip || '--'}</td>
+            <td><span class="band-pill ${bandClass}">${c.band || 'WLAN'}</span></td>
+            <td style="text-align:right;">${statusBadge}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    if (socTag) {
+      if (hasRogue || (r.rogue_count && r.rogue_count > 0)) {
+        socTag.textContent = 'ROGUE ALERT';
+        socTag.className = 'panel-tag alert-red';
+      } else {
+        socTag.textContent = 'SOC ACTIVE';
+        socTag.className = 'panel-tag measured';
+      }
+    }
+  }
+
+  // ── 7. Live Telemetry Panel ───────────────────────────────────────────────
+  if (data.telemetry && Array.isArray(data.telemetry) && data.telemetry.length > 0) {
+    dom.terminalStream.innerHTML = data.telemetry.slice(0, 5).map(line => {
+      const isOk = line.includes('OK') || line.includes('SAFE');
+      const isConn = line.includes('CONN') || line.includes('Path');
+      const isDns = line.includes('DNS');
+      const isSoc = line.includes('SOC');
+      const tag = isOk ? 'ok' : isConn ? 'conn' : isDns ? 'sock' : isSoc ? 'conn' : 'warn';
+      return `<div class="term-line"><span class="term-tag ${tag}">●</span> <span class="term-msg">${line}</span></div>`;
+    }).join('');
+  }
+
+  // ── 8. Real-Time Geospatial & Worldwide DDoS Attack Surface ──────────────
+  if (data.geospatial) {
+    window.__geospatialData = data.geospatial;
+    const geo = data.geospatial;
+    if (geo.threat_surface) {
+      const ts = geo.threat_surface;
+      const threatPill = document.getElementById('globe-threat-badge');
+      if (threatPill && ts.total_threat_gbps !== undefined) {
+        threatPill.innerHTML = `<span class="hud-dot ${ts.total_threat_gbps > 0 ? 'red' : 'green'}"></span> DDoS: ${ts.total_threat_gbps.toFixed(1)} Gbps`;
+      }
+      const incBadge = document.getElementById('globe-inc-badge');
+      if (incBadge) {
+        incBadge.textContent = `VECTORS: ${ts.active_vectors_count || 6} ACTIVE`;
+      }
+      const velBadge = document.getElementById('globe-velocity-badge');
+      if (velBadge && ts.mitigation_rate) {
+        velBadge.textContent = `SHIELD: ${ts.mitigation_rate} MITIGATED`;
+        velBadge.style.color = '#10B981';
+      }
+    }
+  }
+}
+
+// Connect to Go Event Hub SSE Stream
+function connectSSE() {
+  const evtSource = new EventSource('/events');
+  const statusEl = document.getElementById('sse-status');
+
+  evtSource.onopen = () => {
+    statusEl.textContent = 'LIVE HUB';
+    statusEl.style.color = 'var(--accent-green)';
+  };
+
+  evtSource.onmessage = (e) => {
+    try {
+      const payload = JSON.parse(e.data);
+      if (payload.type === 'snapshot') {
+        applySnapshot(payload.data);
+      }
+    } catch(err) {}
+  };
+
+  evtSource.onerror = () => {
+    statusEl.textContent = 'FALLBACK';
+    statusEl.style.color = 'var(--accent-amber)';
+    evtSource.close();
+    // Fallback: poll /api/snapshot every 2s
+    setTimeout(pollSnapshot, 2000);
+  };
+}
+
+async function pollSnapshot() {
+  try {
+    const res = await fetch('output/system_snapshot.json');
+    if (res.ok) {
+      const data = await res.json();
+      applySnapshot(data);
+    }
+  } catch(e) {}
+  setTimeout(pollSnapshot, 1500);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 5. HIGH-DEFINITION VISUAL RECON 4K GALLERY CONTROLLER (MULTI-TRANSITION)
+// ═══════════════════════════════════════════════════════════════════════════
+(function initVisualReconGallery() {
+  let galleryImages = [
+    "IMG_0298.JPG", "IMG_0304.JPG", "IMG_0311.JPG", "IMG_0314.JPG", "IMG_0328.JPG",
+    "IMG_0329.JPG", "IMG_0332.JPG", "IMG_0335.JPG", "IMG_0338.JPG", "IMG_0360.JPG",
+    "IMG_0364.JPG", "IMG_0376.JPG", "IMG_0377.JPG", "IMG_0378.JPG", "IMG_0379.JPG",
+    "IMG_0380.JPG", "IMG_0381.JPG", "IMG_0387.JPG", "IMG_0391.JPG", "IMG_0401.JPG",
+    "IMG_0404.JPG", "IMG_0419.JPG", "IMG_0448.JPG", "IMG_0452.JPG", "IMG_0456.JPG",
+    "IMG_0665.JPG", "IMG_E0696.JPG", "IMG_E0697.JPG", "IMG_E0698.JPG"
+  ];
+
+  const TRANSITIONS = [
+    { name: 'KEN BURNS · ZOOM',   inClass: 'kb-zoom-in' },
+    { name: 'CYBER SHUTTER WIPE', inClass: 'shutter-wipe-in' },
+    { name: 'KEN BURNS · DRIFT',  inClass: 'kb-pan-left' },
+    { name: 'RADIAL IRIS REVEAL', inClass: 'iris-reveal-in' },
+    { name: 'GLASS ZOOM-BLUR',    inClass: 'zoom-blur-in' },
+    { name: 'KEN BURNS · WIDE',   inClass: 'kb-zoom-out' },
+    { name: 'HOLOGRAM DISSOLVE',  inClass: 'hologram-slice-in' }
+  ];
+
+  let galleryIdx = 0;
+  let transIdx = 0;
+  let isTransitioning = false;
+  let isPaused = false;
+  const SLIDE_DURATION = 6000;
+  let progressStart = Date.now();
+
+  const viewportEl  = document.getElementById('gallery-viewport');
+  const imgCurr     = document.getElementById('gallery-img-curr');
+  const imgNext     = document.getElementById('gallery-img-next');
+  const counterEl   = document.getElementById('gallery-counter');
+  const filenameEl  = document.getElementById('gallery-filename');
+  const modeBadge   = document.getElementById('gallery-mode-badge');
+  const progressEl  = document.getElementById('gallery-progress-bar');
+  const btnPrev     = document.getElementById('gallery-btn-prev');
+  const btnNext     = document.getElementById('gallery-btn-next');
+  const btnPlay     = document.getElementById('gallery-btn-play');
+
+  if (!viewportEl || !imgCurr || !imgNext) return;
+
+  // Fetch dynamic list from Go API if available
+  fetch('/api/pictures')
+    .then(r => r.json())
+    .then(list => {
+      if (Array.isArray(list) && list.length > 0) {
+        galleryImages = list;
+        updateUI();
+      }
+    })
+    .catch(() => {});
+
+  function getImgUrl(idx) {
+    const file = galleryImages[(idx + galleryImages.length) % galleryImages.length];
+    return 'Picture/Original%20Picture/' + encodeURIComponent(file);
+  }
+
+  function updateUI() {
+    counterEl.textContent = `${String(galleryIdx + 1).padStart(2, '0')} / ${String(galleryImages.length).padStart(2, '0')}`;
+    const filename = galleryImages[galleryIdx];
+    filenameEl.textContent = filename;
+  }
+
+  function switchSlide(newIdx) {
+    if (isTransitioning) return;
+    isTransitioning = true;
+    progressStart = Date.now();
+
+    galleryIdx = (newIdx + galleryImages.length) % galleryImages.length;
+    const nextUrl = getImgUrl(galleryIdx);
+    const trans = TRANSITIONS[transIdx % TRANSITIONS.length];
+    transIdx++;
+
+    modeBadge.textContent = trans.name;
+    updateUI();
+
+    imgNext.src = nextUrl;
+    imgNext.onload = () => {
+      // Clear previous classes
+      TRANSITIONS.forEach(t => {
+        imgNext.classList.remove(t.inClass);
+        imgCurr.classList.remove(t.inClass);
+      });
+
+      imgNext.classList.add(trans.inClass);
+      imgNext.style.opacity = '1';
+
+      setTimeout(() => {
+        imgCurr.src = nextUrl;
+        imgCurr.className = 'gallery-img-layer ' + (trans.inClass.startsWith('kb-') ? trans.inClass : 'kb-zoom-in');
+        imgNext.style.opacity = '0';
+        TRANSITIONS.forEach(t => imgNext.classList.remove(t.inClass));
+        isTransitioning = false;
+      }, 900);
+    };
+  }
+
+  // Smooth progress bar update
+  function updateProgress() {
+    if (!isPaused && !isTransitioning) {
+      const elapsed = Date.now() - progressStart;
+      const pct = Math.min(100, (elapsed / SLIDE_DURATION) * 100);
+      progressEl.style.width = `${pct}%`;
+      if (pct >= 100) {
+        switchSlide(galleryIdx + 1);
+      }
+    }
+    requestAnimationFrame(updateProgress);
+  }
+  requestAnimationFrame(updateProgress);
+
+  // Controls
+  btnPrev.addEventListener('click', (e) => {
+    e.stopPropagation();
+    switchSlide(galleryIdx - 1);
+  });
+
+  btnNext.addEventListener('click', (e) => {
+    e.stopPropagation();
+    switchSlide(galleryIdx + 1);
+  });
+
+  btnPlay.addEventListener('click', (e) => {
+    e.stopPropagation();
+    isPaused = !isPaused;
+    btnPlay.textContent = isPaused ? '▶' : '⏸';
+    btnPlay.title = isPaused ? 'Resume Slideshow' : 'Pause Slideshow';
+  });
+
+  viewportEl.addEventListener('click', () => {
+    switchSlide(galleryIdx + 1);
+  });
+
+  // 3D Perspective Tilt on Mouse Move
+  viewportEl.addEventListener('mousemove', (e) => {
+    const rect = viewportEl.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    viewportEl.style.transform = `perspective(600px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale(1.01)`;
+  });
+
+  viewportEl.addEventListener('mouseleave', () => {
+    viewportEl.style.transform = 'perspective(600px) rotateY(0deg) rotateX(0deg) scale(1)';
+  });
+
+  // ── Win32 Mouse Bridge for Gallery ───────────────────────────────────────
+  // go_mouse() returns physical Win32 pixels; getBoundingClientRect() returns
+  // CSS logical pixels. Divide by devicePixelRatio to match coordinate spaces.
+  (function startGalleryMouseBridge() {
+    if (typeof go_mouse !== 'function') return;
+
+    let prevLBtn = false;
+
+    function pollGalleryMouse() {
+      go_mouse().then(function(state) {
+        const physX = state[0];
+        const physY = state[1];
+        const lBtn  = !!state[2];
+
+        const dpr  = window.devicePixelRatio || 1;
+        const cssX = physX / dpr;
+        const cssY = physY / dpr;
+
+        const rect   = viewportEl.getBoundingClientRect();
+        const inside = cssX >= rect.left && cssX <= rect.right &&
+                       cssY >= rect.top  && cssY <= rect.bottom;
+
+        // 3D tilt while hovering
+        if (inside) {
+          const x = (cssX - rect.left) / rect.width  - 0.5;
+          const y = (cssY - rect.top)  / rect.height - 0.5;
+          viewportEl.style.transform =
+            `perspective(600px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale(1.01)`;
+        } else {
+          viewportEl.style.transform =
+            'perspective(600px) rotateY(0deg) rotateX(0deg) scale(1)';
+        }
+
+        // Click = advance slide
+        if (!lBtn && prevLBtn && inside) {
+          switchSlide(galleryIdx + 1);
+        }
+
+        prevLBtn = lBtn;
+      }).catch(function() {}).finally(function() {
+        setTimeout(pollGalleryMouse, 50); // 20 Hz
+      });
+    }
+
+    pollGalleryMouse();
+  })();
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// 6. 3D ANTIGRAVITY GEOSPATIAL ORBITAL GLOBE & WORLDWIDE DDoS ATTACK SURFACE
+// ═══════════════════════════════════════════════════════════════════════════
+(function initGeospatialGlobe() {
+  const canvas = document.getElementById('globe-canvas');
+  const viewport = document.getElementById('globe-viewport');
+  const fpsBadge = document.getElementById('globe-fps');
+  const velBadge = document.getElementById('globe-velocity-badge');
+  const beaconLabel = document.getElementById('globe-beacon-label');
+  const beaconCoord = document.getElementById('globe-beacon-coord');
+  const incBadge = document.getElementById('globe-inc-badge');
+  if (!canvas || !viewport) return;
+
+  const ctx = canvas.getContext('2d');
+  let width = 0, height = 0, dpr = window.devicePixelRatio || 1;
+  let radius = 72;
+
+  // 3D Orientation & Rotation
+  let rotY = 0;
+  let rotX = 0.38; // ~22° axial tilt
+  let targetTiltX = 0.38;
+  let targetTiltY = 0;
+  let autoSpeed = 0.006; // Smooth perpetual 360° spin
+  let isDragging = false;
+  let lastMouseX = 0, lastMouseY = 0;
+  let dragVelX = 0, dragVelY = 0;
+  let mouseInViewport = false;
+  let mouseXRel = 0, mouseYRel = 0;
+
+  // Defense Shield Ripples (Mitigation Shockwaves)
+  const shieldRipples = [];
+  const shockwaves = [];
+
+  // FPS calculation
+  let frameCount = 0;
+  let lastFpsTime = performance.now();
+
+  function resize() {
+    const rect = viewport.getBoundingClientRect();
+    const newW = Math.round(rect.width);
+    const newH = Math.round(rect.height);
+    if (newW <= 0 || newH <= 0) return;
+    width = newW;
+    height = newH;
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    canvas.style.width = width + 'px';
+    canvas.style.height = height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    radius = Math.max(68, Math.min(width * 0.38, height * 0.42));
+  }
+  window.addEventListener('resize', resize);
+  if (window.ResizeObserver) {
+    try { new ResizeObserver(resize).observe(viewport); } catch(e) {}
+  }
+  setTimeout(resize, 40);
+  setTimeout(resize, 200);
+
+  // Continental Landmass Detection
+  function isLand(lat, lon) {
+    if (lat <= -65) return true; // Antarctica
+    if (60 <= lat && lat <= 83 && -60 <= lon && lon <= -15) return true; // Greenland
+    if (15 <= lat && lat <= 72 && -168 <= lon && lon <= -52) {
+      if (lat < 30 && lon > -80) return false;
+      if (lat < 28 && lon < -105) return false;
+      return true; // North America
+    }
+    if (8 <= lat && lat <= 20 && -100 <= lon && lon <= -75) return true; // Central America
+    if (-56 <= lat && lat <= 13 && -82 <= lon && lon <= -34) {
+      if (lat > 0 && lon > -50) return false;
+      if (lat < -20 && lon < -72) return false;
+      if (lat < -40 && lon > -60) return false;
+      return true; // South America
+    }
+    if (36 <= lat && lat <= 71 && -10 <= lon && lon <= 45) {
+      if (lat < 43 && lon < -4 && lon > -9) return false;
+      return true; // Europe
+    }
+    if (-35 <= lat && lat <= 37 && -18 <= lon && lon <= 52) {
+      if (lat < 5 && lon < -10) return false;
+      if (lat < -18 && lon > 38) return false;
+      return true; // Africa
+    }
+    if (-26 <= lat && lat <= -12 && 43 <= lon && lon <= 51) return true; // Madagascar
+    if (10 <= lat && lat <= 75 && 35 <= lon && lon <= 180) {
+      if (lat < 12 && lon < 95) return false;
+      return true; // Asia / Siberia
+    }
+    if (6 <= lat && lat <= 35 && 68 <= lon && lon <= 92) return true; // Indian subcontinent & Bangladesh
+    if (-10 <= lat && lat <= 22 && 95 <= lon && lon <= 130) return true; // Southeast Asia
+    if (30 <= lat && lat <= 46 && 129 <= lon && lon <= 146) return true; // Japan
+    if (-44 <= lat && lat <= -10 && 112 <= lon && lon <= 154) return true; // Australia
+    if (-47 <= lat && lat <= -34 && 166 <= lon && lon <= 178) return true; // New Zealand
+    return false;
+  }
+
+  // Pre-generate Land & Grid Particles (Dense 2.8° matrix for crisp continental outlines)
+  const landPoints = [];
+  const gridPoints = [];
+  const DEG2RAD = Math.PI / 180;
+
+  for (let lat = -80; lat <= 80; lat += 2.8) {
+    for (let lon = -180; lon <= 180; lon += 2.8) {
+      const phi = (90 - lat) * DEG2RAD;
+      const theta = (lon + 180) * DEG2RAD;
+      const x0 = -Math.sin(phi) * Math.cos(theta);
+      const z0 = Math.sin(phi) * Math.sin(theta);
+      const y0 = Math.cos(phi);
+
+      if (isLand(lat, lon)) {
+        landPoints.push({ x: x0, y: y0, z: z0, lat, lon });
+      } else if (lat % 14 < 2.8 && lon % 14 < 2.8) {
+        gridPoints.push({ x: x0, y: y0, z: z0 });
+      }
+    }
+  }
+
+  function latLonToVec(lat, lon) {
+    const phi = (90 - lat) * DEG2RAD;
+    const theta = (lon + 180) * DEG2RAD;
+    return {
+      x: -Math.sin(phi) * Math.cos(theta),
+      y: Math.cos(phi),
+      z: Math.sin(phi) * Math.sin(theta)
+    };
+  }
+
+  // ── Worldwide Countries Database (40+ Nations) ──────────────────────────
+  const GLOBAL_COUNTRIES = [
+    // Asia & South Asia
+    { name: 'BANGLADESH', code: 'BD', lat: 24.37, lon: 91.42, isHQ: true },
+    { name: 'INDIA', code: 'IN', lat: 20.59, lon: 78.96 },
+    { name: 'CHINA', code: 'CN', lat: 35.86, lon: 104.20 },
+    { name: 'JAPAN', code: 'JP', lat: 36.20, lon: 138.25 },
+    { name: 'SOUTH KOREA', code: 'KR', lat: 35.91, lon: 127.77 },
+    { name: 'SINGAPORE', code: 'SG', lat: 1.35, lon: 103.82 },
+    { name: 'MALAYSIA', code: 'MY', lat: 4.21, lon: 101.98 },
+    { name: 'INDONESIA', code: 'ID', lat: -0.79, lon: 113.92 },
+    { name: 'PAKISTAN', code: 'PK', lat: 30.38, lon: 69.35 },
+    { name: 'THAILAND', code: 'TH', lat: 15.87, lon: 100.99 },
+    { name: 'VIETNAM', code: 'VN', lat: 14.06, lon: 108.28 },
+    { name: 'PHILIPPINES', code: 'PH', lat: 12.88, lon: 121.77 },
+    { name: 'AUSTRALIA', code: 'AU', lat: -25.27, lon: 133.78 },
+    { name: 'NEW ZEALAND', code: 'NZ', lat: -40.90, lon: 174.89 },
+    // Middle East
+    { name: 'SAUDI ARABIA', code: 'SA', lat: 23.89, lon: 45.08 },
+    { name: 'UAE', code: 'AE', lat: 23.42, lon: 53.85 },
+    { name: 'QATAR', code: 'QA', lat: 25.35, lon: 51.18 },
+    { name: 'TURKEY', code: 'TR', lat: 38.96, lon: 35.24 },
+    { name: 'IRAN', code: 'IR', lat: 32.43, lon: 53.69 },
+    // Europe
+    { name: 'UNITED KINGDOM', code: 'GB', lat: 55.38, lon: -3.44 },
+    { name: 'GERMANY', code: 'DE', lat: 51.17, lon: 10.45 },
+    { name: 'FRANCE', code: 'FR', lat: 46.23, lon: 2.21 },
+    { name: 'NETHERLANDS', code: 'NL', lat: 52.13, lon: 5.29 },
+    { name: 'ITALY', code: 'IT', lat: 41.87, lon: 12.57 },
+    { name: 'SPAIN', code: 'ES', lat: 40.46, lon: -3.75 },
+    { name: 'SWITZERLAND', code: 'CH', lat: 46.82, lon: 8.23 },
+    { name: 'SWEDEN', code: 'SE', lat: 60.13, lon: 18.64 },
+    { name: 'NORWAY', code: 'NO', lat: 60.47, lon: 8.47 },
+    { name: 'POLAND', code: 'PL', lat: 51.92, lon: 19.15 },
+    { name: 'RUSSIA', code: 'RU', lat: 61.52, lon: 105.32 },
+    // Americas
+    { name: 'UNITED STATES', code: 'US', lat: 37.09, lon: -95.71 },
+    { name: 'CANADA', code: 'CA', lat: 56.13, lon: -106.35 },
+    { name: 'BRAZIL', code: 'BR', lat: -14.24, lon: -51.93 },
+    { name: 'MEXICO', code: 'MX', lat: 23.63, lon: -102.55 },
+    { name: 'ARGENTINA', code: 'AR', lat: -38.42, lon: -63.62 },
+    { name: 'CHILE', code: 'CL', lat: -35.68, lon: -71.54 },
+    // Africa
+    { name: 'SOUTH AFRICA', code: 'ZA', lat: -30.56, lon: 22.94 },
+    { name: 'EGYPT', code: 'EG', lat: 26.82, lon: 30.80 },
+    { name: 'NIGERIA', code: 'NG', lat: 9.08, lon: 8.68 },
+    { name: 'KENYA', code: 'KE', lat: -0.02, lon: 37.91 }
+  ];
+
+  const countryNodes = GLOBAL_COUNTRIES.map(c => ({
+    ...c,
+    vec: latLonToVec(c.lat, c.lon)
+  }));
+
+  // Bangladesh Strategic Nodes
+  const BD_NODES = {
+    hq: { name: 'HABIGANJ HQ', lat: 24.37, lon: 91.42, vec: latLonToVec(24.37, 91.42), isHQ: true },
+    smw4: { name: 'SMW4 COX BAZAR', lat: 21.43, lon: 91.98, vec: latLonToVec(21.43, 91.98) },
+    smw5: { name: 'SMW5 KUAKATA', lat: 21.82, lon: 90.12, vec: latLonToVec(21.82, 90.12) },
+    bdix: { name: 'BDIX DHAKA', lat: 23.81, lon: 90.41, vec: latLonToVec(23.81, 90.41) }
+  };
+
+  // Submarine Cable Landing Outflow Paths
+  function createArc(p1, p2, numPoints = 22, heightScale = 0.24) {
+    const pts = [];
+    for (let i = 0; i <= numPoints; i++) {
+      const t = i / numPoints;
+      const x = p1.x + (p2.x - p1.x) * t;
+      const y = p1.y + (p2.y - p1.y) * t;
+      const z = p1.z + (p2.z - p1.z) * t;
+      const len = Math.hypot(x, y, z) || 1;
+      const alt = 1 + heightScale * Math.sin(t * Math.PI);
+      pts.push({
+        x: (x / len) * alt,
+        y: (y / len) * alt,
+        z: (z / len) * alt
+      });
+    }
+    return pts;
+  }
+
+  // Active Worldwide DDoS Attack Vectors
+  const ATTACK_VECTORS = [
+    { originName: 'FRANKFURT [DE]', origin: latLonToVec(50.11, 8.68), target: BD_NODES.smw4.vec, targetNode: 'SMW4', type: 'UDP_NTP_AMP', color: '#EF4444', speed: 0.65 },
+    { originName: 'ASHBURN [US]', origin: latLonToVec(39.04, -77.48), target: BD_NODES.smw5.vec, targetNode: 'SMW5', type: 'TCP_SYN_FLOOD', color: '#06B6D4', speed: 0.85 },
+    { originName: 'TOKYO [JP]', origin: latLonToVec(35.68, 139.65), target: BD_NODES.bdix.vec, targetNode: 'BDIX', type: 'DNS_REFLECT', color: '#F59E0B', speed: 0.70 },
+    { originName: 'SAO PAULO [BR]', origin: latLonToVec(-23.55, -46.63), target: BD_NODES.hq.vec, targetNode: 'HQ', type: 'HTTP3_RESET', color: '#A855F7', speed: 0.55 },
+    { originName: 'LONDON [GB]', origin: latLonToVec(51.51, -0.13), target: BD_NODES.smw4.vec, targetNode: 'SMW4', type: 'GRE_FLOOD', color: '#EC4899', speed: 0.60 },
+    { originName: 'SINGAPORE [SG]', origin: latLonToVec(1.35, 103.82), target: BD_NODES.smw5.vec, targetNode: 'SMW5', type: 'SSDP_AMP', color: '#38BDF8', speed: 0.75 }
+  ];
+
+  const attackArcs = ATTACK_VECTORS.map(v => ({
+    ...v,
+    pts: createArc(v.origin, v.target, 26, 0.28)
+  }));
+
+  // Equatorial Gyro Ring Ticks
+  const ring1Ticks = [];
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2;
+    ring1Ticks.push({
+      x: Math.cos(a) * 1.30,
+      y: 0,
+      z: Math.sin(a) * 1.30,
+      isMajor: i % 4 === 0
+    });
+  }
+
+  // Polar Orbit Ring
+  const polarRingPts = [];
+  const polarInclination = 66 * DEG2RAD;
+  for (let i = 0; i <= 48; i++) {
+    const a = (i / 48) * Math.PI * 2;
+    const r = 1.38;
+    const x0 = Math.cos(a) * r;
+    const z0 = Math.sin(a) * r;
+    polarRingPts.push({
+      x: x0,
+      y: z0 * Math.sin(polarInclination),
+      z: z0 * Math.cos(polarInclination)
+    });
+  }
+
+  // 3D Perspective Projection
+  function project(p, cx, cy, rCurrent) {
+    const cosY = Math.cos(rotY), sinY = Math.sin(rotY);
+    const x1 = p.x * cosY + p.z * sinY;
+    const z1 = -p.x * sinY + p.z * cosY;
+
+    const cosX = Math.cos(rotX), sinX = Math.sin(rotX);
+    const y2 = p.y * cosX - z1 * sinX;
+    const z2 = p.y * sinX + z1 * cosX;
+
+    const fov = 3.6;
+    const scale = fov / (fov + z2);
+
+    return {
+      x: cx + x1 * rCurrent * scale,
+      y: cy - y2 * rCurrent * scale,
+      z: z2,
+      scale: scale,
+      visible: z2 > -0.2
+    };
+  }
+
+  // Antigravity Shockwave on Click
+  viewport.addEventListener('click', (e) => {
+    const rect = viewport.getBoundingClientRect();
+    shockwaves.push({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      radius: 5,
+      alpha: 1.0
+    });
+  });
+
+  // ── Win32 Mouse Bridge (DPI-corrected) ────────────────────────────────────
+  (function initGlobeWin32Mouse() {
+    let prevLBtn = false;
+
+    function pollGlobalMouse() {
+      if (typeof go_mouse !== 'function') {
+        setTimeout(pollGlobalMouse, 200);
+        return;
+      }
+
+      go_mouse().then(function(state) {
+        if (!state || state.length < 4) return;
+        const physX = state[0];
+        const physY = state[1];
+        const lBtn  = state[2];
+
+        const dpr = window.devicePixelRatio || 1;
+        const mouseX = physX / dpr;
+        const mouseY = physY / dpr;
+
+        const rect = viewport.getBoundingClientRect();
+        const inside = (
+          mouseX >= rect.left && mouseX <= rect.right &&
+          mouseY >= rect.top  && mouseY <= rect.bottom
+        );
+
+        if (inside) {
+          mouseInViewport = true;
+          mouseXRel = mouseX - rect.left;
+          mouseYRel = mouseY - rect.top;
+
+          if (lBtn && !prevLBtn) {
+            isDragging = true;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+            dragVelX = 0;
+            dragVelY = 0;
+          } else if (lBtn && isDragging) {
+            const dx = mouseX - lastMouseX;
+            const dy = mouseY - lastMouseY;
+            rotY += dx * 0.009;
+            rotX += dy * 0.009;
+            dragVelX = dx * 0.009;
+            dragVelY = dy * 0.009;
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+          } else if (!lBtn && prevLBtn) {
+            isDragging = false;
+            shockwaves.push({
+              x: mouseXRel,
+              y: mouseYRel,
+              radius: 5,
+              alpha: 1.0
+            });
+          } else if (!lBtn) {
+            const cx = width / 2;
+            const cy = height / 2;
+            targetTiltY = ((mouseXRel - cx) / cx) * 0.25;
+            targetTiltX = 0.38 + ((mouseYRel - cy) / cy) * 0.25;
+          }
+        } else {
+          if (isDragging && !lBtn) isDragging = false;
+          mouseInViewport = false;
+        }
+
+        prevLBtn = lBtn;
+      }).catch(function() {}).finally(function() {
+        setTimeout(pollGlobalMouse, 16); // 60 Hz
+      });
+    }
+
+    pollGlobalMouse();
+  })();
+
+  // ── 60 FPS Render Loop ───────────────────────────────────────────────────
+  let time = 0;
+
+  function render() {
+    time += 0.016;
+    frameCount++;
+
+    // FPS & Threat Volume HUD updates (1 Hz)
+    if (performance.now() - lastFpsTime >= 1000) {
+      if (fpsBadge) fpsBadge.textContent = `${frameCount} FPS`;
+      frameCount = 0;
+      lastFpsTime = performance.now();
+
+      // Read real-time threat volume from snapshot or dynamic model
+      const geo = window.__geospatialData;
+      const threatGbps = geo && geo.threat_surface
+        ? geo.threat_surface.total_threat_gbps
+        : (480.0 + Math.sin(time * 0.5) * 120.0).toFixed(1);
+
+      if (velBadge) {
+        velBadge.textContent = `DDoS: ${threatGbps} Gbps`;
+        velBadge.style.color = 'var(--accent-amber)';
+      }
+      if (incBadge) {
+        incBadge.textContent = 'SHIELD: 100% SECURE';
+        incBadge.style.color = 'var(--accent-green)';
+      }
+    }
+
+    // Physics
+    if (!isDragging) {
+      if (Math.abs(dragVelX) > 0.0005) {
+        rotY += dragVelX;
+        dragVelX *= 0.94;
+      } else {
+        rotY += autoSpeed;
+      }
+      if (Math.abs(dragVelY) > 0.0005) {
+        rotX += dragVelY;
+        dragVelY *= 0.94;
+      } else {
+        rotX += (targetTiltX - rotX) * 0.04;
+      }
+    }
+
+    // Dynamic Viewport Size Auto-Correction
+    const curW = Math.round(viewport.clientWidth);
+    const curH = Math.round(viewport.clientHeight);
+    if (curW > 0 && curH > 0 && (curW !== width || curH !== height)) {
+      resize();
+    }
+
+    ctx.clearRect(0, 0, width, height);
+    const cx = width / 2;
+    const cy = height / 2;
+
+    // 1. Atmosphere Radial Bloom Background
+    const glowGrad = ctx.createRadialGradient(cx, cy, radius * 0.35, cx, cy, radius * 1.48);
+    glowGrad.addColorStop(0, 'rgba(0, 229, 255, 0.12)');
+    glowGrad.addColorStop(0.5, 'rgba(0, 160, 255, 0.03)');
+    glowGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glowGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 1.48, 0, Math.PI * 2);
+    ctx.fill();
+
+    // 2. Quantum Singularity Core Wireframe
+    ctx.save();
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.28)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius * 0.98, 0, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.35)';
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy); ctx.lineTo(cx + 10, cy);
+    ctx.moveTo(cx, cy - 10); ctx.lineTo(cx, cy + 10);
+    ctx.stroke();
+    ctx.restore();
+
+    // 3. Background Ocean Curvature Grid Points
+    ctx.save();
+    ctx.fillStyle = 'rgba(0, 180, 240, 0.18)';
+    for (let i = 0; i < gridPoints.length; i++) {
+      const proj = project(gridPoints[i], cx, cy, radius);
+      if (proj.z > 0.05) {
+        ctx.fillRect(proj.x - 0.5, proj.y - 0.5, 1, 1);
+      }
+    }
+    ctx.restore();
+
+    // 4. Dual Gyro Orbital Rings & Polar Orbit Satellite
+    ctx.save();
+    // Primary Equatorial Gyro Ring with Navigation Ticks
+    ctx.beginPath();
+    let ringFirst = true;
+    for (let i = 0; i <= 64; i++) {
+      const a = (i / 64) * Math.PI * 2;
+      const proj = project({ x: Math.cos(a) * 1.30, y: 0, z: Math.sin(a) * 1.30 }, cx, cy, radius);
+      if (ringFirst) { ctx.moveTo(proj.x, proj.y); ringFirst = false; }
+      else { ctx.lineTo(proj.x, proj.y); }
+    }
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.28)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 6]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Rotating gyro navigation ticks
+    for (let i = 0; i < ring1Ticks.length; i++) {
+      const t = ring1Ticks[i];
+      const ang = -time * 0.35;
+      const cosA = Math.cos(ang), sinA = Math.sin(ang);
+      const rx = t.x * cosA + t.z * sinA;
+      const rz = -t.x * sinA + t.z * cosA;
+      const proj = project({ x: rx, y: 0, z: rz }, cx, cy, radius);
+
+      if (proj.z > -0.35) {
+        const alpha = Math.min(1.0, 0.35 + (proj.z + 0.35) * 0.75);
+        ctx.fillStyle = t.isMajor ? `rgba(0, 240, 255, ${alpha})` : `rgba(16, 210, 130, ${alpha * 0.85})`;
+        const sz = t.isMajor ? 2.6 : 1.6;
+        ctx.fillRect(proj.x - sz/2, proj.y - sz/2, sz, sz);
+      }
+    }
+
+    // Secondary Tilted Golden Orbit Ring
+    ctx.beginPath();
+    let ring2First = true;
+    const tiltAngle = 24 * DEG2RAD;
+    for (let i = 0; i <= 48; i++) {
+      const a = (i / 48) * Math.PI * 2;
+      const r2 = 1.22;
+      const x0 = Math.cos(a) * r2;
+      const z0 = Math.sin(a) * r2;
+      const y0 = Math.sin(a) * Math.sin(tiltAngle) * r2;
+      const proj = project({ x: x0, y: y0, z: z0 * Math.cos(tiltAngle) }, cx, cy, radius);
+      if (ring2First) { ctx.moveTo(proj.x, proj.y); ring2First = false; }
+      else { ctx.lineTo(proj.x, proj.y); }
+    }
+    ctx.strokeStyle = 'rgba(245, 158, 11, 0.30)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 5]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Polar Orbit Ring
+    ctx.beginPath();
+    let polarFirst = true;
+    for (let i = 0; i < polarRingPts.length; i++) {
+      const proj = project(polarRingPts[i], cx, cy, radius);
+      if (polarFirst) { ctx.moveTo(proj.x, proj.y); polarFirst = false; }
+      else { ctx.lineTo(proj.x, proj.y); }
+    }
+    ctx.closePath();
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.35)';
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([3, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Polar Orbit Satellite Beacon
+    const satAngle = time * 0.65;
+    const satIndex = Math.floor(((satAngle % (Math.PI * 2)) / (Math.PI * 2)) * polarRingPts.length) % polarRingPts.length;
+    const satProj = project(polarRingPts[satIndex], cx, cy, radius);
+    if (satProj.z > -0.3) {
+      ctx.fillStyle = '#10B981';
+      ctx.shadowColor = '#10B981';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(satProj.x, satProj.y, 3.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Satellite radar wave
+      const satWave = (time * 18) % 10;
+      const satAlpha = 1 - (satWave / 10);
+      ctx.strokeStyle = `rgba(16, 185, 129, ${satAlpha * 0.7})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(satProj.x, satProj.y, 3.2 + satWave, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // 5. Continental Landmass Particle Matrix
+    ctx.save();
+    for (let i = 0; i < landPoints.length; i++) {
+      const pt = landPoints[i];
+      let p = { x: pt.x, y: pt.y, z: pt.z };
+
+      if (mouseInViewport) {
+        const projTemp = project(p, cx, cy, radius);
+        const distToMouse = Math.hypot(projTemp.x - mouseXRel, projTemp.y - mouseYRel);
+        if (distToMouse < 45) {
+          const lift = (1 - distToMouse / 45) * 0.16;
+          p = { x: pt.x * (1 + lift), y: pt.y * (1 + lift), z: pt.z * (1 + lift) };
+        }
+      }
+
+      const proj = project(p, cx, cy, radius);
+
+      if (proj.z > 0.05) {
+        const brightness = Math.min(1.0, 0.65 + proj.z * 0.40);
+        // Highlight Bangladesh territory in bright neon emerald
+        const isBD = (pt.lat >= 20.5 && pt.lat <= 26.6 && pt.lon >= 88.0 && pt.lon <= 92.8);
+        if (isBD) {
+          ctx.fillStyle = `rgba(16, 235, 140, ${brightness})`;
+          const dotSize = Math.max(2.6, 3.2 * proj.scale);
+          ctx.fillRect(proj.x - dotSize/2, proj.y - dotSize/2, dotSize, dotSize);
+        } else {
+          ctx.fillStyle = `rgba(0, 240, 255, ${brightness * 0.95})`;
+          const dotSize = Math.max(1.8, 2.4 * proj.scale);
+          ctx.fillRect(proj.x - dotSize/2, proj.y - dotSize/2, dotSize, dotSize);
+        }
+      } else if (proj.z > -0.55) {
+        // Back-side continents: subtle deep cyber cyan/blue giving 3D spherical depth
+        const dim = (proj.z + 0.55) * 0.35;
+        ctx.fillStyle = `rgba(0, 150, 220, ${dim})`;
+        ctx.fillRect(proj.x - 0.6, proj.y - 0.6, 1.2, 1.2);
+      }
+    }
+    ctx.restore();
+
+    // 6. Real Host Active Connection Arcs (psutil live socket stream)
+    ctx.save();
+    const geo = window.__geospatialData;
+    const realConns = (geo && (geo.local_sockets || geo.real_connections)) ? (geo.local_sockets || geo.real_connections) : [];
+    realConns.forEach((c, cIdx) => {
+      const targetVec = latLonToVec(c.lat, c.lon);
+      const arcPts = createArc(BD_NODES.hq.vec, targetVec, 16, 0.20);
+      ctx.beginPath();
+      let started = false;
+      let visible = false;
+      for (let j = 0; j < arcPts.length; j++) {
+        const pr = project(arcPts[j], cx, cy, radius);
+        if (pr.z > -0.15) visible = true;
+        if (!started) { ctx.moveTo(pr.x, pr.y); started = true; }
+        else { ctx.lineTo(pr.x, pr.y); }
+      }
+      if (visible) {
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.55)';
+        ctx.lineWidth = 1.2;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Live outgoing packet pulse
+        const packetProgress = ((time * 0.4 + cIdx * 0.15) % 1);
+        const idx = Math.min(arcPts.length - 1, Math.floor(packetProgress * (arcPts.length - 1)));
+        const packetProj = project(arcPts[idx], cx, cy, radius);
+        if (packetProj.z > -0.1) {
+          ctx.fillStyle = '#38BDF8';
+          ctx.shadowColor = '#00E5FF';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(packetProj.x, packetProj.y, 2.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        }
+      }
+    });
+    ctx.restore();
+
+    // 7. Worldwide DDoS Attack Arcs & Particle Streams
+    ctx.save();
+    let currentAttackArcs = attackArcs;
+    if (geo && geo.threat_surface && Array.isArray(geo.threat_surface.active_attacks) && geo.threat_surface.active_attacks.length > 0) {
+      if (!window.__cachedAttackArcs || window.__cachedAttackArcsKey !== geo.threat_surface.active_attacks.length) {
+        window.__cachedAttackArcsKey = geo.threat_surface.active_attacks.length;
+        window.__cachedAttackArcs = geo.threat_surface.active_attacks.map((atk, idx) => {
+          const originVec = latLonToVec(atk.origin_lat, atk.origin_lon);
+          const targetVec = latLonToVec(atk.target_lat, atk.target_lon);
+          const color = atk.vector.includes('SYN') ? '#06B6D4'
+                      : atk.vector.includes('NTP') ? '#EF4444'
+                      : atk.vector.includes('DNS') ? '#F59E0B'
+                      : atk.vector.includes('HTTP') ? '#A855F7'
+                      : '#EC4899';
+          return {
+            originName: `${atk.origin_country.toUpperCase()} [${atk.origin_code}]`,
+            origin: originVec,
+            target: targetVec,
+            targetNode: atk.target_name,
+            type: atk.vector,
+            color: color,
+            speed: 0.55 + (idx % 4) * 0.12,
+            volume: atk.volume_gbps,
+            pts: createArc(originVec, targetVec, 26, 0.28)
+          };
+        });
+      }
+      currentAttackArcs = window.__cachedAttackArcs;
+    }
+
+    currentAttackArcs.forEach((arc, arcIdx) => {
+      ctx.beginPath();
+      let started = false;
+      let allVisible = false;
+
+      for (let j = 0; j < arc.pts.length; j++) {
+        const proj = project(arc.pts[j], cx, cy, radius);
+        if (proj.z > -0.2) allVisible = true;
+        if (!started) { ctx.moveTo(proj.x, proj.y); started = true; }
+        else { ctx.lineTo(proj.x, proj.y); }
+      }
+
+      if (allVisible) {
+        // Glowing attack beam with high contrast
+        ctx.strokeStyle = arc.color === '#EF4444'
+          ? 'rgba(239, 68, 68, 0.85)'
+          : arc.color === '#06B6D4'
+          ? 'rgba(6, 182, 212, 0.80)'
+          : arc.color === '#F59E0B'
+          ? 'rgba(245, 158, 11, 0.80)'
+          : arc.color === '#A855F7'
+          ? 'rgba(168, 85, 247, 0.80)'
+          : 'rgba(236, 72, 153, 0.80)';
+        ctx.lineWidth = 1.8;
+        ctx.stroke();
+
+        // 3 High-speed packet pulses per attack beam
+        for (let p = 0; p < 3; p++) {
+          const packetProgress = ((time * arc.speed + arcIdx * 0.25 + p * 0.33) % 1.0);
+          const idx = Math.min(arc.pts.length - 1, Math.floor(packetProgress * (arc.pts.length - 1)));
+          const packetProj = project(arc.pts[idx], cx, cy, radius);
+
+          if (packetProj.z > -0.15) {
+            ctx.fillStyle = arc.color;
+            ctx.shadowColor = arc.color;
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(packetProj.x, packetProj.y, 2.8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+          }
+
+          // Trigger shield mitigation ripple when packet reaches target (progress > 0.95)
+          if (packetProgress > 0.95 && p === 0 && Math.random() < 0.20) {
+            const targetProj = project(arc.target, cx, cy, radius);
+            if (targetProj.z > 0) {
+              shieldRipples.push({
+                x: targetProj.x,
+                y: targetProj.y,
+                r: 3,
+                maxR: 18,
+                alpha: 0.95,
+                color: '#10B981'
+              });
+            }
+          }
+        }
+      }
+    });
+    ctx.restore();
+
+    // 8. Active Mitigation Shield Ripples
+    for (let i = shieldRipples.length - 1; i >= 0; i--) {
+      const sr = shieldRipples[i];
+      sr.r += 0.8;
+      sr.alpha *= 0.91;
+      ctx.save();
+      ctx.strokeStyle = `rgba(16, 185, 129, ${sr.alpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(sr.x, sr.y, sr.r, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      if (sr.alpha < 0.05 || sr.r >= sr.maxR) {
+        shieldRipples.splice(i, 1);
+      }
+    }
+
+    // 9. Bangladesh Critical Infrastructure Nodes (HQ + Submarine Landing Stations)
+    ctx.save();
+    // Kuakata SMW5
+    const kuaProj = project(BD_NODES.smw5.vec, cx, cy, radius);
+    if (kuaProj.z > 0) {
+      ctx.fillStyle = '#06B6D4';
+      ctx.beginPath(); ctx.arc(kuaProj.x, kuaProj.y, 2.8, 0, Math.PI * 2); ctx.fill();
+    }
+    // Cox's Bazar SMW4
+    const cxbProj = project(BD_NODES.smw4.vec, cx, cy, radius);
+    if (cxbProj.z > 0) {
+      ctx.fillStyle = '#06B6D4';
+      ctx.beginPath(); ctx.arc(cxbProj.x, cxbProj.y, 2.8, 0, Math.PI * 2); ctx.fill();
+    }
+    // Dhaka BDIX
+    const dhaProj = project(BD_NODES.bdix.vec, cx, cy, radius);
+    if (dhaProj.z > 0) {
+      ctx.fillStyle = '#F59E0B';
+      ctx.beginPath(); ctx.arc(dhaProj.x, dhaProj.y, 2.6, 0, Math.PI * 2); ctx.fill();
+    }
+    // Habiganj HQ (Primary)
+    const hqProj = project(BD_NODES.hq.vec, cx, cy, radius);
+    if (hqProj.z > 0) {
+      const ripple = (time * 24) % 18;
+      const rippleAlpha = 1 - (ripple / 18);
+      ctx.strokeStyle = `rgba(16, 185, 129, ${rippleAlpha * 0.95})`;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(hqProj.x, hqProj.y, 4.0 + ripple, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = '#10B981';
+      ctx.shadowColor = '#10B981';
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.arc(hqProj.x, hqProj.y, 4.2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      ctx.font = 'bold 8px monospace';
+      ctx.fillStyle = '#A7F3D0';
+      ctx.fillText('HABIGANJ HQ', hqProj.x + 7, hqProj.y - 4);
+    }
+    ctx.restore();
+
+    // 10. Dynamic Real-Time Country Identification on Orbit & Holographic Country Labels
+    ctx.save();
+    let maxFocusZ = -1;
+    let focusedCountry = null;
+
+    countryNodes.forEach(c => {
+      const proj = project(c.vec, cx, cy, radius);
+
+      // Track front-facing country with highest line-of-sight vector
+      if (proj.z > 0.45 && proj.z > maxFocusZ) {
+        maxFocusZ = proj.z;
+        focusedCountry = c;
+      }
+
+      // Render prominent holographic pins for forward-facing countries
+      if (proj.z > 0.25 && !c.isHQ) {
+        const alpha = Math.min(1.0, (proj.z - 0.2) * 1.5);
+        ctx.fillStyle = `rgba(0, 240, 255, ${alpha * 0.9})`;
+        ctx.fillRect(proj.x - 1.5, proj.y - 1.5, 3, 3);
+
+        // For prominently visible nations, draw country name
+        if (proj.z > 0.58) {
+          ctx.font = 'bold 7.5px monospace';
+          ctx.fillStyle = `rgba(186, 230, 253, ${alpha * 0.95})`;
+          ctx.fillText(c.name, proj.x + 5, proj.y + 2.5);
+        }
+      }
+    });
+
+    // Update bottom HUD with detected active country in real time
+    if (focusedCountry) {
+      if (focusedCountry.isHQ) {
+        if (beaconLabel) beaconLabel.innerHTML = '★ <span style="color:#10B981">COMMAND HQ · BANGLADESH [BD]</span>';
+        if (beaconCoord) beaconCoord.textContent = 'HABIGANJ (24.37°N, 91.42°E) · SMW4/5 SECURE';
+      } else {
+        const latStr = focusedCountry.lat >= 0 ? `${focusedCountry.lat.toFixed(1)}°N` : `${(-focusedCountry.lat).toFixed(1)}°S`;
+        const lonStr = focusedCountry.lon >= 0 ? `${focusedCountry.lon.toFixed(1)}°E` : `${(-focusedCountry.lon).toFixed(1)}°W`;
+        if (beaconLabel) beaconLabel.textContent = `ORBIT: [ ${focusedCountry.name} ]`;
+        if (beaconCoord) beaconCoord.textContent = `${latStr} · ${lonStr} · SECTOR MONITORED`;
+      }
+    }
+    ctx.restore();
+
+    // 11. Click Shockwaves
+    for (let i = shockwaves.length - 1; i >= 0; i--) {
+      const sw = shockwaves[i];
+      sw.radius += 3.5;
+      sw.alpha *= 0.92;
+      ctx.save();
+      ctx.strokeStyle = `rgba(0, 229, 255, ${sw.alpha * 0.8})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      if (sw.alpha < 0.04) {
+        shockwaves.splice(i, 1);
+      }
+    }
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+})();
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 7. POND FLOATING HUD & DYNAMIC CYBER SECURITY TICKER
+// ═══════════════════════════════════════════════════════════════════════════
+(function initPondWelcomeHUD() {
+  const tickerEl = document.getElementById('pond-hud-ticker');
+  const hudEl = document.getElementById('pond-floating-hud');
+  if (!tickerEl || !hudEl) return;
+
+  const MESSAGES = [
+    "● NAZMUL DEFENSE MATRIX · INTEGRITY 100% · ZERO BREACH",
+    "● HABIGANJ PRIMARY STATION · 360° GEOSPATIAL SURVEILLANCE",
+    "● BIOLUMINESCENT ANTIGRAVITY ENGINE · FLUID CADENCE 60 FPS",
+    "● OPERATOR: NAZMU · KERNEL TLS ENCRYPTED · CLEARANCE LEVEL 5",
+    "● ADVANCED TACTICAL THREAT SHIELD · ACTIVE PERIMETER SCAN"
+  ];
+
+  let msgIdx = 0;
+  let intervalId = null;
+
+  function cycleMessage() {
+    tickerEl.classList.add('fade-out');
+    setTimeout(() => {
+      msgIdx = (msgIdx + 1) % MESSAGES.length;
+      tickerEl.textContent = MESSAGES[msgIdx];
+      tickerEl.classList.remove('fade-out');
+    }, 300);
+  }
+
+  intervalId = setInterval(cycleMessage, 5000);
+
+  // Clicking the HUD card advances ticker immediately
+  hudEl.addEventListener('click', () => {
+    clearInterval(intervalId);
+    cycleMessage();
+    intervalId = setInterval(cycleMessage, 5000);
+  });
+})();
+
+// Kick-off SSE connection or fallback
+if (window.location.protocol.startsWith('http')) {
+  connectSSE();
+} else {
+  // Running from file:/// protocol, poll snapshot file directly
+  pollSnapshot();
+}
+</script>
+
+</body>
+</html>

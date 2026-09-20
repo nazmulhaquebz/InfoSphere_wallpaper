@@ -1,0 +1,67 @@
+{
+    "brand_name":  "InfoSphere Cyber Live Wallpaper Engine",
+    "refresh_interval_seconds":  1.0,
+    "resolution_width":  "auto",
+    "resolution_height":  "auto",
+    "display_mode":  "primary",
+    "theme":  "cyber_dark",
+    "output_path":  "output/infosphere_wallpaper.bmp",
+    "log_path":  "logs/wallpaper.log",
+    "show_cpu":  true,
+    "show_ram":  true,
+    "show_disk":  true,
+    "show_ip":  true,
+    "show_network":  true,
+    "show_firewall_status":  true,
+    "show_telemetry":  true,
+    "show_weather":  true,
+    "simulate_threats":  false,
+    "operator_profile":  {
+                             "enabled":  true,
+                             "name":  "Local Operator",
+                             "title":  "System Administrator"
+                         },
+    "accessibility":  {
+                          "theme":  "default",
+                          "density":  "comfortable",
+                          "reduce_motion":  false,
+                          "font_scale":  1
+                      },
+    "weather_city":  "auto",
+    "router":  {
+                   "enabled":  true,
+                   "ip":  "192.168.0.1",
+                   "username":  "admin",
+                   "password_env":  "INFOSPHERE_ROUTER_PASSWORD",
+                   "refresh_secs":  10,
+                   "_note":  "Set INFOSPHERE_ROUTER_PASSWORD in your environment. Never store the password here."
+               },
+    "speedtest":  {
+                      "enabled":  true,
+                      "ping_interval_s":  5,
+                      "speed_interval_s":  15,
+                      "ping_host":  "8.8.8.8",
+                      "ping_port":  53,
+                      "_note":  "Real-time 15-second network speed test and ping monitor."
+                  },
+    "process_optimizer":  {
+                              "enabled":  false,
+                              "terminate_updates":  false,
+                              "throttle_on_load":  false,
+                              "_note":  "Opt in explicitly; the wallpaper never kills or reprioritizes apps by default."
+                          },
+    "ethical_footer":  "Local system monitoring only  |  No unauthorized scanning  |  Ethical use only",
+    "colors":  {
+                   "background":  "#040711",
+                   "panel_bg":  "#070D1F",
+                   "panel_border":  "#152642",
+                   "accent_cyan":  "#00E5FF",
+                   "accent_green":  "#10B981",
+                   "accent_amber":  "#F59E0B",
+                   "accent_red":  "#F43F5E",
+                   "accent_blue":  "#6366F1",
+                   "text_primary":  "#F8FAFC",
+                   "text_secondary":  "#94A3B8",
+                   "text_dim":  "#475569"
+               }
+}
