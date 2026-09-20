@@ -1,8 +1,14 @@
 # ==============================================================================
 # INFOSPHERE · USER CUSTOMIZATION PROFILE
 # ==============================================================================
-# Customize your name and security banner on your live desktop HUD!
-# When you edit and save this file, your live wallpaper updates immediately.
+# This is 1 of only 3 items users should ever customize:
+#   1. user_information.txt       -> Your name, banner, and role title
+#   2. Picture/Original Picture/  -> Drop your personal photos here
+#   3. .env                       -> Optional router gateway & password
+#
+# NOTE: DO NOT MODIFY ANY CORE ENGINE FILES (main.py, HTML, Go binary, etc.).
+# Everything works out-of-the-box. When you save this file, your live wallpaper
+# updates immediately on your desktop in real-time.
 # ==============================================================================
 
 # Your Name or Call-Sign (e.g. NAZMUL, ALEX, CYBER_OPERATOR)

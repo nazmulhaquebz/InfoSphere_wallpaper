@@ -3,6 +3,16 @@
 InfoSphere Cyber Live Wallpaper Engine v2.2.0
 main.py
 
+==============================================================================
+⛔ CORE ENGINE COMPONENT - DO NOT MODIFY DIRECTLY
+==============================================================================
+Users should only ever customize these 3 items:
+  1. user_information.txt       -> Name, role title, and command header
+  2. Picture/Original Picture/  -> Personal photo collection
+  3. .env                       -> Optional router IP and password
+All other files are pre-tuned and protected.
+==============================================================================
+
 Executive SOC / Aerospace HUD Live Architecture
 Updated: 2026-09-17 with Dynamic Hot-Reload & Zero-Collision Layout
 

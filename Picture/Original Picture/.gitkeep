@@ -1,2 +1,12 @@
-# Keep this folder structure in repository.
-# Users place their personal photos in this folder for the Visual Recon panel.
+# ==============================================================================
+# Picture/Original Picture/
+# ==============================================================================
+# This is 1 of only 3 items users should ever customize:
+#   1. user_information.txt       -> Your name, banner, and role title
+#   2. Picture/Original Picture/  -> Drop your personal photos here
+#   3. .env                       -> Optional router gateway & password
+#
+# Drop your personal .jpg or .png photos into this folder.
+# They will automatically rotate inside the Visual Recon 4K Archive panel on your HUD.
+# NOTE: Your photos are gitignored and will NEVER be pushed to GitHub.
+# ==============================================================================

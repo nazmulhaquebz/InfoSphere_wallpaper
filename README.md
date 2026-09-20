@@ -60,6 +60,21 @@ InfoSphere brings together high-performance technologies (Python, Go, Rust, and 
 
 ---
 
+## 🎯 User Customization Boundaries: What You Can Change (The ONLY 3 Items)
+
+> [!IMPORTANT]
+> **STRICT CUSTOMIZATION BOUNDARY FOR ALL USERS WORLDWIDE:**  
+> InfoSphere is engineered as an out-of-the-box, pre-calibrated live wallpaper. To ensure 100% desktop stability, prevent rendering breakage, and protect the engine, **you only ever need to touch or customize these 3 items**:
+>
+> 1. 👤 **`user_information.txt`** — Customize your Call-Sign, Full Name, Central Command Header banner, and Role Title.
+> 2. 🖼️ **`Picture/Original Picture/`** — Drop your personal `.jpg` or `.png` photos/wallpapers here for the Visual Recon 4K Archive panel.
+> 3. 🔐 **`.env`** (copied from `.env.example`) — Optional: Set your router gateway IP and password for SOC intrusion telemetry (or leave blank for passive ARP mode).
+>
+> ⛔ **DO NOT MODIFY ANY OTHER FILES:**  
+> **Never modify** `main.py`, `infosphere_live_wallpaper.html`, `core/`, `css/`, `infosphere_wallpaper.exe`, `START_INFOSPHERE.bat`, `STOP_INFOSPHERE.bat`, or `config.json`. Everything in the engine is automated and pre-configured out-of-the-box.
+
+---
+
 ## 🚀 Step-by-Step Installation ("One by One" with Terminal Code)
 
 Open **PowerShell** or **Command Prompt** (Run as Administrator or standard user) and execute these steps one by one:
@@ -120,7 +135,7 @@ INFOSPHERE_ROUTER_PASSWORD=
 
 ---
 
-### Step 5: Add Personal Photos to Visual Recon (Optional)
+### Step 5: Add Personal Photos to Visual Recon (Optional Customization #2)
 The repository ships with an empty picture directory for privacy: `Picture/Original Picture/`.  
 To display your own personal wallpapers or photos in the **Visual Recon 4K Archive** HUD panel:
 ```cmd
@@ -130,7 +145,16 @@ Drag and drop your favorite `.jpg` or `.png` photos into that folder!
 
 ---
 
-### Step 6: Launch InfoSphere Live Wallpaper
+### Step 6: Personalize Your Name & HUD (Customization #3)
+Customize the central command banner and your operator name on your live wallpaper:
+```cmd
+notepad user_information.txt
+```
+Edit your name or title, save the file, and you are ready!
+
+---
+
+### Step 7: Launch InfoSphere Live Wallpaper
 Start the live wallpaper engine:
 ```cmd
 START_INFOSPHERE.bat
@@ -146,7 +170,7 @@ START_INFOSPHERE.bat
 
 ---
 
-### Step 7 (Optional): Enable Auto-Start on Windows Login
+### Step 8 (Optional): Enable Auto-Start on Windows Login
 To have InfoSphere start automatically every time you turn on your computer:
 ```cmd
 install_autostart_windows.bat
@@ -157,7 +181,7 @@ install_autostart_windows.bat
 
 ---
 
-### Step 8: How to Stop the Wallpaper
+### Step 9: How to Stop the Wallpaper
 To turn off the wallpaper and restore your regular desktop background:
 ```cmd
 STOP_INFOSPHERE.bat
@@ -222,6 +246,10 @@ ROLE_TITLE=SYSTEM ADMINISTRATOR
 ---
 
 ## ⚙️ Configuration Reference (`config.json`)
+
+> [!NOTE]
+> **INTERNAL ENGINE PRESETS:**  
+> Standard users **do not** need to edit `config.json`. All normal personalizations (name, photos, router credentials) are cleanly handled via `user_information.txt`, `Picture/Original Picture/`, and `.env`. Advanced developers can inspect the engine defaults below:
 
 All features can also be configured directly in `config.json`:
 
