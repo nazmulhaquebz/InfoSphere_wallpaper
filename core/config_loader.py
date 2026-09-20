@@ -7,6 +7,7 @@ merges user settings with defaults so new keys always exist.
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -118,6 +119,25 @@ PROJECT_ROOT = (
 CONFIG_PATH = PROJECT_ROOT / "config.json"
 
 
+def load_env_file(env_path: Path = None) -> None:
+    """Load key-value pairs from .env into os.environ if not already set."""
+    if env_path is None:
+        env_path = PROJECT_ROOT / ".env"
+    if not env_path.is_file():
+        return
+    try:
+        for line in env_path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            k, v = line.split("=", 1)
+            k, v = k.strip(), v.strip().strip("'\"")
+            if k and k not in os.environ:
+                os.environ[k] = v
+    except Exception:
+        pass
+
+
 # ── Public API ─────────────────────────────────────────────────────────────
 
 def load_config() -> dict:
@@ -128,6 +148,7 @@ def load_config() -> dict:
     If it exists, user values are merged on top of defaults so
     any key added in a future version is always present.
     """
+    load_env_file()
     if not CONFIG_PATH.exists():
         print("[InfoSphere] config.json not found — creating with defaults.")
         _save_config(DEFAULT_CONFIG)

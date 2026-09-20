@@ -233,8 +233,8 @@ class RouterMonitor:
         cfg = config.get("router", {})
 
         self.enabled:  bool  = bool(cfg.get("enabled", False))
-        self.ip:       str   = cfg.get("ip", "192.168.0.1").strip()
-        self.username: str   = cfg.get("username", "admin").strip()
+        self.ip:       str   = os.environ.get("INFOSPHERE_ROUTER_IP", cfg.get("ip", "192.168.0.1")).strip()
+        self.username: str   = os.environ.get("INFOSPHERE_ROUTER_USERNAME", cfg.get("username", "")).strip()
         password_env = str(
             cfg.get("password_env", "INFOSPHERE_ROUTER_PASSWORD")
         ).strip()

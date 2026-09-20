@@ -77,3 +77,15 @@ desktop.ini
 .agents/
 .continue/
 .kilocode/
+
+# Personal User Photos in Picture/
+Picture/Original Picture/*
+!Picture/Original Picture/.gitkeep
+Picture/cache/*
+!Picture/cache/.gitkeep
+
+# Environment & Router Credentials (keep .env.example tracked, ignore actual .env)
+.env
+.env.local
+.env.*.local
+

@@ -6,6 +6,8 @@
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
 [![Engine](https://img.shields.io/badge/Live%20Engine-Go%20%2B%20WebView2-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
 [![Telemetry](https://img.shields.io/badge/Telemetry-Python%203.10+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Security Audit](https://img.shields.io/badge/Scanner-Rust%20Native-DEA584?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Node.js%20%7C%20Next.js-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Performance](https://img.shields.io/badge/FPS-60%20FPS%20Fluid-10B981?style=for-the-badge)](https://github.com/nazmulhaquebz/InfoSphere_wallpaper)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Ethical%20Clause-F59E0B?style=for-the-badge)](LICENSE)
 [![Ethics](https://img.shields.io/badge/Ethical%20Security-Defensive%20Only-blueviolet?style=for-the-badge)](SECURITY.md)
@@ -33,173 +35,190 @@ Native Windows `WorkerW` embedding · Zero desktop icon collision · 100% backgr
 > - **Authorized Use Only**: Only monitor hardware, network interfaces, and routers that you personally own or have explicit authorization to inspect.
 > - **No Malicious Capability**: InfoSphere contains **no offensive exploit tools, credential harvesters, port flooding, or unauthorized packet sniffing capabilities**.
 > - **Local-Only Privacy**: All system metrics, local ARP tables, and telemetry snapshots reside exclusively in volatile memory and local JSON storage (`127.0.0.1`). **No user data, keystrokes, or network credentials are ever sent to external cloud servers or third-party trackers.**
+> - **Empty Media Privacy**: The repository ships with an empty picture directory (`Picture/Original Picture/`); your personal photos stay strictly on your local disk and are never uploaded to GitHub.
 > - **Ethical Compliance**: Users worldwide must adhere to their local cybersecurity laws, computer fraud statutes, and organizational Acceptable Use Policies (AUP).
 
 ---
 
-## ✨ Key Architectural Features
+## 💻 Runtimes & Tech Stack: What Needs to be Installed First Time
 
-### 1. 🖥️ Native Windows `WorkerW` Desktop Integration
-- Injected directly into the Windows desktop message loop between the wallpaper layer and shell desktop icons (`WorkerW` handle via `user32.dll`).
-- **Desktop icons and shortcuts remain 100% interactive, clickable, and draggable** on top.
-- Zero border windows, zero taskbar presence, and zero desktop click interference.
+InfoSphere brings together high-performance technologies (Python, Go, Rust, and Node.js/Next.js).  
+**Here is exactly which one you need to install first time before running the wallpaper:**
 
-### 2. 🐟 60 FPS Bioluminescent Antigravity Pond
-- Dynamic interactive central water pond with **10 unique Japanese Koi and Goldfish specimens**.
-- Real-time physics simulation with water turbulence ripple effects (SVG Fractal Noise displacement filter).
-- Smooth mathematical spline flocking and obstacle avoidance algorithms running at locked 60 frames per second.
-
-### 3. 🌐 3D Geospatial CIRT Threat Defense Matrix
-- High-density spherical point-cloud globe composed of **4,000+ calculated coordinates**.
-- Features 3D parabolic laser attack arcs with protocol-colored vectors (TCP Cyan, UDP Crimson, DNS Amber, HTTP3 Violet).
-- Dual orbital gyroscopes, rotating cardinal markers, and critical infrastructure telemetric beacons (Dhaka BDIX, Kuakata SMW5, Cox's Bazar SMW4).
-
-### 4. ⚡ 15-Second Real-Time Speed Benchmark
-- Ultra-low-overhead micro-burst throughput testing with Cloudflare Dhaka BDIX edge endpoints.
-- Measures real-time **Download Mbps, Upload Mbps, Latency, and Jitter**.
-- Completes in under 1.5 seconds and consumes <2.5 MB bandwidth per cycle — **never lags your gaming, streaming, or browsing**.
-
-### 5. 🛡️ Hardware-Level SOC Router Analyzer & IDS
-- Reads active local network interfaces and hardware ARP tables via native Win32 `GetIpNetTable` in `iphlpapi.dll`.
-- **Zero Console Popups**: Operates 100% in-process without invoking shell commands or flashing terminal windows.
-- Resolves device manufacturer vendors via IEEE OUI database and immediately flags unknown intruder devices as `● ROGUE ALERT`.
-
-### 6. ⛅ Google IP Local Weather Engine
-- Auto-detects local ISP public IP, ISP provider, and city coordinates.
-- Real-time hyper-local temperature (°C and °F), meteorological condition, humidity, and wind speed.
-
-### 7. 🎨 Instant 6-Theme Tactical Palette Switcher
-- Switch aesthetic color schemes on the fly directly from the header controls:
-  - 🔷 **Cyber Cyan** (Default Tactical Blue)
-  - 🟢 **Emerald Matrix** (Terminal Green)
-  - 🟡 **Imperial Gold** (Command Amber)
-  - 🟣 **Stealth Violet** (Deep Cyberpunk)
-  - 🔴 **Crimson Alert** (High-Threat Red)
-  - ⚪ **Titanium OLED** (Pure Monochromatic Minimal)
-
----
-
-## 🏗️ System Architecture
-
-```mermaid
-flowchart TD
-    subgraph HostOS["Windows 10 / 11 Workstation"]
-        direction TB
-        
-        subgraph PythonCore["Python Telemetry Engine (main.py)"]
-            SysMon["psutil System Sensors<br/>(CPU, RAM, Disks, Network I/O)"]
-            NetSOC["Win32 GetIpNetTable<br/>(Hardware SOC & Rogue IDS)"]
-            WeatherSpeed["Google IP & Cloudflare<br/>(Weather & 15s Speed Test)"]
-            SysMon & NetSOC & WeatherSpeed -->|Atomic Write| SnapJSON["output/system_snapshot.json"]
-        end
-
-        subgraph GoHost["Go Wallpaper Host (infosphere_wallpaper.exe)"]
-            SSEHub["Server-Sent Events (SSE) Hub<br/>(Port 8090 / Loopback)"]
-            WinAPI["Win32 Desktop Injector<br/>(user32.dll -> WorkerW)"]
-            SnapJSON -->|File Watcher| SSEHub
-            WinAPI --> WebView2["Edge WebView2 Runtime"]
-            SSEHub -->|Live Stream| WebView2
-        end
-
-        subgraph DesktopUI["Interactive Desktop HUD"]
-            WebView2 --> LiveHUD["infosphere_live_wallpaper.html<br/>(60 FPS Aquarium, 3D WebGL Globe, HUD Cards)"]
-            DesktopIcons["Windows Desktop Icons & Shortcuts<br/>(Clickable, Draggable on Top)"]
-        end
-    end
-
-    classDef core fill:#0b192e,stroke:#00E5FF,stroke-width:2px,color:#fff;
-    classDef go fill:#032b43,stroke:#10B981,stroke-width:2px,color:#fff;
-    classDef hud fill:#1a103c,stroke:#A855F7,stroke-width:2px,color:#fff;
-    class PythonCore core;
-    class GoHost go;
-    class DesktopUI hud;
-```
-
----
-
-## 💻 Prerequisites (First-Time Install)
-
-Before running InfoSphere on any computer, verify the following prerequisites:
-
-| Requirement | Supported Version | Purpose | Download |
-|---|---|---|---|
-| **Operating System** | Windows 10 or 11 (64-bit) | WorkerW desktop embedding | Built-in |
-| **Python** | 3.10 or newer | Background telemetry engine | [python.org](https://www.python.org/downloads/) |
-| **WebView2** | Evergreen Runtime | Live HTML5/WebGL rendering | [Microsoft WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) *(Pre-installed on most PCs)* |
-| **Git** *(optional)* | 2.x+ | Cloning repository | [git-scm.com](https://git-scm.com/downloads) |
+| Technology | Role in InfoSphere | Is It Required Before Install? | Pre-Compiled in Repo? | Terminal Install Command |
+|---|---|---|---|---|
+| **🐍 Python 3.10+** | Hardware telemetry engine, system counters, speedtest, weather | **✅ REQUIRED FIRST TIME** | No (Interpreted) | `winget install Python.Python.3.12` |
+| **🌐 Edge WebView2** | Renders the HTML5/CSS3/WebGL wallpaper behind desktop icons | **✅ REQUIRED** (Built-in on 99% of PCs) | Pre-installed on Windows 10/11 | `winget install Microsoft.EdgeWebView2Runtime` |
+| **🐹 Go 1.21+** | Native `WorkerW` desktop injector & SSE event hub (`8090`) | **❌ OPTIONAL** (For developers only) | **YES** (`infosphere_wallpaper.exe`) | `winget install GoLang.Go` |
+| **🦀 Rust** | High-speed security auditor & image thumbnail processor | **❌ OPTIONAL** (For developers only) | **YES** (`security_audit.exe`, `image_processor.exe`) | `winget install Rustlang.Rustup` |
+| **⚡ Node.js / Next.js**| Optional standalone Jarvis web dashboard (`http://localhost:8080`) | **❌ OPTIONAL** (Wallpaper runs independently) | No (Requires npm install in `jarvis/`) | `winget install OpenJS.NodeJS.LTS` |
 
 > [!CAUTION]
-> **DURING PYTHON INSTALLATION:** Ensure you check the box:
-> **`☑ Add python.exe to PATH`** on the very first installation screen!
-
-*(Note: Go compiler is **NOT** needed for everyday users because the pre-compiled `infosphere_wallpaper.exe` binary is already included).*
+> **WHEN INSTALLING PYTHON VIA GUI:** You **MUST** check the box that says:  
+> **`☑ Add python.exe to PATH`** on the very first installer screen!  
+> If using `winget` in the terminal, it is added to PATH automatically.
 
 ---
 
-## 🚀 Step-by-Step Installation ("One by One")
+## 🚀 Step-by-Step Installation ("One by One" with Terminal Code)
 
-### Step 1: Clone or Download the Project
-Open PowerShell or Command Prompt:
+Open **PowerShell** or **Command Prompt** (Run as Administrator or standard user) and execute these steps one by one:
+
+### Step 1: Install Required Runtime (First Time Only)
+Verify if Python is installed:
+```cmd
+python --version
+```
+If Python is not installed, install it in one command via Windows Package Manager:
+```cmd
+winget install Python.Python.3.12
+```
+*(After installing via winget, restart your terminal to reload your PATH).*
+
+---
+
+### Step 2: Clone the GitHub Repository
+Clone the repository to your preferred directory (e.g. `C:\InfoSphere_wallpaper`):
 ```cmd
 git clone https://github.com/nazmulhaquebz/InfoSphere_wallpaper.git
 cd InfoSphere_wallpaper
 ```
-*(Or click **Code ➔ Download ZIP** on GitHub and extract to any folder on your computer).*
 
 ---
 
-### Step 2: Install Python Dependencies
-Run this single command inside the folder:
+### Step 3: Install Python Dependencies
+Install the required lightweight Python libraries:
 ```cmd
 python -m pip install -r requirements.txt
 ```
-*This installs three standard libraries: `Pillow`, `psutil`, and `speedtest-cli`.*
+*This installs three standard packages: `Pillow`, `psutil`, and `speedtest-cli`.*
 
 ---
 
-### Step 3: Launch InfoSphere
-Simply double-click:
-👉 **`START_INFOSPHERE.bat`**
+### Step 4: Configure Router & Credentials via `.env` (Blank by Default)
+InfoSphere comes with a clean template file: [`.env.example`](.env.example).  
+Create your local `.env` configuration:
+```cmd
+copy .env.example .env
+```
+Open `.env` in Notepad or your preferred editor:
+```cmd
+notepad .env
+```
+```env
+# Router Gateway IP (e.g. 192.168.0.1, 192.168.1.1, or leave blank)
+INFOSPHERE_ROUTER_IP=
 
-- Launches the telemetry engine and Go live wallpaper seamlessly.
-- Embeds immediately into your desktop background.
-- Zero command prompt windows stay open — **100% silent background operation**.
+# Router Administrative Portal Username (leave blank if not logging into web portal)
+INFOSPHERE_ROUTER_USERNAME=
+
+# Router Administrative Portal Password (leave blank if not logging into web portal)
+INFOSPHERE_ROUTER_PASSWORD=
+```
+> [!TIP]
+> **Zero-Configuration Mode:** You can leave all three fields **BLANK**! InfoSphere automatically uses native in-process Win32 ARP hardware discovery to detect connected devices (phones, cameras, PCs) without needing your router password.
 
 ---
 
-### Step 4 (Optional): Enable Auto-Start on Windows Boot
-If you want the live wallpaper to automatically start every time you log into Windows:
-👉 Double-click **`install_autostart_windows.bat`**
-
-- Configures a silent entry in your user registry (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
-- Starts smoothly on startup with no terminal popups.
-- To disable autostart later, double-click **`remove_autostart_windows.bat`**.
+### Step 5: Add Personal Photos to Visual Recon (Optional)
+The repository ships with an empty picture directory for privacy: `Picture/Original Picture/`.  
+To display your own personal wallpapers or photos in the **Visual Recon 4K Archive** HUD panel:
+```cmd
+explorer "Picture\Original Picture"
+```
+Drag and drop your favorite `.jpg` or `.png` photos into that folder!
 
 ---
 
-### Step 5: Stop the Wallpaper
-To turn off the wallpaper and restore your standard desktop:
-👉 Double-click **`STOP_INFOSPHERE.bat`**
+### Step 6: Launch InfoSphere Live Wallpaper
+Start the live wallpaper engine:
+```cmd
+START_INFOSPHERE.bat
+```
+*(Or simply double-click **`START_INFOSPHERE.bat`** in Windows Explorer).*
 
-- Cleanly terminates the Go wallpaper host, WebView2 instances, and Python telemetry engine, and frees port 8090.
+**What happens automatically:**
+1. Silently launches the Python telemetry engine in the background (`main.py` via `pythonw.exe`).
+2. Launches the Go live wallpaper host (`infosphere_wallpaper.exe`).
+3. Injects the 60 FPS HUD and Antigravity Aquarium behind your desktop icons in `WorkerW`.
+4. Your desktop icons, right-clicks, and window dragging remain **100% normal and responsive**.
+5. Runs **completely silently in the background with zero command prompt windows**.
+
+---
+
+### Step 7 (Optional): Enable Auto-Start on Windows Login
+To have InfoSphere start automatically every time you turn on your computer:
+```cmd
+install_autostart_windows.bat
+```
+- Adds a silent startup entry to your Windows registry (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
+- Starts with zero console popups on boot.
+- To disable autostart anytime, run: `remove_autostart_windows.bat`.
+
+---
+
+### Step 8: How to Stop the Wallpaper
+To turn off the wallpaper and restore your regular desktop background:
+```cmd
+STOP_INFOSPHERE.bat
+```
+- Cleanly terminates `infosphere_wallpaper.exe`, WebView2, and `main.py`, and releases port 8090.
+
+---
+
+## 🛠️ Developer Guide: Compiling Go & Rust from Source (Optional)
+
+If you have Go and Rust installed and wish to recompile the native binaries:
+
+### Compile Go Wallpaper Injector & SSE Hub:
+```cmd
+cd core\wallpaper
+go build -ldflags="-H=windowsgui -s -w" -buildvcs=false -o ..\..\infosphere_wallpaper.exe .
+cd ..\..
+```
+
+### Compile Rust Security Auditor:
+```cmd
+cd core\scanner
+rustc -O security_audit.rs -o ..\bin\security_audit.exe
+cd ..\..
+```
+
+### Launch Optional Jarvis Next.js Dashboard:
+```cmd
+cd jarvis
+npm install
+npm run dev
+```
+*Access Jarvis dashboard locally at `http://127.0.0.1:8080`.*
 
 ---
 
 ## ⚙️ Configuration Reference (`config.json`)
 
-All features are customizable via `config.json`:
+All features can also be configured directly in `config.json`:
 
 | Parameter | Type | Default | Description |
 |---|---|---|---|
-| `refresh_interval_seconds` | Float | `1.0` | Telemetry refresh rate (seconds) |
+| `refresh_interval_seconds` | Float | `1.0` | Telemetry refresh frequency (seconds) |
 | `show_weather` | Boolean | `true` | Enable/disable Google IP weather module |
-| `weather_city` | String | `"auto"` | `"auto"` for IP geolocation or type city name |
-| `speedtest.enabled` | Boolean | `true` | Enable/disable network benchmark |
+| `weather_city` | String | `"auto"` | `"auto"` for automatic IP geolocation |
+| `speedtest.enabled` | Boolean | `true` | Enable/disable real-time speed benchmark |
 | `speedtest.speed_interval_s`| Integer | `15` | Interval between speed tests (seconds) |
-| `speedtest.ping_host` | String | `"8.8.8.8"` | Target host for ICMP/TCP latency & jitter |
 | `router.enabled` | Boolean | `true` | Enable/disable hardware SOC network analyzer |
 | `router.refresh_secs` | Integer | `10` | Frequency of ARP table sweep |
-| `colors.accent_cyan` | String | `"#00E5FF"` | Primary tactical HUD accent color |
+
+---
+
+## 📜 Version Control Ledger
+
+InfoSphere includes a dedicated version ledger and automated management system:
+- Check version and release history: See [`CHANGELOG.md`](CHANGELOG.md).
+- To bump versions with today's date automatically:
+  ```cmd
+  python bump_version.py 2.3.1 "Release notes"
+  ```
+  *(Or double-click `bump_version.bat`).*
 
 ---
 
@@ -207,7 +226,8 @@ All features are customizable via `config.json`:
 
 - **Zero Cloud Leakage**: No telemetry, system configurations, Wi-Fi SSIDs, or hardware MAC addresses are transmitted to external servers.
 - **Loopback Enforcement**: Internal communication uses strictly `127.0.0.1`.
-- **Read-Only Inspection**: Network discovery uses standard operating system ARP lookups; it never transmits aggressive packets, port scans, or exploitation payloads.
+- **Passive Read-Only Inspection**: Network discovery uses standard operating system ARP lookups; it never transmits aggressive packets, port scans, or exploitation payloads.
+- **Git Privacy**: `.gitignore` strictly protects your personal photos in `Picture/` and router passwords in `.env` from ever being pushed to GitHub.
 
 ---
 
