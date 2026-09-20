@@ -194,6 +194,33 @@ npm run dev
 
 ---
 
+## 👤 Personalize Your Name & Desktop HUD (`user_information.txt`)
+
+Any user worldwide can customize the central command banner and their name on their desktop HUD anytime without modifying code:
+
+Open **`user_information.txt`** in Notepad or any text editor:
+```cmd
+notepad user_information.txt
+```
+```ini
+# Your Name or Call-Sign (e.g. NAZMUL, ALEX, CYBER_OPERATOR)
+NAME=NAZMUL
+
+# Central Command Banner Header (Displayed above the 60 FPS Antigravity Pond)
+WELCOME_TITLE=WELCOME TO THE NAZMUL SECURITY WORLD
+
+# Security Status Subtitle & Ticker
+STATUS_SUBTITLE=● ADVANCED TACTICAL THREAT SHIELD · ACTIVE PERIMETER SCAN
+
+# Operator Role / Title (displayed in the top header)
+ROLE_TITLE=SYSTEM ADMINISTRATOR
+```
+
+> [!TIP]
+> **Instant Live Sync**: As soon as you save `user_information.txt`, the live wallpaper automatically updates the central banner, operator pill, and status ticker in real time!
+
+---
+
 ## ⚙️ Configuration Reference (`config.json`)
 
 All features can also be configured directly in `config.json`:

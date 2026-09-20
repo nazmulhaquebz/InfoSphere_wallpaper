@@ -353,10 +353,10 @@
               </svg>
             </div>
             <div class="hud-title-col">
-              <div class="hud-welcome-title">WELCOME TO THE NAZMUL SECURITY WORLD</div>
+              <div class="hud-welcome-title" id="hud-welcome-title">WELCOME TO THE NAZMUL SECURITY WORLD</div>
               <div class="hud-ticker-row">
                 <span class="hud-ticker-prefix">STATUS:</span>
-                <span class="hud-ticker-text" id="pond-hud-ticker">● NAZMUL DEFENSE MATRIX · INTEGRITY 100% · ZERO BREACH</span>
+                <span class="hud-ticker-text" id="pond-hud-ticker">● ADVANCED TACTICAL THREAT SHIELD · ACTIVE PERIMETER SCAN</span>
               </div>
             </div>
           </div>
@@ -1069,7 +1069,13 @@ const dom = {
   routerTbody: document.getElementById('router-tbody'),
 
   // Live Telemetry
-  terminalStream: document.getElementById('terminal-stream')
+  terminalStream: document.getElementById('terminal-stream'),
+
+  // Central Command Banner & Operator Info
+  hudWelcomeTitle: document.getElementById('hud-welcome-title'),
+  pondHudTicker: document.getElementById('pond-hud-ticker'),
+  opName: document.getElementById('op-name'),
+  opTitle: document.getElementById('op-title')
 };
 
 // Dirty-checking helpers to prevent unnecessary browser layout reflows and minimize RAM
@@ -1090,6 +1096,21 @@ function applySnapshot(data) {
   if (!data) return;
   if (data.geospatial) {
     window.__geospatialData = data.geospatial;
+  }
+  if (data.user_info) {
+    const ui = data.user_info;
+    if (ui.welcome_title && dom.hudWelcomeTitle) {
+      updateText(dom.hudWelcomeTitle, ui.welcome_title);
+    }
+    if (ui.status_subtitle && dom.pondHudTicker) {
+      updateText(dom.pondHudTicker, ui.status_subtitle);
+    }
+    if (ui.name && dom.opName) {
+      updateText(dom.opName, ui.name);
+    }
+    if (ui.role_title && dom.opTitle) {
+      updateText(dom.opTitle, ui.role_title);
+    }
   }
   const m = data.metrics || {};
   const s = data.system || {};
@@ -1179,7 +1200,7 @@ function applySnapshot(data) {
     updateText(dom.hostName, s.hostname);
   }
   if (s.os_name) {
-    const op = s.username ? s.username.toUpperCase() : 'NAZMU';
+    const op = (data.user_info && data.user_info.name) ? data.user_info.name.toUpperCase() : (s.username ? s.username.toUpperCase() : 'OPERATOR');
     updateText(dom.hostOs, `${s.os_name} · OPERATOR: ${op}`);
   }
 

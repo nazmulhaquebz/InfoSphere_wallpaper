@@ -1,0 +1,18 @@
+# ==============================================================================
+# INFOSPHERE · USER CUSTOMIZATION PROFILE
+# ==============================================================================
+# Customize your name and security banner on your live desktop HUD!
+# When you edit and save this file, your live wallpaper updates immediately.
+# ==============================================================================
+
+# Your Name or Call-Sign (e.g. NAZMUL, ALEX, CYBER_OPERATOR)
+NAME=NAZMUL
+
+# Central Command Banner Header (Marked area above the 60 FPS Antigravity Pond)
+WELCOME_TITLE=WELCOME TO THE NAZMUL SECURITY WORLD
+
+# Security Status Subtitle & Ticker
+STATUS_SUBTITLE=● ADVANCED TACTICAL THREAT SHIELD · ACTIVE PERIMETER SCAN
+
+# Operator Role / Title (displayed in the top header)
+ROLE_TITLE=SYSTEM ADMINISTRATOR

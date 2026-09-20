@@ -60,6 +60,7 @@ from core.telemetry_snapshot import build_snapshot, validate_snapshot
 from core.display_info      import resolve_display_config
 from core.version           import APP_VERSION
 from core.geospatial_telemetry import get_geospatial_telemetry
+from core.user_info         import load_user_info
 
 
 _SINGLETON_HANDLE = None
@@ -382,6 +383,7 @@ def main() -> None:
                     refresh_seconds=refresh_secs,
                     simulate_threats=telemetry.simulate_threats,
                     geospatial=get_geospatial_telemetry(),
+                    user_info=load_user_info(),
                 )
                 snapshot_errors = validate_snapshot(snapshot)
                 if snapshot_errors:
