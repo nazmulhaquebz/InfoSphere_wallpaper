@@ -7,7 +7,7 @@
 [![Engine](https://img.shields.io/badge/Live%20Engine-Go%201.26%20%2B%20WebView2-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
 [![Telemetry](https://img.shields.io/badge/Telemetry-Python%203.14+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Security Audit](https://img.shields.io/badge/Scanner-Rust%201.96-DEA584?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Node.js%2024%20%7C%20Next.js%2016-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Node.js%2026%20%7C%20Next.js%2016.3-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Performance](https://img.shields.io/badge/FPS-60%20FPS%20Fluid-10B981?style=for-the-badge)](https://github.com/nazmulhaquebz/InfoSphere_wallpaper)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Ethical%20Clause-F59E0B?style=for-the-badge)](LICENSE)
 [![Ethics](https://img.shields.io/badge/Ethical%20Security-Defensive%20Only-blueviolet?style=for-the-badge)](SECURITY.md)
@@ -51,7 +51,7 @@ InfoSphere brings together high-performance, modern technologies (Python, Go, Ru
 | **🌐 Edge WebView2** | Renders HTML5/CSS3/WebGL wallpaper behind desktop icons | **Evergreen Runtime** | **✅ REQUIRED** (Built-in on 99% of PCs) | Pre-installed on Windows 10/11 | `winget install Microsoft.EdgeWebView2Runtime` |
 | **🐹 Go (Golang)** | Native `WorkerW` desktop injector & SSE event hub (`8090`) | **Go 1.26.4** (in `go.mod`) | **❌ OPTIONAL** (For developers only) | **YES** (`infosphere_wallpaper.exe`) | `winget install GoLang.Go` |
 | **🦀 Rust** | High-speed security auditor & image thumbnail processor | **rustc 1.96.0** (Native) | **❌ OPTIONAL** (For developers only) | **YES** (`security_audit.exe`, `image_processor.exe`) | `winget install Rustlang.Rustup` |
-| **⚡ Node.js / Next.js**| Optional standalone Jarvis web dashboard (`http://localhost:8080`) | **Node.js v24.18.0 · Next.js 16.2.12 (React 19.2.4)** | **❌ OPTIONAL** (Wallpaper runs independently) | Dependencies configured in `jarvis/` | `winget install OpenJS.NodeJS.LTS` |
+| **⚡ Node.js / Next.js**| Optional standalone Jarvis web dashboard (`http://localhost:8080`) | **Node.js v26.9.0 (npm 11.19.1) · Next.js 16.3.5 (React 19.2.4)** | **❌ OPTIONAL** (Wallpaper runs independently) | Dependencies configured in `jarvis/` | `winget install OpenJS.NodeJS` |
 
 > [!CAUTION]
 > **WHEN INSTALLING PYTHON VIA GUI:** You **MUST** check the box that says:  
