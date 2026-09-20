@@ -41,6 +41,8 @@ logs/*
 *.log
 *.bak
 *.bmp
+*.pdb
+core/scanner/output/
 
 # Browser / WebView2 runtime profile
 edge_profile/

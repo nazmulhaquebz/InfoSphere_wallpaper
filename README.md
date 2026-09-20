@@ -4,10 +4,10 @@
 ### Executive 60 FPS Live Wallpaper · SOC Intrusion Telemetry · 3D Geospatial Defense Matrix
 
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
-[![Engine](https://img.shields.io/badge/Live%20Engine-Go%20%2B%20WebView2-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
-[![Telemetry](https://img.shields.io/badge/Telemetry-Python%203.10+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
-[![Security Audit](https://img.shields.io/badge/Scanner-Rust%20Native-DEA584?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
-[![Dashboard](https://img.shields.io/badge/Dashboard-Node.js%20%7C%20Next.js-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
+[![Engine](https://img.shields.io/badge/Live%20Engine-Go%201.26%20%2B%20WebView2-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
+[![Telemetry](https://img.shields.io/badge/Telemetry-Python%203.14+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
+[![Security Audit](https://img.shields.io/badge/Scanner-Rust%201.96-DEA584?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
+[![Dashboard](https://img.shields.io/badge/Dashboard-Node.js%2024%20%7C%20Next.js%2016-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Performance](https://img.shields.io/badge/FPS-60%20FPS%20Fluid-10B981?style=for-the-badge)](https://github.com/nazmulhaquebz/InfoSphere_wallpaper)
 [![License](https://img.shields.io/badge/License-MIT%20%2B%20Ethical%20Clause-F59E0B?style=for-the-badge)](LICENSE)
 [![Ethics](https://img.shields.io/badge/Ethical%20Security-Defensive%20Only-blueviolet?style=for-the-badge)](SECURITY.md)
@@ -40,18 +40,18 @@ Native Windows `WorkerW` embedding · Zero desktop icon collision · 100% backgr
 
 ---
 
-## 💻 Runtimes & Tech Stack: What Needs to be Installed First Time
+## 💻 Runtimes & Tech Stack: Language & Framework Versions
 
-InfoSphere brings together high-performance technologies (Python, Go, Rust, and Node.js/Next.js).  
-**Here is exactly which one you need to install first time before running the wallpaper:**
+InfoSphere brings together high-performance, modern technologies (Python, Go, Rust, and Node.js/Next.js).  
+**Here is the exact version ledger and runtime requirements for each component:**
 
-| Technology | Role in InfoSphere | Is It Required Before Install? | Pre-Compiled in Repo? | Terminal Install Command |
-|---|---|---|---|---|
-| **🐍 Python 3.10+** | Hardware telemetry engine, system counters, speedtest, weather | **✅ REQUIRED FIRST TIME** | No (Interpreted) | `winget install Python.Python.3.12` |
-| **🌐 Edge WebView2** | Renders the HTML5/CSS3/WebGL wallpaper behind desktop icons | **✅ REQUIRED** (Built-in on 99% of PCs) | Pre-installed on Windows 10/11 | `winget install Microsoft.EdgeWebView2Runtime` |
-| **🐹 Go 1.21+** | Native `WorkerW` desktop injector & SSE event hub (`8090`) | **❌ OPTIONAL** (For developers only) | **YES** (`infosphere_wallpaper.exe`) | `winget install GoLang.Go` |
-| **🦀 Rust** | High-speed security auditor & image thumbnail processor | **❌ OPTIONAL** (For developers only) | **YES** (`security_audit.exe`, `image_processor.exe`) | `winget install Rustlang.Rustup` |
-| **⚡ Node.js / Next.js**| Optional standalone Jarvis web dashboard (`http://localhost:8080`) | **❌ OPTIONAL** (Wallpaper runs independently) | No (Requires npm install in `jarvis/`) | `winget install OpenJS.NodeJS.LTS` |
+| Technology | Role in InfoSphere | Installed / Verified Version | Is It Required Before Install? | Pre-Compiled in Repo? | Terminal Install Command |
+|---|---|---|---|---|---|
+| **🐍 Python** | Hardware telemetry engine, system counters, speedtest, weather | **Python 3.14.7** (Supports 3.10+) | **✅ REQUIRED FIRST TIME** | No (Interpreted) | `winget install Python.Python.3.12` |
+| **🌐 Edge WebView2** | Renders HTML5/CSS3/WebGL wallpaper behind desktop icons | **Evergreen Runtime** | **✅ REQUIRED** (Built-in on 99% of PCs) | Pre-installed on Windows 10/11 | `winget install Microsoft.EdgeWebView2Runtime` |
+| **🐹 Go (Golang)** | Native `WorkerW` desktop injector & SSE event hub (`8090`) | **Go 1.26.4** (in `go.mod`) | **❌ OPTIONAL** (For developers only) | **YES** (`infosphere_wallpaper.exe`) | `winget install GoLang.Go` |
+| **🦀 Rust** | High-speed security auditor & image thumbnail processor | **rustc 1.96.0** (Native) | **❌ OPTIONAL** (For developers only) | **YES** (`security_audit.exe`, `image_processor.exe`) | `winget install Rustlang.Rustup` |
+| **⚡ Node.js / Next.js**| Optional standalone Jarvis web dashboard (`http://localhost:8080`) | **Node.js v24.18.0 · Next.js 16.2.12 (React 19.2.4)** | **❌ OPTIONAL** (Wallpaper runs independently) | Dependencies configured in `jarvis/` | `winget install OpenJS.NodeJS.LTS` |
 
 > [!CAUTION]
 > **WHEN INSTALLING PYTHON VIA GUI:** You **MUST** check the box that says:  
