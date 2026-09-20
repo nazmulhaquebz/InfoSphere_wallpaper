@@ -1,0 +1,43 @@
+MIT License
+
+Copyright (c) 2026 Mohammad Nazmul Haque (https://github.com/nazmulhaquebz)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------------
+ETHICAL USE & RESPONSIBLE MONITORING ADDENDUM
+--------------------------------------------------------------------------------
+InfoSphere is engineered exclusively for defensive, educational, aesthetic, and
+authorized personal workstation observability. By downloading, compiling, or
+using this software, you agree to the following ethical principles:
+
+1. AUTHORIZED USE ONLY: You may only monitor systems, local interfaces, and
+   network equipment that you personally own or have explicit, documented
+   permission to observe.
+2. NO MALICIOUS OR OFFENSIVE USE: Under no circumstances may this software or its
+   underlying telemetry modules be used for unauthorized network intrusion,
+   packet interception, port scanning, denial-of-service, or surveillance of
+   third-party devices without prior consent.
+3. LOCAL PRIVACY: InfoSphere is designed with a strict privacy-first architecture.
+   All hardware metrics, network states, and telemetry snapshots remain strictly
+   local to your workstation and are never transmitted to external telemetry
+   servers or third-party trackers.
+4. COMPLIANCE WITH APPLICABLE LAWS: Users are solely responsible for ensuring
+   their use of this software complies with all local, national, and international
+   cybersecurity laws, regulations, and institutional Acceptable Use Policies (AUP).

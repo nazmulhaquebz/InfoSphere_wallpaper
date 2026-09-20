@@ -46,6 +46,7 @@ logs/*
 edge_profile/
 
 # Temporary / Scratch scripts and data
+caveman/
 scratch/
 check_*.py
 compare_*.py
