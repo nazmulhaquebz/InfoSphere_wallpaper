@@ -65,10 +65,10 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
     </div>
 
     <!-- GitHub Release Update Notifier (Auto-revealed when new release is detected) -->
-    <a id="update-notify-pill" class="update-notify-pill" href="https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases/latest" target="_blank" rel="noopener noreferrer" style="display:none;" title="Click to view new release on GitHub">
+    <a id="update-notify-pill" class="update-notify-pill" href="javascript:void(0)" onclick="openUpdateModal()" style="display:none;" title="Click to install update">
       <span class="update-pulse-dot"></span>
       <span id="update-notify-text" class="update-text">UPDATE AVAILABLE</span>
-      <span class="update-btn-tag">GET UPDATE ➔</span>
+      <span class="update-btn-tag">UPDATE NOW ⚡</span>
     </a>
 
     <!-- Multi-Theme Palette Picker -->
@@ -1138,6 +1138,7 @@ function applySnapshot(data) {
   // ── GitHub Release Update Notification Handler ───────────────────────────
   if (data.update_info) {
     const up = data.update_info;
+    window.__latestUpdateInfo = up;
     const pill = dom.updatePill || document.getElementById('update-notify-pill');
     if (pill) {
       if (up.update_available) {
@@ -1146,10 +1147,7 @@ function applySnapshot(data) {
         if (txt) {
           updateText(txt, `NEW UPDATE ${up.latest_version}`);
         }
-        if (up.release_url) {
-          pill.href = up.release_url;
-        }
-        pill.title = `New Release ${up.latest_version} available on GitHub! Click to download / view details.`;
+        pill.title = `New Release ${up.latest_version} available! Click to update now.`;
       } else {
         pill.style.display = 'none';
       }
@@ -2552,6 +2550,112 @@ async function pollSnapshot() {
   });
 })();
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 10. INFOSPHERE 1-CLICK IN-APP AUTO-UPDATER CONTROLLER
+// ═══════════════════════════════════════════════════════════════════════════
+let updatePollTimer = null;
+let isUpdating = false;
+
+function openUpdateModal() {
+  const modal = document.getElementById('update-modal');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  const curVer = document.getElementById('update-cur-ver');
+  const targetVer = document.getElementById('update-target-ver');
+  if (curVer) curVer.textContent = 'v2.3.0';
+  if (targetVer && window.__latestUpdateInfo) {
+    targetVer.textContent = window.__latestUpdateInfo.latest_version || 'NEW RELEASE';
+  }
+}
+
+function closeUpdateModal() {
+  if (isUpdating) return;
+  const modal = document.getElementById('update-modal');
+  if (modal) modal.style.display = 'none';
+  if (updatePollTimer) {
+    clearInterval(updatePollTimer);
+    updatePollTimer = null;
+  }
+}
+
+async function triggerInAppUpdate() {
+  const btn = document.getElementById('update-btn-action');
+  const cancelBtn = document.getElementById('update-btn-cancel');
+  const statusMsg = document.getElementById('update-status-msg');
+  const pctVal = document.getElementById('update-pct-val');
+  const fill = document.getElementById('update-progress-fill');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.classList.add('busy');
+  }
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  isUpdating = true;
+
+  if (statusMsg) statusMsg.textContent = 'Connecting to update engine...';
+  if (fill) fill.style.width = '8%';
+  if (pctVal) pctVal.textContent = '8%';
+
+  try {
+    const res = await fetch('/api/update/start', { method: 'POST' });
+    if (!res.ok) {
+      throw new Error(`Server returned HTTP ${res.status}`);
+    }
+  } catch (err) {
+    if (statusMsg) statusMsg.textContent = `Update trigger failed: ${err.message}`;
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove('busy');
+      const lbl = document.getElementById('update-btn-label');
+      if (lbl) lbl.textContent = 'RETRY UPDATE';
+    }
+    if (cancelBtn) cancelBtn.style.display = 'inline-block';
+    isUpdating = false;
+    return;
+  }
+
+  // Poll status every 350ms
+  updatePollTimer = setInterval(async () => {
+    try {
+      const res = await fetch('/api/update/status');
+      if (res.ok) {
+        const data = await res.json();
+        const pct = Math.max(0, Math.min(100, data.pct || 0));
+        if (fill) fill.style.width = `${pct}%`;
+        if (pctVal) pctVal.textContent = `${pct}%`;
+        if (statusMsg && data.message) statusMsg.textContent = data.message;
+
+        const speedEl = document.getElementById('update-speed-val');
+        if (speedEl && data.speed_mb > 0) {
+          speedEl.textContent = `SPEED: ${data.speed_mb} MB/s`;
+        }
+
+        const bytesEl = document.getElementById('update-bytes-val');
+        if (bytesEl && data.total_mb > 0) {
+          bytesEl.textContent = `TRANSFERRED: ${data.downloaded_mb} MB / ${data.total_mb} MB`;
+        }
+
+        if (data.status === 'RESTARTING') {
+          if (statusMsg) statusMsg.textContent = 'Applying updates & restarting live wallpaper engine...';
+          clearInterval(updatePollTimer);
+          updatePollTimer = null;
+        } else if (data.status === 'ERROR') {
+          clearInterval(updatePollTimer);
+          updatePollTimer = null;
+          isUpdating = false;
+          if (btn) {
+            btn.disabled = false;
+            btn.classList.remove('busy');
+            const lbl = document.getElementById('update-btn-label');
+            if (lbl) lbl.textContent = 'RETRY UPDATE';
+          }
+          if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        }
+      }
+    } catch (e) {}
+  }, 350);
+}
+
 // Kick-off SSE connection or fallback
 if (window.location.protocol.startsWith('http')) {
   connectSSE();
@@ -2560,6 +2664,67 @@ if (window.location.protocol.startsWith('http')) {
   pollSnapshot();
 }
 </script>
+
+<!-- ─── Tactical Cyber In-App Auto-Updater Modal ────────────────────────────── -->
+<div id="update-modal" class="update-modal" style="display:none;">
+  <div class="update-modal-backdrop" onclick="closeUpdateModal()"></div>
+  <div class="update-modal-card">
+    <div class="update-modal-header">
+      <div class="update-modal-title">
+        <span class="update-beacon-dot"></span>
+        <span>INFOSPHERE · 1-CLICK SYSTEM AUTO-UPDATER</span>
+      </div>
+      <button class="update-modal-close" onclick="closeUpdateModal()" title="Close">&times;</button>
+    </div>
+
+    <div class="update-modal-body">
+      <div class="update-meta-row">
+        <div class="update-meta-item">
+          <span class="update-meta-lbl">CURRENT BUILD</span>
+          <span class="update-meta-val" id="update-cur-ver">v2.3.0</span>
+        </div>
+        <div class="update-meta-item">
+          <span class="update-meta-lbl">TARGET RELEASE</span>
+          <span class="update-meta-val target" id="update-target-ver">v2.4.0</span>
+        </div>
+        <div class="update-meta-item">
+          <span class="update-meta-lbl">USER DATA</span>
+          <span class="update-meta-val safe">PROTECTED (100%)</span>
+        </div>
+      </div>
+
+      <div class="update-notice-box">
+        <div class="update-notice-title">🛡️ ZERO DATA LOSS SAFETY GUARANTEE</div>
+        <div class="update-notice-desc">
+          Your personal photos (<code class="update-code">Picture/Original Picture/</code>), operator credentials (<code class="update-code">user_information.txt</code>), and router settings (<code class="update-code">.env</code>) are safely preserved. Only core engine files, shaders, and widgets will be upgraded.
+        </div>
+      </div>
+
+      <!-- Live Progress Bar Section -->
+      <div class="update-progress-container">
+        <div class="update-progress-info">
+          <span id="update-status-msg" class="update-status-msg">Ready to download and install update.</span>
+          <span id="update-pct-val" class="update-pct-val">0%</span>
+        </div>
+        <div class="update-progress-track">
+          <div id="update-progress-fill" class="update-progress-fill" style="width:0%;"></div>
+        </div>
+        <div class="update-metrics-row">
+          <span id="update-speed-val" class="update-metric-lbl">SPEED: -- MB/s</span>
+          <span id="update-bytes-val" class="update-metric-lbl">TRANSFERRED: -- / --</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="update-modal-footer">
+      <button id="update-btn-cancel" class="update-btn-secondary" onclick="closeUpdateModal()">CANCEL</button>
+      <button id="update-btn-action" class="update-btn-primary" onclick="triggerInAppUpdate()">
+        <span class="update-btn-icon">⚡</span>
+        <span id="update-btn-label">INSTALL UPDATE NOW</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

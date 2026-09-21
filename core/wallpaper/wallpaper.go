@@ -17,6 +17,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -480,6 +481,35 @@ func startServer(root string, port int, hub *sseHub) error {
 			}
 		}
 		json.NewEncoder(w).Encode(list)
+	})
+
+	// 1-Click Automated In-App Update API
+	http.HandleFunc("/api/update/start", func(w http.ResponseWriter, r *http.Request) {
+		cors(w)
+		if r.Method != http.MethodPost {
+			http.Error(w, `{"error":"method not allowed"}`, http.StatusMethodNotAllowed)
+			return
+		}
+		cmd := exec.Command("python", "core/updater.py", "--start")
+		cmd.Dir = root
+		if err := cmd.Start(); err != nil {
+			log.Printf("[Updater] Failed to launch updater: %v", err)
+			http.Error(w, fmt.Sprintf(`{"error":"%v"}`, err), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`{"status":"started"}`))
+	})
+
+	http.HandleFunc("/api/update/status", func(w http.ResponseWriter, r *http.Request) {
+		cors(w)
+		w.Header().Set("Content-Type", "application/json")
+		statusFile := filepath.Join(root, "output", "update_status.json")
+		if d, err := os.ReadFile(statusFile); err == nil {
+			w.Write(d)
+		} else {
+			w.Write([]byte(`{"status":"IDLE","pct":0,"message":"Ready"}`))
+		}
 	})
 
 	// Static files
