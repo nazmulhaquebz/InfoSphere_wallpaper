@@ -32,7 +32,7 @@ echo    [2/3] Stopping Python engines & updater workers...
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop_engine.ps1" -Quiet >nul 2>&1
 :: Fallback: force-kill any remaining pythonw/python running main.py or updater.py
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
-  "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { ($_.Name -match 'python') -and ($_.CommandLine -match 'main\.py' -or $_.CommandLine -match 'updater\.py') } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+  "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { ($_.Name -match 'python') -and (($_.CommandLine -match 'main\.py') -or ($_.CommandLine -match 'updater\.py')) } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 echo           Done.
 
 :: ─── [3/3] Clean up port 8090 if anything is still bound ────────────────────

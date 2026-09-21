@@ -55,14 +55,26 @@ def bump_version(new_ver: str, notes: str = ""):
         )
         # Replace brand subtitle
         content = re.sub(
-            r'<div class="brand-subtitle">v[0-9\.]+ · LOCAL & SECURE · KERNEL SYNC</div>',
-            f'<div class="brand-subtitle">v{new_ver} · LOCAL & SECURE · KERNEL SYNC</div>',
+            r'<div class="brand-subtitle">v[0-9\.]+ · LOCAL &amp; SECURE · KERNEL SYNC</div>',
+            f'<div class="brand-subtitle">v{new_ver} · LOCAL &amp; SECURE · KERNEL SYNC</div>',
             content
         )
         # Replace footer
         content = re.sub(
             r"InfoSphere v[0-9\.]+ · Intelligent Live Engine",
             f"InfoSphere v{new_ver} · Intelligent Live Engine",
+            content
+        )
+        # Replace hardcoded JS fallback version in update modal openUpdateModal()
+        content = re.sub(
+            r"(\|\| ')\d+\.\d+\.\d+(';\s*\n\s*curVer\.textContent)",
+            rf"\g<1>{new_ver}\g<2>",
+            content
+        )
+        # Replace static CURRENT BUILD label in modal HTML
+        content = re.sub(
+            r'(<span class="update-meta-val" id="update-cur-ver">)v[0-9\.]+(<)',
+            rf'\g<1>v{new_ver}\g<2>',
             content
         )
         HTML_FILE.write_text(content, encoding="utf-8")

@@ -497,6 +497,8 @@ func startServer(root string, port int, hub *sseHub) error {
 			http.Error(w, fmt.Sprintf(`{"error":"%v"}`, err), http.StatusInternalServerError)
 			return
 		}
+		// Reap the child process in background to avoid zombie accumulation
+		go func() { _ = cmd.Wait() }()
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(`{"status":"started"}`))
 	})

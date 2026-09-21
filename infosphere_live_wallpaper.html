@@ -1097,7 +1097,7 @@ const dom = {
 
   // GitHub Release Update Notifier
   updatePill: document.getElementById('update-notify-pill'),
-  updateText: document.getElementById('update-notify-text')
+  updateNotifyText: document.getElementById('update-notify-text')
 };
 
 // Dirty-checking helpers to prevent unnecessary browser layout reflows and minimize RAM
@@ -1143,7 +1143,7 @@ function applySnapshot(data) {
     if (pill) {
       if (up.update_available) {
         pill.style.display = 'inline-flex';
-        const txt = dom.updateText || document.getElementById('update-notify-text');
+        const txt = dom.updateNotifyText || document.getElementById('update-notify-text');
         if (txt) {
           updateText(txt, `NEW UPDATE ${up.latest_version}`);
         }
@@ -2562,7 +2562,13 @@ function openUpdateModal() {
   modal.style.display = 'flex';
   const curVer = document.getElementById('update-cur-ver');
   const targetVer = document.getElementById('update-target-ver');
-  if (curVer) curVer.textContent = 'v2.3.0';
+  if (curVer) {
+    // Read current version dynamically from snapshot data; fall back to HTML title parse
+    const cur = (window.__latestUpdateInfo && window.__latestUpdateInfo.current_version)
+      || (document.title.match(/v([\d.]+)/) || [])[1]
+      || '2.3.0';
+    curVer.textContent = cur.startsWith('v') ? cur : `v${cur}`;
+  }
   if (targetVer && window.__latestUpdateInfo) {
     targetVer.textContent = window.__latestUpdateInfo.latest_version || 'NEW RELEASE';
   }
