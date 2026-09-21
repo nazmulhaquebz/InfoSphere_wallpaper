@@ -94,27 +94,57 @@ winget install Python.Python.3.12
 
 ### Step 2: Download InfoSphere to Your PC
 
-Choose your preferred download method below:
+#### 💻 How to Download via Windows Terminal (Recommended & No Virus Warnings)
+Downloading via terminal uses the official Git protocol. It completely bypasses browser Safe Browsing ZIP blocks and is the fastest method.
 
-#### Method A: Via Windows Terminal (`git clone` — Recommended)
-Open **PowerShell** or **Command Prompt** and run:
+Open **Windows Terminal** (PowerShell or Command Prompt):
+
+##### Method 1: Using `git clone` (Standard & Best Method)
 ```cmd
 git clone https://github.com/nazmulhaquebz/InfoSphere_wallpaper.git
 cd InfoSphere_wallpaper
 ```
-*(If you do not have Git installed, install it in one command: `winget install Git.Git`).*
 
-#### Method B: Direct Download & Extract in PowerShell (No Git Required)
-If you do not have Git, copy-paste this into **PowerShell**:
+> [!TIP]
+> **If Git is not installed yet**, install it in one command via Windows Package Manager:
+> ```cmd
+> winget install Git.Git
+> ```
+> *(Close and reopen terminal after install, then run the `git clone` command above).*
+
+##### Method 2: Download & Extract the ZIP Directly in PowerShell
+If you do not want to install Git, you can download and extract the ZIP directly in **PowerShell**:
+
 ```powershell
+# 1. Download the repository ZIP
 Invoke-WebRequest -Uri "https://github.com/nazmulhaquebz/InfoSphere_wallpaper/archive/refs/heads/main.zip" -OutFile "InfoSphere.zip"
+
+# 2. Extract the ZIP
 Expand-Archive -Path "InfoSphere.zip" -DestinationPath . -Force
+
+# 3. Unblock files from Windows Internet Zone security
 Get-ChildItem -Path ".\InfoSphere_wallpaper-main" -Recurse | Unblock-File
+
+# 4. Enter the folder
 cd InfoSphere_wallpaper-main
 ```
 
-#### Method C: Browser "Download ZIP" Button & False-Positive Notice
-If clicking the green **`<> Code` ➔ `Download ZIP`** button in Google Chrome or Microsoft Edge:
+---
+
+#### 🌐 How to Allow the Download in Your Browser (If Using the Web Button)
+If you prefer clicking the green **"Download ZIP"** button in your browser:
+
+* **In Google Chrome**:
+  1. Press `Ctrl + J` to open your **Downloads** tab.
+  2. Find `InfoSphere_wallpaper-main.zip`.
+  3. Click **"Keep dangerous file"** (or click the three dots `...` ➔ **"Download suspicious file"** ➔ **"Keep anyway"**).
+* **In Microsoft Edge**:
+  1. Press `Ctrl + J` to open **Downloads**.
+  2. Hover over the blocked file and click the three dots `...` (More options).
+  3. Click **"Keep"** ➔ **"Keep anyway"**.
+* **In Windows SmartScreen** (blue popup on first launch):
+  1. Click **"More info"**.
+  2. Click **"Run anyway"**.
 
 > [!NOTE]
 > **WHY DOES CHROME / EDGE SAY "VIRUS DETECTED" OR "FILE IS DANGEROUS"?**  
@@ -123,11 +153,6 @@ If clicking the green **`<> Code` ➔ `Download ZIP`** button in Google Chrome o
 > 2. **Automation Scripts**: Background launchers (`.bat` / `.vbs`) run the engine silently without keeping terminal windows open. Google Chrome and Microsoft SmartScreen heuristic algorithms automatically flag any downloaded `.zip` containing both unsigned `.exe` files and background scripts.
 > 3. **Verified Clean**: The repository and ZIP were scanned with **Microsoft Windows Defender (`MpCmdRun.exe`)**:
 >    `Scanning found no threats (Clean).`
->
-> **How to allow the download:**
-> - **In Chrome**: Press `Ctrl + J` (Downloads) ➔ click **"Keep dangerous file"** (or `...` ➔ **"Download suspicious file"** ➔ **"Keep anyway"**).
-> - **In Edge**: Press `Ctrl + J` (Downloads) ➔ hover over file ➔ click `...` ➔ **"Keep"** ➔ **"Keep anyway"**.
-> - **In Windows SmartScreen**: Click **"More info"** ➔ **"Run anyway"**.
 
 ---
 
