@@ -1,0 +1,68 @@
+name: Publish Official Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Package Distribution Archive
+        run: |
+          python package_release.py
+
+      - name: Extract Version
+        id: get_version
+        shell: pwsh
+        run: |
+          $ver = (Get-Content -Path VERSION).Trim()
+          echo "VERSION=$ver" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "InfoSphere v${{ steps.get_version.outputs.VERSION }} · Tactical Cyber Live Engine"
+          body: |
+            ## 🌐 InfoSphere v${{ steps.get_version.outputs.VERSION }} (Production Release)
+            
+            Executive 60 FPS Tactical Cyber Live Wallpaper Engine for Windows 10 & 11.
+            
+            ### 📥 Quick Download
+            - **Download Package**: [`InfoSphere-v${{ steps.get_version.outputs.VERSION }}-Windows.zip`](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/InfoSphere-v${{ steps.get_version.outputs.VERSION }}-Windows.zip)
+            
+            ### 🚀 Quick Start
+            1. Extract the downloaded `.zip` file.
+            2. Run `START_INFOSPHERE.bat` (or double-click it in Windows Explorer).
+            3. Enjoy your 60 FPS aerospace-grade live workstation HUD!
+            
+            ### 👤 Customization
+            - Edit `user_information.txt` to customize your Call-Sign, Operator Name, and Header Banner.
+            - Drop personal photos into `Picture/Original Picture/` for the 4K Visual Recon display.
+            - Optional: Configure `.env` from `.env.example` for router SOC telemetry.
+            
+            ---
+            *See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for full release ledger.*
+          files: |
+            dist/*.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

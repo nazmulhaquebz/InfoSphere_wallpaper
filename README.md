@@ -4,6 +4,8 @@
 ### Executive 60 FPS Live Wallpaper · SOC Intrusion Telemetry · 3D Geospatial Defense Matrix
 
 [![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(64--bit)-0078D6?style=for-the-badge&logo=windows)](https://www.microsoft.com/windows)
+[![Release](https://img.shields.io/github/v/release/nazmulhaquebz/InfoSphere_wallpaper?style=for-the-badge&logo=github&color=00E5FF)](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases)
+[![Downloads](https://img.shields.io/github/downloads/nazmulhaquebz/InfoSphere_wallpaper/total?style=for-the-badge&logo=github&color=10B981)](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases)
 [![Engine](https://img.shields.io/badge/Live%20Engine-Go%201.26%20%2B%20WebView2-00ADD8?style=for-the-badge&logo=go)](https://go.dev/)
 [![Telemetry](https://img.shields.io/badge/Telemetry-Python%203.14+-3776AB?style=for-the-badge&logo=python)](https://www.python.org/)
 [![Security Audit](https://img.shields.io/badge/Scanner-Rust%201.96-DEA584?style=for-the-badge&logo=rust)](https://www.rust-lang.org/)
@@ -128,6 +130,13 @@ Get-ChildItem -Path ".\InfoSphere_wallpaper-main" -Recurse | Unblock-File
 # 4. Enter the folder
 cd InfoSphere_wallpaper-main
 ```
+
+---
+
+#### 📦 Official GitHub Releases (Tracked Downloads & Verified Packages)
+Download officially packaged, tested releases directly from our [**GitHub Releases Page**](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases):
+- **Latest Release**: [**InfoSphere v2.3.0 (Production Release)**](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases/latest)
+- **Download Asset**: `InfoSphere-v2.3.0-Windows.zip` *(Downloads are tracked live)*.
 
 ---
 
