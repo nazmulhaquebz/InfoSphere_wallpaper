@@ -42,7 +42,7 @@ if exist package.json (
 popd
 
 echo [5/6] Synchronizing timestamps and launcher configs...
-powershell -Command "$now = Get-Date; Get-Item 'main.py', 'install_autostart_windows.bat', 'run_windows.bat', 'launch_hidden.vbs', 'config.json' | ForEach-Object { $_.LastWriteTime = $now }"
+powershell -Command "$now = Get-Date; Get-Item 'main.py', 'START_INFOSPHERE.bat', 'STOP_INFOSPHERE.bat', 'UPDATE_INFOSPHERE.bat', 'install_autostart_windows.bat', 'run_windows.bat', 'launch_hidden.vbs', 'config.json' | ForEach-Object { $_.LastWriteTime = $now }"
 
 echo [6/6] Recompiling Go live wallpaper and restarting live engine...
 pushd core\wallpaper

@@ -14,7 +14,7 @@ echo.
 echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.3.0 - SHUTDOWN
 echo      Author Name: Mohammad Nazmul Haque
 echo      Address: Tulshipur, Madhabpur, Habiganj, Bangladesh
-echo      Last Updated: 2026-09-19 - Native WorkerW desktop embedding (icons on top)
+echo      Last Updated: 2026-09-21 - Clean Shutdown with In-App Updater Synchronization
 echo    ========================================================================
 echo.
 echo    Initiating secure shutdown...
@@ -27,12 +27,12 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
   "Get-Process -Name msedgewebview2 -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue" >nul 2>&1
 echo           Done.
 
-:: ─── [2/3] Stop Python telemetry engine via PID record ──────────────────────
-echo    [2/3] Stopping Python telemetry engine...
+:: ─── [2/3] Stop Python telemetry & updater processes ───────────────────────
+echo    [2/3] Stopping Python engines & updater workers...
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop_engine.ps1" -Quiet >nul 2>&1
-:: Fallback: force-kill any remaining pythonw/python running main.py
+:: Fallback: force-kill any remaining pythonw/python running main.py or updater.py
 powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
-  "Get-WmiObject Win32_Process | Where-Object { $_.Name -match 'python' -and $_.CommandLine -match 'main\.py' } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
+  "Get-CimInstance Win32_Process -ErrorAction SilentlyContinue | Where-Object { ($_.Name -match 'python') -and ($_.CommandLine -match 'main\.py' -or $_.CommandLine -match 'updater\.py') } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }" >nul 2>&1
 echo           Done.
 
 :: ─── [3/3] Clean up port 8090 if anything is still bound ────────────────────

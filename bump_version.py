@@ -97,6 +97,40 @@ def bump_version(new_ver: str, notes: str = ""):
         else:
             print(f"  [INFO] Version {new_ver} already present in CHANGELOG.md")
 
+    # 4. Update START_INFOSPHERE.bat
+    start_bat = ROOT_DIR / "START_INFOSPHERE.bat"
+    if start_bat.exists():
+        bat_content = start_bat.read_text(encoding="utf-8")
+        bat_content = re.sub(
+            r"TACTICAL CYBER LIVE WALLPAPER ENGINE v[0-9\.]+",
+            f"TACTICAL CYBER LIVE WALLPAPER ENGINE v{new_ver}",
+            bat_content
+        )
+        bat_content = re.sub(
+            r"Last Updated: \d{4}-\d{2}-\d{2}",
+            f"Last Updated: {today_str}",
+            bat_content
+        )
+        start_bat.write_text(bat_content, encoding="utf-8")
+        print(f"  [OK] Synchronized START_INFOSPHERE.bat (v{new_ver}, {today_str})")
+
+    # 5. Update STOP_INFOSPHERE.bat
+    stop_bat = ROOT_DIR / "STOP_INFOSPHERE.bat"
+    if stop_bat.exists():
+        bat_content = stop_bat.read_text(encoding="utf-8")
+        bat_content = re.sub(
+            r"TACTICAL CYBER LIVE WALLPAPER ENGINE v[0-9\.]+",
+            f"TACTICAL CYBER LIVE WALLPAPER ENGINE v{new_ver}",
+            bat_content
+        )
+        bat_content = re.sub(
+            r"Last Updated: \d{4}-\d{2}-\d{2}",
+            f"Last Updated: {today_str}",
+            bat_content
+        )
+        stop_bat.write_text(bat_content, encoding="utf-8")
+        print(f"  [OK] Synchronized STOP_INFOSPHERE.bat (v{new_ver}, {today_str})")
+
     print(f"=======================================================")
     print(f"  [SUCCESS] Version bumped to v{new_ver} ({today_str})!")
     print(f"=======================================================\n")

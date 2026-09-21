@@ -14,7 +14,7 @@ echo.
 echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.3.0 (Go-Native)
 echo      Author Name: Mohammad Nazmul Haque
 echo      Address: Tulshipur, Madhabpur, Habiganj, Bangladesh
-echo      Last Updated: 2026-09-19 - Native WorkerW desktop embedding (icons on top)
+echo      Last Updated: 2026-09-21 - 1-Click Auto-Updater & WorkerW Desktop Embedding
 echo    ========================================================================
 echo.
 
@@ -50,6 +50,7 @@ echo        - Desktop icons          : 100%% visible and interactive on top
 echo        - Mouse and Desktop clicks : Native Windows desktop behavior
 echo        - Taskbar                : hidden (real wallpaper behavior)
 echo        - Python telemetry       : background (main.py via pythonw)
+echo        - Automated Updates      : 1-Click In-App Updater & GitHub Release Sync
 echo      Zero console windows - runs silently in background.
 echo    ========================================================================
 echo.
