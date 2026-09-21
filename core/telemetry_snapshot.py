@@ -83,6 +83,7 @@ def build_snapshot(
     simulate_threats: bool = False,
     geospatial: dict | None = None,
     user_info: dict | None = None,
+    update_info: dict | None = None,
 ) -> dict:
     """Build the canonical snapshot consumed by every presentation layer."""
     weather = weather or {}
@@ -92,6 +93,7 @@ def build_snapshot(
     display = display or {}
     geospatial = geospatial or {}
     user_info = user_info or {}
+    update_info = update_info or {}
 
     temp_provenance = temperature_provenance(system.get("cpu_temp_source", ""))
     router_status = str(router.get("status", "")).upper()
@@ -149,6 +151,7 @@ def build_snapshot(
         "display": display,
         "geospatial": geospatial,
         "user_info": user_info,
+        "update_info": update_info,
     })
 
 

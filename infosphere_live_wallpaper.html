@@ -64,6 +64,13 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
       </div>
     </div>
 
+    <!-- GitHub Release Update Notifier (Auto-revealed when new release is detected) -->
+    <a id="update-notify-pill" class="update-notify-pill" href="https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases/latest" target="_blank" rel="noopener noreferrer" style="display:none;" title="Click to view new release on GitHub">
+      <span class="update-pulse-dot"></span>
+      <span id="update-notify-text" class="update-text">UPDATE AVAILABLE</span>
+      <span class="update-btn-tag">GET UPDATE ➔</span>
+    </a>
+
     <!-- Multi-Theme Palette Picker -->
     <div class="theme-picker" style="flex-shrink:0;" title="Switch Cyber Theme Palette">
       <div class="theme-btn active" style="background:#00E5FF;color:#00E5FF;" data-set-theme="cyber-cyan" title="Cyber Cyan"></div>
@@ -1086,7 +1093,11 @@ const dom = {
   hudWelcomeTitle: document.getElementById('hud-welcome-title'),
   pondHudTicker: document.getElementById('pond-hud-ticker'),
   opName: document.getElementById('op-name'),
-  opTitle: document.getElementById('op-title')
+  opTitle: document.getElementById('op-title'),
+
+  // GitHub Release Update Notifier
+  updatePill: document.getElementById('update-notify-pill'),
+  updateText: document.getElementById('update-notify-text')
 };
 
 // Dirty-checking helpers to prevent unnecessary browser layout reflows and minimize RAM
@@ -1121,6 +1132,27 @@ function applySnapshot(data) {
     }
     if (ui.role_title && dom.opTitle) {
       updateText(dom.opTitle, ui.role_title);
+    }
+  }
+
+  // ── GitHub Release Update Notification Handler ───────────────────────────
+  if (data.update_info) {
+    const up = data.update_info;
+    const pill = dom.updatePill || document.getElementById('update-notify-pill');
+    if (pill) {
+      if (up.update_available) {
+        pill.style.display = 'inline-flex';
+        const txt = dom.updateText || document.getElementById('update-notify-text');
+        if (txt) {
+          updateText(txt, `NEW UPDATE ${up.latest_version}`);
+        }
+        if (up.release_url) {
+          pill.href = up.release_url;
+        }
+        pill.title = `New Release ${up.latest_version} available on GitHub! Click to download / view details.`;
+      } else {
+        pill.style.display = 'none';
+      }
     }
   }
   const m = data.metrics || {};

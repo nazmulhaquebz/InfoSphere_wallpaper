@@ -71,6 +71,7 @@ from core.display_info      import resolve_display_config
 from core.version           import APP_VERSION
 from core.geospatial_telemetry import get_geospatial_telemetry
 from core.user_info         import load_user_info
+from core.update_notifier   import UpdateNotifier
 
 
 _SINGLETON_HANDLE = None
@@ -284,6 +285,8 @@ def main() -> None:
     weather   = WeatherFetcher(config, log)
     router    = RouterMonitor(config, log)
     speedtest = SpeedTestMonitor(config, log)
+    notifier  = UpdateNotifier(logger=log)
+    notifier.start()
 
     out_path = _resolve_project_path(
         config.get("output_path", "output/infosphere_wallpaper.bmp")
@@ -382,6 +385,10 @@ def main() -> None:
                     os.path.join(ROOT, "output", "cam_feed_status.json"),
                     {"active_file": "N/A", "size_kb": 0.0},
                 )
+                update_data = notifier.get_info()
+                if update_data.get("update_available") and (cycle == 1 or cycle % 120 == 0):
+                    telemetry.add_event("INFO", f"NEW RELEASE: {update_data.get('latest_version')} is available on GitHub!")
+
                 snapshot = build_snapshot(
                     system=info,
                     telemetry=telem_lines,
@@ -394,6 +401,7 @@ def main() -> None:
                     simulate_threats=telemetry.simulate_threats,
                     geospatial=get_geospatial_telemetry(),
                     user_info=load_user_info(),
+                    update_info=update_data,
                 )
                 snapshot_errors = validate_snapshot(snapshot)
                 if snapshot_errors:

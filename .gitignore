@@ -62,7 +62,7 @@ replace_arrows.py
 restore_core.py
 scan_*.py
 search_*.py
-test_*.py
+/test_*.py
 test_run.log
 debug_run.txt
 command_outputs.txt
