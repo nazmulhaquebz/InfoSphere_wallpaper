@@ -10,7 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## 📅 Version Control Index
 
 | Version | Release Date | Highlights | Type |
-|---|---|---|---|
+|---
+
+## [2.4.0] - 2026-09-21
+
+### 🚀 Highlights
+- GitHub Release Auto-Updater, 1-Click In-App Updater, HUD update badge, zero-data-loss pipeline, launcher sync, and security audit fixes
+|---|---|---|
+| [**2.4.0**](#240---2026-09-21) | **2026-09-21** | GitHub Release Auto-Updater, 1-Click In-App Updater, HUD update badge, zero-data-loss pipeline, launcher sync, and security audit fixes | Feature Release |
 | [**2.3.0**](#230---2026-09-20) | **2026-09-20** | High-Contrast HUD · Zero-Popup Win32 SOC · 15s Speed Test · Global Portability | **Current Release** |
 | [**2.2.0**](#220---2026-09-17) | **2026-09-17** | Native WorkerW Go Embedding · 60 FPS Pond · 3D Geospatial Defense Globe | Major Feature |
 | [**2.1.0**](#210---2026-08-15) | **2026-08-15** | Unified JSON Telemetry Contract · Data Provenance · Multi-Monitor Spanning | Architecture |

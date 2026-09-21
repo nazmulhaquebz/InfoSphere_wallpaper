@@ -12,7 +12,7 @@
 # ==============================================================================
 
 # Your Name or Call-Sign (e.g. NAZMUL, ALEX, CYBER_OPERATOR)
-NAME=NAZMUL
+NAME=MOHAMMAD NAZMUL HAQUE
 
 # Central Command Banner Header (Marked area above the 60 FPS Antigravity Pond)
 WELCOME_TITLE=WELCOME TO THE NAZMUL SECURITY WORLD
