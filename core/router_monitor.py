@@ -315,11 +315,8 @@ class RouterMonitor:
         )
 
     def _compile_scanner(self) -> None:
-        """Verify the Go network scanner binary exists."""
-        workspace = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        exe_file = os.path.join(workspace, "core", "bin", "net_scanner.exe")
-        if not os.path.exists(exe_file):
-            self._log.debug("[RouterMonitor] Net scanner binary not found at %s", exe_file)
+        """In-process NetworkSOC analyzer is used natively."""
+        pass
 
     def _run_go_scanner(self) -> List[NetworkClient]:
         """In-process native Win32 ARP scanner and NetworkSOC analyzer."""

@@ -64,7 +64,7 @@ def run_checks():
     else:
         results.append(check("Telemetry snapshot", True, "not generated yet", required=False))
 
-    for binary in ("weather_fetcher.exe", "net_scanner.exe", "image_processor.exe"):
+    for binary in ("security_audit.exe", "image_processor.exe"):
         exists = (ROOT / "core" / "bin" / binary).exists()
         results.append(check(f"Optional binary: {binary}", exists, "present" if exists else "missing", required=False))
 
