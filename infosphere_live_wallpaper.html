@@ -360,12 +360,18 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
         </div>
       </div>
 
-      <!-- Permanent 3D/4D Holographic Cyber Video Avatar (Always stationed at top-right area) -->
+      <!-- Permanent 3D/4D Holographic Cyber Video Avatar (Dual-Video 10s Crossfade) -->
       <div id="pond-cyber-avatar" class="pond-cyber-avatar active walking" title="Click to unmute / toggle cyber command voice">
         <div class="cyber-avatar-wrap" id="cyber-avatar-wrap">
-          <video id="pond-cyber-video" class="cyber-avatar-video" playsinline preload="auto" muted loop autoplay>
+          <!-- Video A: human_video_transparent.webm -->
+          <video id="pond-cyber-video" class="cyber-avatar-video cyber-vid-a vid-active" playsinline preload="auto" muted loop autoplay>
             <source src="Human/human_video/human_video_transparent.webm" type="video/webm">
             <source src="Human/human_video/human_video.mp4" type="video/mp4">
+          </video>
+          <!-- Video B: human_video_1_transparent.webm (crossfades in after 10s) -->
+          <video id="pond-cyber-video-b" class="cyber-avatar-video cyber-vid-b vid-inactive" playsinline preload="auto" muted loop autoplay>
+            <source src="Human/human_video/human_video_1_transparent.webm" type="video/webm">
+            <source src="Human/human_video/Human_video_1.mp4" type="video/mp4">
           </video>
           <div class="cyber-avatar-scanline"></div>
           <div class="cyber-feet-ripple"></div>
@@ -794,7 +800,52 @@ pCanvas.addEventListener('click', e => {
 const cyberAvatarEl = document.getElementById('pond-cyber-avatar');
 const cyberAvatarWrapEl = document.getElementById('cyber-avatar-wrap');
 const cyberVideoEl = document.getElementById('pond-cyber-video');
+const cyberVideoBEl = document.getElementById('pond-cyber-video-b');
 const cyberVoiceBadge = document.getElementById('cyber-voice-badge');
+
+let currentVideoTrack = 'A'; // 'A' or 'B'
+let cyberAudioMuted = true;
+let switchIntervalId = null;
+
+function switchCyberAvatarVideo() {
+  if (!cyberVideoEl || !cyberVideoBEl) return;
+
+  if (currentVideoTrack === 'A') {
+    currentVideoTrack = 'B';
+    cyberVideoBEl.currentTime = 0;
+    cyberVideoBEl.muted = cyberAudioMuted;
+    cyberVideoBEl.play().catch(() => {});
+
+    cyberVideoBEl.classList.remove('vid-inactive');
+    cyberVideoBEl.classList.add('vid-active');
+    cyberVideoEl.classList.remove('vid-active');
+    cyberVideoEl.classList.add('vid-inactive');
+
+    // Pause inactive video after crossfade finishes to release GPU decoding & save RAM
+    setTimeout(() => {
+      if (currentVideoTrack === 'B' && cyberVideoEl) {
+        cyberVideoEl.pause();
+      }
+    }, 900);
+  } else {
+    currentVideoTrack = 'A';
+    cyberVideoEl.currentTime = 0;
+    cyberVideoEl.muted = cyberAudioMuted;
+    cyberVideoEl.play().catch(() => {});
+
+    cyberVideoEl.classList.remove('vid-inactive');
+    cyberVideoEl.classList.add('vid-active');
+    cyberVideoBEl.classList.remove('vid-active');
+    cyberVideoBEl.classList.add('vid-inactive');
+
+    // Pause inactive video after crossfade finishes to release GPU decoding & save RAM
+    setTimeout(() => {
+      if (currentVideoTrack === 'A' && cyberVideoBEl) {
+        cyberVideoBEl.pause();
+      }
+    }, 900);
+  }
+}
 
 const cyberAvatarState = {
   active: true,
@@ -807,15 +858,18 @@ const cyberAvatarState = {
 };
 
 // Interactive Click: Toggle Voice/Audio of Cyber Command Speech
-if (cyberAvatarEl && cyberVideoEl) {
+if (cyberAvatarEl) {
   cyberAvatarEl.addEventListener('click', (e) => {
     e.stopPropagation();
-    cyberVideoEl.muted = !cyberVideoEl.muted;
+    cyberAudioMuted = !cyberAudioMuted;
+    const activeVideo = currentVideoTrack === 'A' ? cyberVideoEl : cyberVideoBEl;
+    if (cyberVideoEl) cyberVideoEl.muted = cyberAudioMuted;
+    if (cyberVideoBEl) cyberVideoBEl.muted = cyberAudioMuted;
     if (cyberVoiceBadge) {
-      cyberVoiceBadge.style.display = cyberVideoEl.muted ? 'none' : 'block';
-      cyberVoiceBadge.textContent = cyberVideoEl.muted ? 'MUTED' : 'VOICE ACTIVE';
-      if (!cyberVideoEl.muted) {
-        cyberVideoEl.play().catch(() => {});
+      cyberVoiceBadge.style.display = cyberAudioMuted ? 'none' : 'block';
+      cyberVoiceBadge.textContent = cyberAudioMuted ? 'MUTED' : 'VOICE ACTIVE';
+      if (!cyberAudioMuted && activeVideo) {
+        activeVideo.play().catch(() => {});
       }
     }
   });
@@ -909,7 +963,19 @@ function initCyberAvatarStation() {
   cyberAvatarState.phase = 'walking';
   cyberAvatarEl.style.display = 'block';
   cyberAvatarEl.className = 'pond-cyber-avatar active walking';
+
+  cyberVideoEl.classList.add('vid-active');
+  cyberVideoEl.classList.remove('vid-inactive');
+  if (cyberVideoBEl) {
+    cyberVideoBEl.classList.add('vid-inactive');
+    cyberVideoBEl.classList.remove('vid-active');
+    cyberVideoBEl.pause();
+  }
   cyberVideoEl.play().catch(() => {});
+
+  if (!switchIntervalId) {
+    switchIntervalId = setInterval(switchCyberAvatarVideo, 10000);
+  }
 }
 
 // Start immediately and maintain continuous loop

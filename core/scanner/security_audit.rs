@@ -67,8 +67,9 @@ fn main() -> io::Result<()> {
         let _ = fs::create_dir_all(output_dir);
     }
 
+    let update_baseline = std::env::args().any(|arg| arg == "--update-baseline");
     let baseline_path = Path::new("output/security_baseline.json");
-    let baseline_exists = baseline_path.exists();
+    let baseline_exists = baseline_path.exists() && !update_baseline;
     let mut baseline_hashes = HashMap::new();
 
     if baseline_exists {
