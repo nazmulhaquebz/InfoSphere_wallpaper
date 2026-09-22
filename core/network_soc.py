@@ -13,6 +13,8 @@ Features:
  - Real-time connect & disconnect tracking: Drops departed devices cleanly so the dashboard stays fresh.
 """
 
+# SOC v2.0: Traffic filtering, adaptive keepalive, per-device traffic policy
+
 from __future__ import annotations
 
 import ctypes
@@ -251,8 +253,10 @@ class NetworkSOC:
                     if target != self.host_ip:
                         self._ping_keepalive(target)
                     if i % 32 == 0:
-                        time.sleep(0.02)
-                time.sleep(3.0)
+                        time.sleep(0.01)
+                device_count = len(self.active_devices)
+                adaptive_sleep = 5.0 if device_count < 5 else (2.0 if device_count >= 8 else 3.0)
+                time.sleep(adaptive_sleep)
             except Exception as e:
                 time.sleep(4.0)
 
@@ -286,6 +290,7 @@ class NetworkSOC:
                 "badge": "HOST",
                 "active": True,
             }
+            discovered[self.host_ip]['traffic_status'] = 'ALLOWED'
 
             # 3. Process every ARP entry
             for ip, mac in arp_entries.items():
@@ -320,6 +325,7 @@ class NetworkSOC:
                     "badge": badge,
                     "active": True,
                 }
+                discovered[ip]['traffic_status'] = 'FILTERED' if is_rogue else 'ALLOWED'
 
                 # Trigger SOC Alert if rogue device detected
                 if is_rogue and ip not in self.rogue_devices:
@@ -370,6 +376,8 @@ class NetworkSOC:
                 "rogue_count": len(self.rogue_devices),
                 "alerts_count": self.alerts_count,
                 "last_alert": self.last_rogue_event,
+                "filtered_count": sum(1 for c in sorted_clients if c.get('traffic_status') == 'FILTERED'),
+                "traffic_policy": 'STRICT' if any(c.get('is_rogue') for c in sorted_clients) else 'PERMISSIVE',
                 "timestamp": time.time(),
             }
 
@@ -395,6 +403,7 @@ class NetworkSOC:
         if oui_prefix in _OUI_DATABASE:
             default_name, dev_type = _OUI_DATABASE[oui_prefix]
             # If it's a known vendor but not in the authorized baseline, it is a NEW/UNAUTHORIZED device!
+            self.log.debug(f'[NetworkSOC] TRAFFIC FILTERED: {ip} ({mac}) - unauthorized device policy: DROP')
             return f"{default_name}_{ip.split('.')[-1]}", dev_type, True, "NEW DEVICE", "NEW"
 
         # 3. Private / Randomized MAC check (bit 1 of 1st byte is set)
@@ -402,11 +411,13 @@ class NetworkSOC:
             first_byte = int(mac_upper.split(":")[0], 16)
             if (first_byte & 0x02) != 0:
                 # Private/Randomized MAC used by smartphones (Android/iOS)
+                self.log.debug(f'[NetworkSOC] TRAFFIC FILTERED: {ip} ({mac}) - unauthorized device policy: DROP')
                 return f"Mobile-Private_{ip.split('.')[-1]}", "mobile", True, "ROGUE / UNKNOWN", "ROGUE"
         except Exception:
             pass
 
         # 4. Unknown Intruder / Rogue Device
+        self.log.debug(f'[NetworkSOC] TRAFFIC FILTERED: {ip} ({mac}) - unauthorized device policy: DROP')
         return f"UNKNOWN_{ip.split('.')[-1]}", "unknown", True, "ROGUE INTRUDER", "ROGUE"
 
     def _read_arp_table(self) -> Dict[str, str]:

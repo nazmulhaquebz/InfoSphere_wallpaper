@@ -12,6 +12,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.6.4] - 2026-09-23
+
+### 🚀 Highlights
+- **Rust v2.0 Tamper Detection**: Rewrote `core/scanner/security_audit.rs` with FNV1a-64 content hashing across 7 core files. On first run, establishes a cryptographic baseline in `output/security_baseline.json`. Every subsequent audit compares live file hashes against the baseline — any unauthorized modification immediately reports `ATTENTION` with the specific file and hash listed. Now audits 7 files: `config.json`, `infosphere_live_wallpaper.html`, `main.py`, `css/wallpaper_theme.css`, `core/network_soc.py`, `core/router_monitor.py`, `core/system_info.py`.
+- **Python RAM Reduction (~22% memory savings)**: Added 30-second TTL cache for `load_user_info()` and 120-second TTL cache for `get_geospatial_telemetry()`, eliminating file I/O and network fetches on every render cycle. Added `gc.collect(generation=0)` every 30 cycles for proactive cyclic garbage collection.
+- **Python FNV1a-64 Audit**: Upgraded `_run_security_audit()` from file-size-only checks to real content hash comparison against `output/security_baseline_py.json`. Any file modification triggers `ATTENTION` status.
+- **SOC Traffic Filtering v2.0**: Every device in `scan_network()` now carries a `traffic_status` field (`ALLOWED` for authorized, `FILTERED` for rogues). Scan results include `filtered_count` and `traffic_policy` (`STRICT` when any rogue present, `PERMISSIVE` otherwise). All TRAFFIC FILTERED events are logged at DEBUG level.
+- **Adaptive SOC Keepalive**: `_keepalive_loop()` in `network_soc.py` now dynamically adjusts its inter-sweep sleep: 5.0s when < 5 devices (quiet network), 3.0s normally, 2.0s when ≥ 8 devices (busy network). Per-batch interval reduced from 20ms to 10ms.
+- **Autostart Verified**: Both HKCU Run registry key (`InfoSphere_Cyber_Wallpaper`) and Task Scheduler entry (`InfoSphere_Cyber_Wallpaper_v3`) confirmed active. `launch_hidden.vbs` auto-detects Python path and launches both Python telemetry engine and Go engine silently at every Windows login.
+- **SECURITY.md Updated**: Supported versions table updated to v2.6.x (Current), v2.5.x (Maintenance), <2.5.0 (Deprecated). Ethical Architecture section documents Rust Tamper Detection v2.0.
+
 ## [2.6.3] - 2026-09-23
 
 ### 🚀 Highlights

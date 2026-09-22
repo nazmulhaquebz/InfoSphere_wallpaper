@@ -6,9 +6,9 @@ InfoSphere is actively maintained. Security patches and vulnerability fixes are 
 
 | Version | Supported          | Status             |
 | ------- | ------------------ | ------------------ |
-| 2.3.x   | :white_check_mark: | Current Production |
-| 2.2.x   | :white_check_mark: | Maintenance        |
-| < 2.2.0 | :x:                | Deprecated         |
+| 2.6.x   | :white_check_mark: | Current Production |
+| 2.5.x   | :white_check_mark: | Maintenance        |
+| < 2.5.0 | :x:                | Deprecated         |
 
 ---
 
@@ -20,6 +20,7 @@ InfoSphere adheres to a **Privacy-First & Defensive-Only** architectural model:
 2. **Zero Inbound Telemetry / Zero Cloud Tracking**: No user metrics, keystrokes, personal files, browsing histories, or hardware identifiers are ever sent to external cloud servers or analytical trackers.
 3. **In-Process Hardware Queries**: Network interface and ARP table readings use native Windows Win32 API (`GetIpNetTable` in `iphlpapi.dll`) in-process, preventing shell execution, command-line tampering, and console flickering.
 4. **Defensive Intrusion Awareness**: The built-in SOC Analyzer is an observability tool intended to identify unauthorized MAC addresses on your own home or office Wi-Fi. It performs no invasive attacks or credential harvesting.
+5. **Rust Native Tamper Detection (v2.0)**: Core engine files are FNV1a-64 hash-fingerprinted on every audit cycle. Any unauthorized modification since the initial baseline is immediately detected and reported as ATTENTION status with the specific modified file listed.
 
 ---
 

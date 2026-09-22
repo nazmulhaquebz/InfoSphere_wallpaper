@@ -14,7 +14,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.6.3</title>
+  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.6.4</title>
   <meta name="description" content="Intelligent Live Cyber Wallpaper for Windows. 60 FPS 10-Fish Antigravity Pond, real-time telemetry, multi-theme CSS, and Go Event Hub."/>
   <link rel="stylesheet" href="css/wallpaper_theme.css"/>
 </head>
@@ -40,7 +40,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
       <img src="img/logo.png" class="brand-logo-img" alt="IS Logo" />
       <div class="brand-title">
         <h1>INFOSPHERE <span>TACTICAL CYBER LIVE ENGINE</span></h1>
-        <div class="brand-subtitle" id="brand-subtitle">v2.6.3 · LOCAL & SECURE · KERNEL SYNC</div>
+        <div class="brand-subtitle" id="brand-subtitle">v2.6.4 · LOCAL &amp; SECURE · KERNEL SYNC</div>
       </div>
     </div>
 
@@ -554,7 +554,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
     </div>
     <div class="footer-right">
       <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 6px var(--accent-green);display:inline-block;"></span>
-      <span>InfoSphere v2.6.3 · Intelligent Live Engine · 2026</span>
+      <span>InfoSphere v2.6.4 · Intelligent Live Engine · 2026</span>
     </div>
   </footer>
 
@@ -2889,7 +2889,7 @@ function openUpdateModal() {
     // Read current version dynamically from snapshot data; fall back to HTML title parse
     const cur = (window.__latestUpdateInfo && window.__latestUpdateInfo.current_version)
       || (document.title.match(/v([\d.]+)/) || [])[1]
-      || '2.6.3';
+      || '2.6.4';
     curVer.textContent = cur.startsWith('v') ? cur : `v${cur}`;
   }
   if (targetVer && window.__latestUpdateInfo) {
@@ -3010,7 +3010,7 @@ if (window.location.protocol.startsWith('http')) {
       <div class="update-meta-row">
         <div class="update-meta-item">
           <span class="update-meta-lbl">CURRENT BUILD</span>
-          <span class="update-meta-val" id="update-cur-ver">v2.6.3</span>
+          <span class="update-meta-val" id="update-cur-ver">v2.6.4</span>
         </div>
         <div class="update-meta-item">
           <span class="update-meta-lbl">TARGET RELEASE</span>

@@ -30,6 +30,7 @@ ARCHITECTURE (No-Freeze Native Mode):
 Run:   python main.py   (or via run_windows.bat / ONE_CLICK_SETUP.bat)
 Stop:  Ctrl+C or stop_engine.bat
 """
+# Optimized v2.6.4: RAM reduction (user_info/geo caching), GC tuning, FNV1a tamper detection
 
 import datetime
 import atexit
@@ -41,6 +42,11 @@ import sys
 import time
 import threading
 import signal
+
+_USER_INFO_CACHE = {'data': None, 'ts': 0.0}
+_GEO_CACHE = {'data': None, 'ts': 0.0}
+_USER_INFO_TTL = 30.0
+_GEO_TTL = 120.0
 
 # Ensure safe stdout/stderr when launched headless under pythonw.exe
 if sys.stdout is None:
@@ -201,6 +207,13 @@ def _run_image_processor(log) -> None:
         log.debug(f"[Engine] Image cache notice: {e}")
 
 
+def _fnv1a_64(data: bytes) -> int:
+    h = 0xcbf29ce484222325
+    for b in data:
+        h ^= b
+        h = (h * 0x100000001b3) & 0xFFFFFFFFFFFFFFFF
+    return h
+
 def _run_security_audit(log) -> None:
     """In-process zero-subprocess cryptographic audit."""
     try:
@@ -208,14 +221,28 @@ def _run_security_audit(log) -> None:
         verified = 0
         total_bytes = 0
         anomalies = 0
+        baseline_path = os.path.join(ROOT, "output", "security_baseline_py.json")
+        baseline = _read_json(baseline_path, {})
+        new_baseline = {}
         for f in files:
             fp = os.path.join(ROOT, f)
             if os.path.exists(fp):
                 try:
-                    total_bytes += os.path.getsize(fp)
+                    with open(fp, "rb") as bf:
+                        data = bf.read()
+                    total_bytes += len(data)
+                    file_hash = _fnv1a_64(data)
+                    new_baseline[f] = file_hash
+                    if baseline:
+                        if baseline.get(f) != file_hash:
+                            anomalies += 1
                     verified += 1
                 except Exception:
                     anomalies += 1
+        if not baseline:
+            _write_json_atomic(baseline_path, new_baseline)
+            anomalies = 0
+
         score = 100 if anomalies == 0 else max(0, 100 - anomalies * 25)
         out = {
             "status": "SECURE" if score >= 90 else "ATTENTION",
@@ -323,6 +350,8 @@ def main() -> None:
         while not stop_event.is_set():
             t_start = time.perf_counter()
             cycle += 1
+            if cycle % 30 == 0:
+                gc.collect(generation=0)
             now_str = datetime.datetime.now().strftime("%H:%M:%S")
 
             # Automatic Hot-Reload on config/theme change
@@ -389,6 +418,17 @@ def main() -> None:
                 if update_data.get("update_available") and (cycle == 1 or cycle % 120 == 0):
                     telemetry.add_event("INFO", f"NEW RELEASE: {update_data.get('latest_version')} is available on GitHub!")
 
+                now_ts = time.monotonic()
+                if _USER_INFO_CACHE['data'] is None or (now_ts - _USER_INFO_CACHE['ts']) > _USER_INFO_TTL:
+                    _USER_INFO_CACHE['data'] = load_user_info()
+                    _USER_INFO_CACHE['ts'] = now_ts
+                user_info_data = _USER_INFO_CACHE['data']
+                
+                if _GEO_CACHE['data'] is None or (now_ts - _GEO_CACHE['ts']) > _GEO_TTL:
+                    _GEO_CACHE['data'] = get_geospatial_telemetry()
+                    _GEO_CACHE['ts'] = now_ts
+                geo_data = _GEO_CACHE['data']
+
                 snapshot = build_snapshot(
                     system=info,
                     telemetry=telem_lines,
@@ -399,8 +439,8 @@ def main() -> None:
                     display=config.get("_display_info", {}),
                     refresh_seconds=refresh_secs,
                     simulate_threats=telemetry.simulate_threats,
-                    geospatial=get_geospatial_telemetry(),
-                    user_info=load_user_info(),
+                    geospatial=geo_data,
+                    user_info=user_info_data,
                     update_info=update_data,
                 )
                 snapshot_errors = validate_snapshot(snapshot)
