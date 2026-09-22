@@ -40,7 +40,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
       <img src="img/logo.png" class="brand-logo-img" alt="IS Logo" />
       <div class="brand-title">
         <h1>INFOSPHERE <span>TACTICAL CYBER LIVE ENGINE</span></h1>
-        <div class="brand-subtitle">v2.3.0 · LOCAL & SECURE · KERNEL SYNC</div>
+        <div class="brand-subtitle" id="brand-subtitle">v2.5.0 · LOCAL & SECURE · KERNEL SYNC</div>
       </div>
     </div>
 
@@ -1052,61 +1052,109 @@ const CYBER_SPAWN_POINTS = [
 let cyberPointIndex = 0;
 let cyberActiveTimer = null;
 let cyberVanishTimer = null;
+let cyberWalkInterval = null;
 
 function spawnCyberAvatar() {
   if (!cyberAvatarEl || pW <= 0 || pH <= 0) return;
 
-  // Clear previous timers if any
+  // Clear previous timers and walking intervals if any
   if (cyberActiveTimer) clearTimeout(cyberActiveTimer);
   if (cyberVanishTimer) clearTimeout(cyberVanishTimer);
+  if (cyberWalkInterval) clearInterval(cyberWalkInterval);
 
-  const pt = CYBER_SPAWN_POINTS[cyberPointIndex];
-  cyberPointIndex = (cyberPointIndex + 1) % CYBER_SPAWN_POINTS.length;
+  // Pick start point and walking destination waypoint
+  const startPt = CYBER_SPAWN_POINTS[cyberPointIndex];
+  const nextIndex = (cyberPointIndex + 1) % CYBER_SPAWN_POINTS.length;
+  const targetPt = CYBER_SPAWN_POINTS[nextIndex];
+  cyberPointIndex = nextIndex;
 
-  // Position avatar at chosen point
-  cyberAvatarEl.style.left = `${pt.leftPct}%`;
-  cyberAvatarEl.style.top = `${pt.topPct}%`;
+  // Initial spawn position (instant teleport without transition)
+  cyberAvatarEl.style.transition = 'none';
+  cyberAvatarEl.style.left = `${startPt.leftPct}%`;
+  cyberAvatarEl.style.top = `${startPt.topPct}%`;
   cyberAvatarEl.style.display = 'block';
 
-  // Trigger spawn animation
+  // Force reflow
+  void cyberAvatarEl.offsetWidth;
+
+  // Trigger materialization animation
   cyberAvatarEl.className = 'pond-cyber-avatar materializing';
 
-  // Trigger water ripples at avatar feet on the pond canvas
-  const footX = (pt.leftPct / 100) * pW + 27;
-  const footY = (pt.topPct / 100) * pH + 138;
-  pRipples.push({ x: footX, y: footY, r: 4, maxR: 55, alpha: 0.95, spd: 1.8, color: [0, 229, 255] });
-  pRipples.push({ x: footX, y: footY, r: 2, maxR: 35, alpha: 0.8, spd: 1.2, color: [0, 180, 255] });
+  // Trigger initial water ripples at avatar feet
+  const startFootX = (startPt.leftPct / 100) * pW + 27;
+  const startFootY = (startPt.topPct / 100) * pH + 138;
+  pRipples.push({ x: startFootX, y: startFootY, r: 4, maxR: 55, alpha: 0.95, spd: 1.8, color: [0, 229, 255] });
+  pRipples.push({ x: startFootX, y: startFootY, r: 2, maxR: 35, alpha: 0.8, spd: 1.2, color: [0, 180, 255] });
 
-  // Scatter nearby koi fish away from the teleportation beam
+  // Scatter nearby koi fish away from teleportation point
   pondFishList.forEach(f => {
-    const d = Math.hypot(f.x - footX, f.y - footY);
+    const d = Math.hypot(f.x - startFootX, f.y - startFootY);
     if (d < 120) {
       f.scatter = true;
       f.scatterTime = 1.5;
-      const ang = Math.atan2(f.y - footY, f.x - footX);
+      const ang = Math.atan2(f.y - startFootY, f.x - startFootX);
       f.scatterVx = Math.cos(ang) * 180;
       f.scatterVy = Math.sin(ang) * 180;
     }
   });
 
-  // Switch to active breathing/floating state after 0.45s spawn
+  // After 0.45s spawn beam, initiate live walking traversal across the pond!
   cyberActiveTimer = setTimeout(() => {
-    cyberAvatarEl.className = 'pond-cyber-avatar active';
+    cyberAvatarEl.style.transition = 'left 4.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 4.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    cyberAvatarEl.className = 'pond-cyber-avatar walking';
+    cyberAvatarEl.style.left = `${targetPt.leftPct}%`;
+    cyberAvatarEl.style.top = `${targetPt.topPct}%`;
+
+    // Emit alternating footstep water ripples every 600ms along the walking path
+    let stepCount = 0;
+    const walkStartTime = performance.now();
+    const walkDuration = 4200;
+
+    cyberWalkInterval = setInterval(() => {
+      const elapsed = performance.now() - walkStartTime;
+      const progress = Math.min(1, elapsed / walkDuration);
+      
+      const curLeft = startPt.leftPct + (targetPt.leftPct - startPt.leftPct) * progress;
+      const curTop  = startPt.topPct + (targetPt.topPct - startPt.topPct) * progress;
+      
+      const footSide = (stepCount % 2 === 0) ? -7 : 7; // Alternate left/right foot
+      const stepX = (curLeft / 100) * pW + 27 + footSide;
+      const stepY = (curTop / 100) * pH + 138;
+
+      // Concentric water footstep ripple
+      pRipples.push({ x: stepX, y: stepY, r: 2, maxR: 38, alpha: 0.85, spd: 1.5, color: [0, 229, 255] });
+
+      // Reactive koi fish scattering as avatar walks through the pond
+      pondFishList.forEach(f => {
+        const d = Math.hypot(f.x - stepX, f.y - stepY);
+        if (d < 90) {
+          f.scatter = true;
+          f.scatterTime = 1.2;
+          const ang = Math.atan2(f.y - stepY, f.x - stepX);
+          f.scatterVx = Math.cos(ang) * 160;
+          f.scatterVy = Math.sin(ang) * 160;
+        }
+      });
+
+      stepCount++;
+      if (progress >= 1) clearInterval(cyberWalkInterval);
+    }, 600);
   }, 450);
 
-  // Begin dematerialization after 2.5 seconds (visible duration: 2.5s)
+  // Dematerialize after 5.0 seconds (extended stay duration)
   cyberVanishTimer = setTimeout(() => {
+    if (cyberWalkInterval) clearInterval(cyberWalkInterval);
     cyberAvatarEl.className = 'pond-cyber-avatar dematerializing';
-    
-    // Exit ripple burst
-    pRipples.push({ x: footX, y: footY, r: 3, maxR: 45, alpha: 0.85, spd: 1.6, color: [0, 229, 255] });
 
-    // Hide completely after vanish animation (0.4s)
+    const endFootX = (targetPt.leftPct / 100) * pW + 27;
+    const endFootY = (targetPt.topPct / 100) * pH + 138;
+    pRipples.push({ x: endFootX, y: endFootY, r: 3, maxR: 50, alpha: 0.9, spd: 1.6, color: [0, 229, 255] });
+
     setTimeout(() => {
       cyberAvatarEl.className = 'pond-cyber-avatar';
       cyberAvatarEl.style.display = 'none';
     }, 400);
-  }, 2500);
+  }, 5000);
 }
 
 // Teleport every 10 seconds (first spawn starts after 2.5s initial delay)
@@ -1190,6 +1238,7 @@ const dom = {
   pondHudTicker: document.getElementById('pond-hud-ticker'),
   opName: document.getElementById('op-name'),
   opTitle: document.getElementById('op-title'),
+  brandSubtitle: document.getElementById('brand-subtitle'),
 
   // GitHub Release Update Notifier
   updatePill: document.getElementById('update-notify-pill'),
@@ -1228,6 +1277,14 @@ function applySnapshot(data) {
     }
     if (ui.role_title && dom.opTitle) {
       updateText(dom.opTitle, ui.role_title);
+    }
+  }
+
+  // ── Real-Time App Version Synchronization ────────────────────────────────
+  if (data.app_version) {
+    const bSub = dom.brandSubtitle || document.getElementById('brand-subtitle');
+    if (bSub) {
+      updateText(bSub, `v${data.app_version} · LOCAL & SECURE · KERNEL SYNC`);
     }
   }
 

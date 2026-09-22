@@ -53,10 +53,10 @@ def bump_version(new_ver: str, notes: str = ""):
             f"<title>InfoSphere · Tactical Cyber Live Wallpaper Engine v{new_ver}</title>",
             content
         )
-        # Replace brand subtitle
+        # Replace brand subtitle (handles both literal & and &amp;)
         content = re.sub(
-            r'<div class="brand-subtitle">v[0-9\.]+ · LOCAL &amp; SECURE · KERNEL SYNC</div>',
-            f'<div class="brand-subtitle">v{new_ver} · LOCAL &amp; SECURE · KERNEL SYNC</div>',
+            r'<div class="brand-subtitle"(?: id="brand-subtitle")?>v[0-9\.]+ · LOCAL (?:&|&amp;) SECURE · KERNEL SYNC</div>',
+            f'<div class="brand-subtitle" id="brand-subtitle">v{new_ver} · LOCAL & SECURE · KERNEL SYNC</div>',
             content
         )
         # Replace footer
@@ -142,6 +142,23 @@ def bump_version(new_ver: str, notes: str = ""):
         )
         stop_bat.write_text(bat_content, encoding="utf-8")
         print(f"  [OK] Synchronized STOP_INFOSPHERE.bat (v{new_ver}, {today_str})")
+
+    # 6. Update README.md
+    readme = ROOT_DIR / "README.md"
+    if readme.exists():
+        r_content = readme.read_text(encoding="utf-8")
+        r_content = re.sub(
+            r"InfoSphere v[0-9\.]+ \(Production Release\)",
+            f"InfoSphere v{new_ver} (Production Release)",
+            r_content
+        )
+        r_content = re.sub(
+            r"InfoSphere-v[0-9\.]+-Windows\.zip",
+            f"InfoSphere-v{new_ver}-Windows.zip",
+            r_content
+        )
+        readme.write_text(r_content, encoding="utf-8")
+        print(f"  [OK] Synchronized README.md (v{new_ver})")
 
     print(f"=======================================================")
     print(f"  [SUCCESS] Version bumped to v{new_ver} ({today_str})!")
