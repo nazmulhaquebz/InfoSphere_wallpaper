@@ -1808,15 +1808,17 @@ body::before {
 
 .pond-cyber-avatar {
   position: absolute;
-  width: 54px;
-  height: 141px;
-  pointer-events: none;
+  width: 86px;
+  height: 152px;
+  pointer-events: auto;
+  cursor: pointer;
   z-index: 8;
   transform-origin: center bottom;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: drop-shadow(0 0 12px rgba(0, 229, 255, 0.75));
+  filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.85));
+  perspective: 800px;
 }
 
 .pond-cyber-avatar.active {
@@ -1829,7 +1831,7 @@ body::before {
   opacity: 1;
   visibility: visible;
   animation: cyber-walk-cadence 0.65s ease-in-out infinite alternate;
-  transition: left 4.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 4.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: left 9.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 9.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .pond-cyber-avatar.materializing {
@@ -1849,24 +1851,35 @@ body::before {
   height: 100%;
 }
 
-.cyber-avatar-base {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  filter: contrast(1.1) brightness(1.05);
-}
-
-.cyber-avatar-overlay {
+.cyber-avatar-video {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
   mix-blend-mode: screen;
-  animation: cyber-circuit-pulse 1.8s ease-in-out infinite alternate;
+  filter: contrast(1.25) brightness(1.15) drop-shadow(0 0 14px rgba(0, 229, 255, 0.85));
+  transform: perspective(600px) rotateX(4deg);
+  border-radius: 4px;
   pointer-events: none;
+}
+
+.cyber-voice-badge {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 229, 255, 0.25);
+  border: 1px solid #00E5FF;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 7.5px;
+  color: #00E5FF;
+  padding: 1px 5px;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
 }
 
 /* Holographic Laser Scanline Sweep */

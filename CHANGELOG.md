@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.6.0] - 2026-09-22
+
+### 🚀 Highlights
+- 3D/4D Live Hologram Video in Antigravity Pond, 10s Full-Sequence Walking Cadence, Speech Audio Toggle, and GPU Background Keying
+
+
 ## [2.5.1] - 2026-09-22
 
 ### 🚀 Highlights
