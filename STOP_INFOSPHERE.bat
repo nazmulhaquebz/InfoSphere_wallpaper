@@ -11,7 +11,7 @@ echo     _/ // _ \/ _  // __/ / /__ / _ \ / _ \/ _ \/ __/ _ `/
 echo    /___/_//_/\_,_//_/    \___// .__//_//_/\___/_/  \_,_/   
 echo                              /_/                           
 echo.
-echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.5.0 - SHUTDOWN
+echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.5.1 - SHUTDOWN
 echo      Author Name: Mohammad Nazmul Haque
 echo      Address: Tulshipur, Madhabpur, Habiganj, Bangladesh
 echo      Last Updated: 2026-09-22 - Clean Shutdown with In-App Updater Synchronization

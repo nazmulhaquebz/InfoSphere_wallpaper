@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.5.1] - 2026-09-22
+
+### 🚀 Highlights
+- Live Walking Orbit-Dot Cyber Avatar in Antigravity Pond, 3D Orbital Rings, 5s Active Stay, and Modular Custom Photo Updater
+
+
 ## [2.5.0] - 2026-09-22
 
 ### 🚀 Highlights
