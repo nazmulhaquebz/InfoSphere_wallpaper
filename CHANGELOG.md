@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.6.3] - 2026-09-23
+
+### 🚀 Highlights
+- Full u2net High-Precision AI Matting: Replaced low-res u2netp with full 176 MB u2net neural network model across all 240 frames, preserving every fine wireframe grid line, point-cloud particle, and sunglasses reflection without edge erosion or jaggedness.
+- High-Fidelity VP9 WebM Master (CRF 15): Encoded with Constant Quality CRF 15 at ~27 Mb/s with native 8-bit alpha (`yuva420p`) and embedded 48 kHz Opus audio, eliminating block compression and compression haze.
+- Elimination of Destructive CSS Blurs: Removed double drop-shadow filters and nested 3D perspective transforms from the video element, allowing Chromium GPU compositor to render the hologram texture 1:1 razor-sharp.
+- Permanent Top-Right Tactical Stationing: Re-anchored avatar directly in the user-specified top-right area (`top: 32px; right: 20px; width: 120px; height: 214px; z-index: 25;`), seamlessly bridging the clock panel and the pond water on a continuous, active walking loop.
+- Synchronized Water & Fish Kinematics: Dynamically anchored feet contact at the top-right pond water surface with real-time bounding client calculation, emitting hydrodynamic ripples, Kelvin wake corridors, surface tension meniscus tension glow, and playful koi escort interactions.
+
 ## [2.6.2] - 2026-09-22
 
 ### 🚀 Highlights

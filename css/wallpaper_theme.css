@@ -1804,32 +1804,30 @@ body::before {
   100% { opacity: 1; }
 }
 
-/* ─── 5-Point Holographic Cyber Avatar in Antigravity Pond ─────────────────── */
+/* ─── Permanent Tactical Holographic Cyber Avatar (Stationed at Top Area) ─── */
 
 .pond-cyber-avatar {
   position: absolute;
-  width: 86px;
-  height: 152px;
+  top: 32px;
+  right: 20px;
+  width: 120px;
+  height: 214px;
   pointer-events: auto;
   cursor: pointer;
-  z-index: 8;
+  z-index: 25;
   transform-origin: center bottom;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.85));
-  perspective: 800px;
-}
-
-.pond-cyber-avatar.active {
   opacity: 1;
   visibility: visible;
-  animation: cyber-holo-breathe 2.4s ease-in-out infinite;
+  display: block;
+  perspective: 800px;
+  transition: transform 0.2s ease-out;
 }
 
+.pond-cyber-avatar.active,
 .pond-cyber-avatar.walking {
   opacity: 1;
   visibility: visible;
+  display: block;
 }
 
 .pond-cyber-avatar.materializing {
@@ -1858,24 +1856,23 @@ body::before {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  filter: contrast(1.08) brightness(1.05) drop-shadow(0 0 14px rgba(0, 229, 255, 0.85));
-  transform: perspective(600px) rotateX(4deg);
+  filter: contrast(1.12) brightness(1.15) drop-shadow(0 0 6px rgba(0, 245, 255, 0.65));
   border-radius: 4px;
   pointer-events: none;
 }
 
 .cyber-voice-badge {
   position: absolute;
-  top: -16px;
+  top: -18px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(0, 229, 255, 0.25);
   border: 1px solid #00E5FF;
   border-radius: 3px;
   font-family: var(--font-mono);
-  font-size: 7.5px;
+  font-size: 8px;
   color: #00E5FF;
-  padding: 1px 5px;
+  padding: 1.5px 6px;
   letter-spacing: 0.08em;
   white-space: nowrap;
   pointer-events: none;
@@ -1905,8 +1902,8 @@ body::before {
   bottom: -4px;
   left: 50%;
   transform: translateX(-50%);
-  width: 54px;
-  height: 16px;
+  width: 72px;
+  height: 20px;
   border: 1.5px solid rgba(0, 229, 255, 0.85);
   border-radius: 50%;
   box-shadow: 0 0 10px rgba(0, 229, 255, 0.6);
@@ -1922,11 +1919,9 @@ body::before {
 @keyframes cyber-holo-breathe {
   0%, 100% {
     transform: translateY(0) scale(1);
-    filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.65));
   }
   50% {
-    transform: translateY(-5px) scale(1.02);
-    filter: drop-shadow(0 0 18px rgba(0, 229, 255, 0.95));
+    transform: translateY(-4px) scale(1.015);
   }
 }
 
