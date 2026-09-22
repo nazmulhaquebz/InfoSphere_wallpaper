@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.5.0] - 2026-09-22
+
+### 🚀 Highlights
+- 5-Point Animated Cybernetic Hologram Avatar in Antigravity Pond with 100% Face Preservation, Laser Scanline Materialize, and Fluid Water Ripple Interaction
+
+
 ## [2.4.0] - 2026-09-21
 
 ### 🚀 Highlights
