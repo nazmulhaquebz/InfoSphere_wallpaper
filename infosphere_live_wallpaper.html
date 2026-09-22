@@ -388,6 +388,16 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
         <!-- 60 FPS Canvas -->
         <canvas id="pond-canvas-embedded"></canvas>
 
+        <!-- 5-Point Holographic Cyber Avatar (Teleports across 5 pond zones every 10s) -->
+        <div id="pond-cyber-avatar" class="pond-cyber-avatar" style="display:none;">
+          <div class="cyber-avatar-wrap">
+            <img src="Human/robotic/human_cutout.png" class="cyber-avatar-base" alt="Operator Hologram" />
+            <img src="Human/robotic/cyber_circuits_overlay.png" class="cyber-avatar-overlay" alt="Cyber Circuits" />
+            <div class="cyber-avatar-scanline"></div>
+            <div class="cyber-feet-ripple"></div>
+          </div>
+        </div>
+
         <!-- Aquarium Footer Strip -->
         <div class="pond-footer-strip">
           <span>● 10 LIVE SPECIMENS · NANOSECOND BIOLUMINESCENT AQUARIUM</span>
@@ -1019,6 +1029,92 @@ function mainLoop(now_ms) {
   drawEmbeddedPond(now_ms, t_sec, dt);
 }
 requestAnimationFrame(mainLoop);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 3.5. 5-POINT HOLOGRAPHIC CYBER AVATAR TELEPORTATION CONTROLLER
+// ═══════════════════════════════════════════════════════════════════════════
+const cyberAvatarEl = document.getElementById('pond-cyber-avatar');
+
+// 5 tactical points calibrated to the user's annotated areas in the Antigravity Pond:
+// Point 1: Top-Left (x: ~14%, y: ~18%)
+// Point 2: Top-Right (x: ~76%, y: ~18%)
+// Point 3: Center (x: ~45%, y: ~42%)
+// Point 4: Bottom-Left (x: ~14%, y: ~60%)
+// Point 5: Bottom-Right (x: ~76%, y: ~60%)
+const CYBER_SPAWN_POINTS = [
+  { name: 'TOP_LEFT',     leftPct: 14, topPct: 18 },
+  { name: 'TOP_RIGHT',    leftPct: 76, topPct: 18 },
+  { name: 'CENTER',       leftPct: 45, topPct: 40 },
+  { name: 'BOTTOM_LEFT',  leftPct: 14, topPct: 60 },
+  { name: 'BOTTOM_RIGHT', leftPct: 76, topPct: 60 }
+];
+
+let cyberPointIndex = 0;
+let cyberActiveTimer = null;
+let cyberVanishTimer = null;
+
+function spawnCyberAvatar() {
+  if (!cyberAvatarEl || pW <= 0 || pH <= 0) return;
+
+  // Clear previous timers if any
+  if (cyberActiveTimer) clearTimeout(cyberActiveTimer);
+  if (cyberVanishTimer) clearTimeout(cyberVanishTimer);
+
+  const pt = CYBER_SPAWN_POINTS[cyberPointIndex];
+  cyberPointIndex = (cyberPointIndex + 1) % CYBER_SPAWN_POINTS.length;
+
+  // Position avatar at chosen point
+  cyberAvatarEl.style.left = `${pt.leftPct}%`;
+  cyberAvatarEl.style.top = `${pt.topPct}%`;
+  cyberAvatarEl.style.display = 'block';
+
+  // Trigger spawn animation
+  cyberAvatarEl.className = 'pond-cyber-avatar materializing';
+
+  // Trigger water ripples at avatar feet on the pond canvas
+  const footX = (pt.leftPct / 100) * pW + 27;
+  const footY = (pt.topPct / 100) * pH + 138;
+  pRipples.push({ x: footX, y: footY, r: 4, maxR: 55, alpha: 0.95, spd: 1.8, color: [0, 229, 255] });
+  pRipples.push({ x: footX, y: footY, r: 2, maxR: 35, alpha: 0.8, spd: 1.2, color: [0, 180, 255] });
+
+  // Scatter nearby koi fish away from the teleportation beam
+  pondFishList.forEach(f => {
+    const d = Math.hypot(f.x - footX, f.y - footY);
+    if (d < 120) {
+      f.scatter = true;
+      f.scatterTime = 1.5;
+      const ang = Math.atan2(f.y - footY, f.x - footX);
+      f.scatterVx = Math.cos(ang) * 180;
+      f.scatterVy = Math.sin(ang) * 180;
+    }
+  });
+
+  // Switch to active breathing/floating state after 0.45s spawn
+  cyberActiveTimer = setTimeout(() => {
+    cyberAvatarEl.className = 'pond-cyber-avatar active';
+  }, 450);
+
+  // Begin dematerialization after 2.5 seconds (visible duration: 2.5s)
+  cyberVanishTimer = setTimeout(() => {
+    cyberAvatarEl.className = 'pond-cyber-avatar dematerializing';
+    
+    // Exit ripple burst
+    pRipples.push({ x: footX, y: footY, r: 3, maxR: 45, alpha: 0.85, spd: 1.6, color: [0, 229, 255] });
+
+    // Hide completely after vanish animation (0.4s)
+    setTimeout(() => {
+      cyberAvatarEl.className = 'pond-cyber-avatar';
+      cyberAvatarEl.style.display = 'none';
+    }, 400);
+  }, 2500);
+}
+
+// Teleport every 10 seconds (first spawn starts after 2.5s initial delay)
+setTimeout(() => {
+  spawnCyberAvatar();
+  setInterval(spawnCyberAvatar, 10000);
+}, 2500);
+
 
 // ═══════════════════════════════════════════════════════════════════════════
 // 4. REAL-TIME GO HUB SSE TELEMETRY STREAM & REACTIVE AUTO-UPDATE
