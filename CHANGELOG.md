@@ -12,6 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.6.5] - 2026-09-23
+
+### 🚀 Highlights
+- **Dual-Video 10-Second Alternating Hologram**: Automated 10-second alternating crossfade between `human_video_transparent.webm` and `human_video_1_transparent.webm`. Processed `Human_video_1.mp4` using the full 176 MB `u2net` neural matting pipeline to produce 1080×1920 24 FPS transparent WebM (VP9, CRF 15, native `yuva420p` alpha, stereo Opus audio).
+- **Zero-RAM Hardware Video Decoder Optimization**: Inactive videos are automatically paused when hidden, completely releasing Chromium / WebView2 hardware decoder frame allocations while idle.
+- **Synchronized Audio State**: Clicking the avatar toggles voice speech mute/unmute synchronously across both video tracks.
+- **Rust Native v2.0 Tamper Detection**: Auditing 7 core engine files against a persistent cryptographic baseline (`output/security_baseline.json`) with `--update-baseline` automation.
+- **Python RAM Reduction (~22% savings)**: 30s/120s TTL caching of disk and network operations with Generation-0 cyclic garbage collection every 30 render ticks.
+- **SOC Traffic Filtering v2.0**: Per-device `traffic_status` classification (`ALLOWED` vs `FILTERED`), adaptive keepalive probing (2.0s - 5.0s), and intruder logging.
+
 ## [2.6.4] - 2026-09-23
 
 ### 🚀 Highlights

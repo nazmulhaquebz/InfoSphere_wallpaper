@@ -135,8 +135,8 @@ cd InfoSphere_wallpaper-main
 
 #### 📦 Official GitHub Releases (Tracked Downloads & Verified Packages)
 Download officially packaged, tested releases directly from our [**GitHub Releases Page**](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases):
-- **Latest Release**: [**InfoSphere v2.6.4 (Production Release)**](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases/latest)
-- **Download Asset**: `InfoSphere-v2.6.4-Windows.zip` *(Downloads are tracked live)*.
+- **Latest Release**: [**InfoSphere v2.6.5 (Production Release)**](https://github.com/nazmulhaquebz/InfoSphere_wallpaper/releases/latest)
+- **Download Asset**: `InfoSphere-v2.6.5-Windows.zip` *(Downloads are tracked live)*.
 
 ---
 

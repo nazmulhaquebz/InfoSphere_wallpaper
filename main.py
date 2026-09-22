@@ -30,7 +30,7 @@ ARCHITECTURE (No-Freeze Native Mode):
 Run:   python main.py   (or via run_windows.bat / ONE_CLICK_SETUP.bat)
 Stop:  Ctrl+C or stop_engine.bat
 """
-# Optimized v2.6.4: RAM reduction (user_info/geo caching), GC tuning, FNV1a tamper detection
+# Optimized v2.6.5: Dual-video 10s crossfade, RAM reduction (user_info/geo caching), GC tuning, FNV1a tamper detection
 
 import datetime
 import atexit
