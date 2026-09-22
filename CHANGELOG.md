@@ -12,6 +12,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.6.1] - 2026-09-22
+
+### 🚀 Highlights
+- AI Neural Background Removal: Synthesized `Human/human_video/human_video_transparent.webm` using `u2netp` neural matting, achieving 100% transparent alpha (`rgba(0,0,0,0)`) on all background areas with zero dark box or bounding halo.
+- Full Visual & Audio Preservation: 100% preserved the user's face, sunglasses, expression, dark navy suit, tie, shoes, and natural walking gestures.
+- Native VP9 Yuva420p Hardware Acceleration: Direct WebM VP9 playback with native 8-bit alpha channel rendering directly on top of the Antigravity Pond caustics and koi fish.
+- Audio Integration: Embedded stereo Opus speech track ("The digital lattice is now complete...") with interactive click-to-unmute toggle and visual cyan `VOICE ONLINE` HUD telemetry badge.
+- Modular Python Pipeline: Packaged `Human/human_video/render_ai_transparent.py` with multi-threaded batching (4 worker threads) for lightning-fast rendering of any replacement video.
+
+
 ## [2.6.0] - 2026-09-22
 
 ### 🚀 Highlights

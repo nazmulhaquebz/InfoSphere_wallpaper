@@ -1857,8 +1857,7 @@ body::before {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  mix-blend-mode: screen;
-  filter: contrast(1.25) brightness(1.15) drop-shadow(0 0 14px rgba(0, 229, 255, 0.85));
+  filter: contrast(1.08) brightness(1.05) drop-shadow(0 0 14px rgba(0, 229, 255, 0.85));
   transform: perspective(600px) rotateX(4deg);
   border-radius: 4px;
   pointer-events: none;
