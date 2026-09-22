@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | Version | Release Date | Highlights | Type |
 |---
 
+## [2.6.2] - 2026-09-22
+
+### 🚀 Highlights
+- Native 1080x1920 Full HD Master Resolution: Zero downscaling applied; master video synthesized directly at 1080x1920 at 24 FPS with native 8-bit alpha channel (`yuva420p`, 9 Mbps bitrate, stereo Opus audio), guaranteeing razor-sharp clarity and pristine edge definition.
+- 60 FPS Dynamic Walking Angles: Unified avatar kinematics into the 60 FPS animation loop with smoothstep easing, dynamic left/right horizontal facing, 3D yaw angle rotation, turn banking (`rotateZ`), and natural step cadence vertical bob and lateral sway.
+- Walking ON Water Surface Kinematics: Added real-time liquid contact effects including a luminous cyan surface tension meniscus glow ring, dynamic translucent ground contact shadow, trailing hydrodynamic Kelvin V-wake waves, and footstep impact 3D water splashes.
+- Playful Koi Fish Interactions: Friendly large koi (*Gold Ogon*, *Neon Cyan*, *Kohaku*) playfully escort the avatar, circling around footsteps and emitting glowing pearlescent bubbles (`pBubbles`) upon footstep ripples, while schooling tetras weave through the wake corridors.
+
+
 ## [2.6.1] - 2026-09-22
 
 ### 🚀 Highlights

@@ -14,7 +14,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.6.1</title>
+  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.6.2</title>
   <meta name="description" content="Intelligent Live Cyber Wallpaper for Windows. 60 FPS 10-Fish Antigravity Pond, real-time telemetry, multi-theme CSS, and Go Event Hub."/>
   <link rel="stylesheet" href="css/wallpaper_theme.css"/>
 </head>
@@ -40,7 +40,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
       <img src="img/logo.png" class="brand-logo-img" alt="IS Logo" />
       <div class="brand-title">
         <h1>INFOSPHERE <span>TACTICAL CYBER LIVE ENGINE</span></h1>
-        <div class="brand-subtitle" id="brand-subtitle">v2.6.1 · LOCAL & SECURE · KERNEL SYNC</div>
+        <div class="brand-subtitle" id="brand-subtitle">v2.6.2 · LOCAL & SECURE · KERNEL SYNC</div>
       </div>
     </div>
 
@@ -390,7 +390,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
 
         <!-- 5-Point 3D/4D Holographic Cyber Video Avatar (Teleports across 5 pond zones, active for 10s) -->
         <div id="pond-cyber-avatar" class="pond-cyber-avatar" style="display:none;" title="Click to unmute / toggle cyber command voice">
-          <div class="cyber-avatar-wrap">
+          <div class="cyber-avatar-wrap" id="cyber-avatar-wrap">
             <video id="pond-cyber-video" class="cyber-avatar-video" playsinline preload="auto" muted loop>
               <source src="Human/human_video/human_video_transparent.webm" type="video/webm">
               <source src="Human/human_video/human_video.mp4" type="video/mp4">
@@ -554,7 +554,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
     </div>
     <div class="footer-right">
       <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 6px var(--accent-green);display:inline-block;"></span>
-      <span>InfoSphere v2.6.1 · Intelligent Live Engine · 2026</span>
+      <span>InfoSphere v2.6.2 · Intelligent Live Engine · 2026</span>
     </div>
   </footer>
 
@@ -693,6 +693,8 @@ for (let i = 0; i < TOTAL_FISH; i++) {
 
 const pRipples = [];
 const pPellets = [];
+const pWaterSplashes = [];
+const pBubbles = [];
 let pMouseX = -9999, pMouseY = -9999;
 
 // Standard HTML mouse events (works in browser but blocked by desktop layer)
@@ -786,23 +788,253 @@ pCanvas.addEventListener('click', e => {
   });
 });
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 3.5. 5-POINT 3D/4D HOLOGRAPHIC CYBER AVATAR & WATER KINEMATICS ENGINE
+// ═══════════════════════════════════════════════════════════════════════════
+const cyberAvatarEl = document.getElementById('pond-cyber-avatar');
+const cyberAvatarWrapEl = document.getElementById('cyber-avatar-wrap');
+const cyberVideoEl = document.getElementById('pond-cyber-video');
+const cyberVoiceBadge = document.getElementById('cyber-voice-badge');
+
+// 5 tactical points calibrated to the user's annotated areas in the Antigravity Pond:
+// Point 1: Top-Left (x: ~14%, y: ~18%)
+// Point 2: Top-Right (x: ~76%, y: ~18%)
+// Point 3: Center (x: ~45%, y: ~40%)
+// Point 4: Bottom-Left (x: ~14%, y: ~60%)
+// Point 5: Bottom-Right (x: ~76%, y: ~60%)
+const CYBER_SPAWN_POINTS = [
+  { name: 'TOP_LEFT',     leftPct: 14, topPct: 18 },
+  { name: 'TOP_RIGHT',    leftPct: 76, topPct: 18 },
+  { name: 'CENTER',       leftPct: 45, topPct: 40 },
+  { name: 'BOTTOM_LEFT',  leftPct: 14, topPct: 60 },
+  { name: 'BOTTOM_RIGHT', leftPct: 76, topPct: 60 }
+];
+
+const cyberAvatarState = {
+  active: false,
+  phase: 'idle', // 'spawning' | 'walking' | 'vanish' | 'idle'
+  spawnTime: 0,
+  walkStartTime: 0,
+  walkDuration: 9200, // 9.2s of fluid walking traversal
+  startPt: null,
+  targetPt: null,
+  curX: 0,
+  curY: 0,
+  footX: 0,
+  footY: 0,
+  facingX: 1,
+  moveAngle: 0,
+  stepCadence: 640,
+  lastStepIndex: -1,
+  waterWakeTimer: 0,
+  pointIndex: 0
+};
+
+// Interactive Click: Toggle Voice/Audio of Cyber Command Speech
+if (cyberAvatarEl && cyberVideoEl) {
+  cyberAvatarEl.addEventListener('click', (e) => {
+    e.stopPropagation();
+    cyberVideoEl.muted = !cyberVideoEl.muted;
+    if (cyberVoiceBadge) {
+      cyberVoiceBadge.style.display = cyberVideoEl.muted ? 'none' : 'block';
+      cyberVoiceBadge.textContent = cyberVideoEl.muted ? 'MUTED' : 'VOICE ACTIVE';
+      if (!cyberVideoEl.muted) {
+        cyberVideoEl.play().catch(() => {});
+      }
+    }
+  });
+}
+
+function triggerWaterFootstep(footX, footY, footSide, facingX, dx, dy) {
+  const stepX = footX + footSide * 10 * facingX;
+  const stepY = footY;
+
+  // Primary footstep water ripple
+  pRipples.push({
+    x: stepX, y: stepY,
+    r: 3, maxR: 48,
+    alpha: 0.95, spd: 1.6,
+    color: [0, 245, 255]
+  });
+
+  // Secondary delayed water swell ring
+  setTimeout(() => {
+    pRipples.push({
+      x: stepX, y: stepY,
+      r: 2, maxR: 32,
+      alpha: 0.75, spd: 1.1,
+      color: [0, 180, 255]
+    });
+  }, 120);
+
+  // Micro water splash droplets flying upward in 3D
+  for (let s = 0; s < 6; s++) {
+    const spd = 20 + Math.random() * 40;
+    const ang = Math.random() * Math.PI * 2;
+    pWaterSplashes.push({
+      x: stepX,
+      y: stepY,
+      vx: Math.cos(ang) * spd,
+      vy: Math.sin(ang) * spd * 0.6,
+      z: 0,
+      vz: 26 + Math.random() * 38,
+      alpha: 0.95,
+      size: 1.2 + Math.random() * 1.5,
+      color: [0, 240, 255]
+    });
+  }
+
+  // Playful reaction from nearby koi fish
+  pondFishList.forEach(f => {
+    const d = Math.hypot(f.x - stepX, f.y - stepY);
+    if (d < 110) {
+      f.wigglePhase += 0.8;
+      if (Math.random() < 0.65) {
+        pBubbles.push({
+          x: f.x + (Math.random() - 0.5) * 8,
+          y: f.y + (Math.random() - 0.5) * 8,
+          r: 2 + Math.random() * 2,
+          vy: -18 - Math.random() * 12,
+          alpha: 0.85,
+          wobble: Math.random() * 10,
+          color: f.cfg.glow
+        });
+      }
+    }
+  });
+}
+
+function emitWaterWake(footX, footY, moveAngle) {
+  const wakeDist = 12;
+  const backAngle = moveAngle + Math.PI;
+  const leftAngle = backAngle + 0.45;
+  const rightAngle = backAngle - 0.45;
+
+  pRipples.push({
+    x: footX + Math.cos(leftAngle) * wakeDist,
+    y: footY + Math.sin(leftAngle) * (wakeDist * 0.6),
+    r: 2, maxR: 26, alpha: 0.65, spd: 1.0,
+    color: [0, 210, 255],
+    isWake: true, wakeAngle: moveAngle
+  });
+
+  pRipples.push({
+    x: footX + Math.cos(rightAngle) * wakeDist,
+    y: footY + Math.sin(rightAngle) * (wakeDist * 0.6),
+    r: 2, maxR: 26, alpha: 0.65, spd: 1.0,
+    color: [0, 210, 255],
+    isWake: true, wakeAngle: moveAngle
+  });
+}
+
+let cyberTeleportTimer = null;
+
+function spawnCyberAvatar() {
+  if (!cyberAvatarEl || pW <= 0 || pH <= 0) return;
+
+  if (cyberTeleportTimer) clearTimeout(cyberTeleportTimer);
+
+  const startPt = CYBER_SPAWN_POINTS[cyberAvatarState.pointIndex];
+  const nextIndex = (cyberAvatarState.pointIndex + 1) % CYBER_SPAWN_POINTS.length;
+  const targetPt = CYBER_SPAWN_POINTS[nextIndex];
+  cyberAvatarState.pointIndex = nextIndex;
+
+  cyberAvatarState.active = true;
+  cyberAvatarState.phase = 'spawning';
+  cyberAvatarState.spawnTime = performance.now();
+  cyberAvatarState.startPt = startPt;
+  cyberAvatarState.targetPt = targetPt;
+  cyberAvatarState.curX = (startPt.leftPct / 100) * pW;
+  cyberAvatarState.curY = (startPt.topPct / 100) * pH;
+  cyberAvatarState.footX = cyberAvatarState.curX + 43;
+  cyberAvatarState.footY = cyberAvatarState.curY + 150;
+  cyberAvatarState.lastStepIndex = -1;
+  cyberAvatarState.waterWakeTimer = 0;
+
+  const dx = targetPt.leftPct - startPt.leftPct;
+  const dy = targetPt.topPct - startPt.topPct;
+  cyberAvatarState.facingX = dx >= 0 ? 1 : -1;
+  cyberAvatarState.moveAngle = Math.atan2(dy, dx);
+
+  cyberAvatarEl.style.transition = 'none';
+  cyberAvatarEl.style.left = `${cyberAvatarState.curX}px`;
+  cyberAvatarEl.style.top = `${cyberAvatarState.curY}px`;
+  cyberAvatarEl.style.display = 'block';
+  void cyberAvatarEl.offsetWidth; // Force reflow
+  cyberAvatarEl.className = 'pond-cyber-avatar materializing';
+
+  // Initial water ripple & splash on spawn
+  triggerWaterFootstep(cyberAvatarState.footX, cyberAvatarState.footY, 0, cyberAvatarState.facingX, dx, dy);
+
+  // After 450ms materialization beam, start walking traversal and video playback!
+  setTimeout(() => {
+    cyberAvatarState.phase = 'walking';
+    cyberAvatarState.walkStartTime = performance.now();
+    cyberAvatarEl.className = 'pond-cyber-avatar walking';
+
+    if (cyberVideoEl) {
+      cyberVideoEl.currentTime = 0;
+      cyberVideoEl.play().catch(() => {});
+    }
+  }, 450);
+
+  // Dematerialize after 9.65s (stays visible for full 10.1s sequence!)
+  setTimeout(() => {
+    cyberAvatarState.phase = 'vanish';
+    cyberAvatarEl.className = 'pond-cyber-avatar dematerializing';
+    if (cyberVideoEl) cyberVideoEl.pause();
+
+    // Vanish ripple and splash
+    pRipples.push({
+      x: cyberAvatarState.footX, y: cyberAvatarState.footY,
+      r: 4, maxR: 55, alpha: 0.95, spd: 1.8,
+      color: [0, 245, 255]
+    });
+
+    // Hide after animation
+    setTimeout(() => {
+      cyberAvatarEl.className = 'pond-cyber-avatar';
+      cyberAvatarEl.style.display = 'none';
+      cyberAvatarState.active = false;
+      cyberAvatarState.phase = 'idle';
+
+      // Schedule next teleport cycle after 3.5s pause
+      cyberTeleportTimer = setTimeout(spawnCyberAvatar, 3500);
+    }, 450);
+  }, 9650);
+}
+
+// Teleport every 14s (10.1s active visible sequence + 3.5s pause)
+setTimeout(() => {
+  spawnCyberAvatar();
+}, 2000);
+
 function drawEmbeddedPond(t_ns, t_sec, dt) {
   if (pW <= 0 || pH <= 0) return;
 
   // Clear canvas to let the CSS aquarium background show through
   pCtx.clearRect(0, 0, pW, pH);
 
-  // Interactive Ripples
+  // Interactive Ripples & Wake
   for (let i = pRipples.length - 1; i >= 0; i--) {
     const rp = pRipples[i];
     rp.r += rp.spd * dt * 60;
     rp.alpha = Math.max(0, 0.9 * (1 - rp.r / rp.maxR));
     if (rp.alpha <= 0 || rp.r >= rp.maxR) { pRipples.splice(i, 1); continue; }
     pCtx.strokeStyle = `rgba(${rp.color.join(',')}, ${rp.alpha.toFixed(2)})`;
-    pCtx.lineWidth = 1.2;
+    pCtx.lineWidth = rp.isWake ? 1.0 : 1.2;
     pCtx.beginPath();
-    pCtx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.6, 0, 0, Math.PI * 2);
-    pCtx.stroke();
+    if (rp.isWake) {
+      pCtx.save();
+      pCtx.translate(rp.x, rp.y);
+      pCtx.rotate(rp.wakeAngle || 0);
+      pCtx.ellipse(0, 0, rp.r * 1.3, rp.r * 0.45, 0, 0, Math.PI * 2);
+      pCtx.stroke();
+      pCtx.restore();
+    } else {
+      pCtx.ellipse(rp.x, rp.y, rp.r, rp.r * 0.6, 0, 0, Math.PI * 2);
+      pCtx.stroke();
+    }
   }
 
   // Pellets
@@ -816,6 +1048,144 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
     pCtx.beginPath();
     pCtx.arc(p.x, p.y, 3, 0, Math.PI * 2);
     pCtx.fill();
+  }
+
+  // ── Water Splashes from Avatar Walking on Water ──
+  for (let i = pWaterSplashes.length - 1; i >= 0; i--) {
+    const sp = pWaterSplashes[i];
+    sp.x += sp.vx * dt;
+    sp.y += sp.vy * dt;
+    sp.z += sp.vz * dt;
+    sp.vz -= 85 * dt; // Gravity
+    sp.alpha -= dt * 1.5;
+    if (sp.z <= 0 && sp.vz < 0) {
+      if (Math.random() < 0.25) {
+        pRipples.push({ x: sp.x, y: sp.y, r: 1, maxR: 12, alpha: 0.5, spd: 0.8, color: [0, 229, 255] });
+      }
+      pWaterSplashes.splice(i, 1);
+      continue;
+    }
+    if (sp.alpha <= 0) { pWaterSplashes.splice(i, 1); continue; }
+    pCtx.fillStyle = `rgba(${sp.color.join(',')}, ${sp.alpha.toFixed(2)})`;
+    pCtx.beginPath();
+    pCtx.arc(sp.x, sp.y - sp.z, sp.size, 0, Math.PI * 2);
+    pCtx.fill();
+  }
+
+  // ── Bioluminescent Bubbles from Playing Fish ──
+  for (let i = pBubbles.length - 1; i >= 0; i--) {
+    const b = pBubbles[i];
+    b.y += b.vy * dt;
+    b.x += Math.sin(t_sec * 4 + b.wobble) * 0.5;
+    b.r += dt * 0.5;
+    b.alpha -= dt * 0.45;
+    if (b.alpha <= 0 || b.y <= 0) { pBubbles.splice(i, 1); continue; }
+    pCtx.save();
+    pCtx.strokeStyle = `rgba(${b.color.join(',')}, ${b.alpha.toFixed(2)})`;
+    pCtx.fillStyle = `rgba(${b.color.join(',')}, ${(b.alpha * 0.35).toFixed(2)})`;
+    pCtx.lineWidth = 0.8;
+    pCtx.beginPath();
+    pCtx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    pCtx.fill();
+    pCtx.stroke();
+    pCtx.restore();
+  }
+
+  // ── Update 5-Point 3D Holographic Avatar & Water Kinematics (60 FPS) ──
+  if (cyberAvatarState.active) {
+    const nowPerf = performance.now();
+    
+    if (cyberAvatarState.phase === 'spawning') {
+      const sp = cyberAvatarState.startPt;
+      cyberAvatarState.curX = (sp.leftPct / 100) * pW;
+      cyberAvatarState.curY = (sp.topPct / 100) * pH;
+      cyberAvatarState.footX = cyberAvatarState.curX + 43;
+      cyberAvatarState.footY = cyberAvatarState.curY + 150;
+      
+      cyberAvatarEl.style.left = `${cyberAvatarState.curX}px`;
+      cyberAvatarEl.style.top = `${cyberAvatarState.curY}px`;
+      if (cyberAvatarWrapEl) {
+        cyberAvatarWrapEl.style.transform = `scaleX(${cyberAvatarState.facingX}) rotateY(${cyberAvatarState.facingX * 10}deg) rotateX(4deg) translate3d(0, 0, 0)`;
+      }
+    } else if (cyberAvatarState.phase === 'walking') {
+      const walkElapsed = nowPerf - cyberAvatarState.walkStartTime;
+      const rawProg = Math.min(1, Math.max(0, walkElapsed / cyberAvatarState.walkDuration));
+      
+      // Smooth cubic easing (ease-in-out)
+      const progress = rawProg < 0.5 ? 2 * rawProg * rawProg : -1 + (4 - 2 * rawProg) * rawProg;
+      
+      const sp = cyberAvatarState.startPt;
+      const tp = cyberAvatarState.targetPt;
+      const startX = (sp.leftPct / 100) * pW;
+      const startY = (sp.topPct / 100) * pH;
+      const endX = (tp.leftPct / 100) * pW;
+      const endY = (tp.topPct / 100) * pH;
+      const dx = endX - startX;
+      const dy = endY - startY;
+
+      cyberAvatarState.curX = startX + dx * progress;
+      cyberAvatarState.curY = startY + dy * progress;
+      cyberAvatarState.footX = cyberAvatarState.curX + 43;
+      cyberAvatarState.footY = cyberAvatarState.curY + 150;
+      cyberAvatarState.moveAngle = Math.atan2(dy, dx);
+      
+      const targetFacing = dx >= 0 ? 1 : -1;
+      cyberAvatarState.facingX = targetFacing;
+
+      // Dynamic Walking Cadence (every 640ms per step)
+      const stepPhase = (walkElapsed / cyberAvatarState.stepCadence) * Math.PI;
+      const yBob = -Math.abs(Math.sin(stepPhase)) * 3.8;
+      const xSway = Math.sin(stepPhase) * 2.2 * targetFacing;
+      const bank = Math.max(-6, Math.min(6, (dx / Math.max(1, pW)) * 22)) + Math.cos(stepPhase) * 1.5;
+      const yaw = targetFacing * (12 + Math.sin(t_sec * 3.5) * 4);
+      const pitch = 4 + (dy / Math.max(1, pH)) * 6;
+
+      // 60 FPS Smooth Transform
+      cyberAvatarEl.style.left = `${cyberAvatarState.curX}px`;
+      cyberAvatarEl.style.top = `${cyberAvatarState.curY}px`;
+      if (cyberAvatarWrapEl) {
+        cyberAvatarWrapEl.style.transform = `scaleX(${targetFacing}) rotateY(${yaw.toFixed(1)}deg) rotateZ(${bank.toFixed(1)}deg) rotateX(${pitch.toFixed(1)}deg) translate3d(${xSway.toFixed(1)}px, ${yBob.toFixed(1)}px, 0)`;
+      }
+
+      // Footstep landing trigger (when foot hits water)
+      const currentStepIndex = Math.floor(walkElapsed / cyberAvatarState.stepCadence);
+      if (currentStepIndex > cyberAvatarState.lastStepIndex && rawProg < 0.98) {
+        cyberAvatarState.lastStepIndex = currentStepIndex;
+        const footSide = (currentStepIndex % 2 === 0) ? -1 : 1;
+        triggerWaterFootstep(cyberAvatarState.footX, cyberAvatarState.footY, footSide, targetFacing, dx, dy);
+      }
+
+      // Continuous Hydrodynamic Water Wake
+      cyberAvatarState.waterWakeTimer += dt;
+      if (cyberAvatarState.waterWakeTimer >= 0.12 && rawProg < 0.96) {
+        cyberAvatarState.waterWakeTimer = 0;
+        emitWaterWake(cyberAvatarState.footX, cyberAvatarState.footY, cyberAvatarState.moveAngle);
+      }
+    }
+
+    // ── Water Surface Contact Effects (Meniscus & Liquid Shadow) ──
+    if (cyberAvatarState.phase !== 'idle') {
+      pCtx.save();
+      // Soft translucent contact shadow on pond bed
+      pCtx.fillStyle = 'rgba(0, 18, 32, 0.40)';
+      pCtx.beginPath();
+      pCtx.ellipse(cyberAvatarState.footX, cyberAvatarState.footY + 2, 32, 10, 0, 0, Math.PI * 2);
+      pCtx.fill();
+
+      // Glowing bioluminescent surface tension meniscus ring (avatar walking ON liquid)
+      const meniscusGrad = pCtx.createRadialGradient(
+        cyberAvatarState.footX, cyberAvatarState.footY, 2,
+        cyberAvatarState.footX, cyberAvatarState.footY, 32
+      );
+      meniscusGrad.addColorStop(0, 'rgba(0, 245, 255, 0.65)');
+      meniscusGrad.addColorStop(0.35, 'rgba(0, 190, 255, 0.30)');
+      meniscusGrad.addColorStop(1, 'rgba(0, 180, 255, 0)');
+      pCtx.fillStyle = meniscusGrad;
+      pCtx.beginPath();
+      pCtx.ellipse(cyberAvatarState.footX, cyberAvatarState.footY, 32, 12, 0, 0, Math.PI * 2);
+      pCtx.fill();
+      pCtx.restore();
+    }
   }
 
   // Ultra-Realistic Fluid Kinematics
@@ -848,8 +1218,67 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
       }
     }
 
+    // ── Playing with Walking Avatar Logic ──
+    let isPlayingWithAvatar = false;
+    let playDesiredVx = 0;
+    let playDesiredVy = 0;
+
+    if (cyberAvatarState.active && cyberAvatarState.phase === 'walking') {
+      const dAvatar = Math.hypot(f.x - cyberAvatarState.footX, f.y - cyberAvatarState.footY);
+
+      // If foot lands directly on fish (< 22px), gentle playful quick-dodge
+      if (dAvatar < 22) {
+        f.scatter = true;
+        f.scatterTime = 0.7;
+        const ang = Math.atan2(f.y - cyberAvatarState.footY, f.x - cyberAvatarState.footX);
+        f.scatterVx = Math.cos(ang) * baseSpd * 3.2;
+        f.scatterVy = Math.sin(ang) * baseSpd * 3.2;
+        pBubbles.push({
+          x: f.x, y: f.y, r: 2.5, vy: -20, alpha: 0.9,
+          wobble: Math.random() * 10, color: sc.glow
+        });
+      } else if (!f.scatter && !f.feeding) {
+        // Friendly koi fish playing with avatar (large koi or nearby fish)
+        if (sc.isLarge || dAvatar < 130) {
+          isPlayingWithAvatar = true;
+          f.isPlayActive = true;
+
+          f.playAngle = (f.playAngle || (Math.random() * Math.PI * 2)) + dt * (sc.isLarge ? 1.3 : 2.1);
+          const orbitDist = sc.isLarge ? (50 + Math.sin(t_sec * 2 + f.glowPulse) * 16) : (36 + Math.cos(t_sec * 3) * 10);
+
+          // Lead slightly ahead of walking footsteps
+          const leadAheadX = Math.cos(cyberAvatarState.moveAngle || 0) * (sc.isLarge ? 26 : 14);
+          const leadAheadY = Math.sin(cyberAvatarState.moveAngle || 0) * (sc.isLarge ? 26 : 14);
+
+          const targetPlayX = cyberAvatarState.footX + leadAheadX + Math.cos(f.playAngle) * orbitDist;
+          const targetPlayY = cyberAvatarState.footY + leadAheadY + Math.sin(f.playAngle) * (orbitDist * 0.55);
+
+          const dxPlay = targetPlayX - f.x;
+          const dyPlay = targetPlayY - f.y;
+          const dPlay = Math.hypot(dxPlay, dyPlay);
+
+          if (dPlay > 4) {
+            const playSpd = baseSpd * (sc.isLarge ? 1.4 : 1.75);
+            playDesiredVx = (dxPlay / dPlay) * playSpd;
+            playDesiredVy = (dyPlay / dPlay) * playSpd;
+          }
+
+          // Emit playful bubbles periodically while playing
+          if (Math.random() < 0.035) {
+            pBubbles.push({
+              x: f.x, y: f.y, r: 1.5 + Math.random() * 1.5,
+              vy: -15 - Math.random() * 10, alpha: 0.85,
+              wobble: Math.random() * 10, color: sc.glow
+            });
+          }
+        }
+      }
+    } else {
+      f.isPlayActive = false;
+    }
+
     // Autonomous Wandering target selection
-    if (!f.scatter && !f.feeding) {
+    if (!f.scatter && !f.feeding && !isPlayingWithAvatar) {
       if (f.targetWait > 0) {
         f.targetWait -= dt;
       } else {
@@ -875,6 +1304,9 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
       const dx = f.feedX - f.x, dy = f.feedY - f.y;
       const d = Math.hypot(dx, dy);
       if (d > 0) { desiredVx = (dx/d) * baseSpd * 2.0; desiredVy = (dy/d) * baseSpd * 2.0; }
+    } else if (isPlayingWithAvatar) {
+      desiredVx = playDesiredVx;
+      desiredVy = playDesiredVy;
     } else if (f.targetWait <= 0) {
       const dx = f.targetX - f.x, dy = f.targetY - f.y;
       const d = Math.hypot(dx, dy);
@@ -886,7 +1318,7 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
     }
 
     // Apply steering
-    const steerForce = f.scatter ? 5.0 * dt : 1.5 * dt;
+    const steerForce = f.scatter ? 5.0 * dt : (isPlayingWithAvatar ? 3.2 * dt : 1.5 * dt);
     f.vx += (desiredVx - f.vx) * steerForce;
     f.vy += (desiredVy - f.vy) * steerForce;
 
@@ -937,9 +1369,9 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
     // ── Drawing the Side-View Aquarium Fish Sprite ──
     pCtx.save();
     
-    // Draw Drop Shadow
-    pCtx.shadowColor = 'rgba(0, 0, 0, 0.6)';
-    pCtx.shadowBlur = 15;
+    // Draw Drop Shadow (glowing when playing with avatar!)
+    pCtx.shadowColor = f.isPlayActive ? `rgba(${sc.glow.join(',')}, 0.85)` : 'rgba(0, 0, 0, 0.6)';
+    pCtx.shadowBlur = f.isPlayActive ? 18 : 15;
     pCtx.shadowOffsetX = 10;
     pCtx.shadowOffsetY = 15;
     
@@ -1033,166 +1465,7 @@ function mainLoop(now_ms) {
 }
 requestAnimationFrame(mainLoop);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// 3.5. 5-POINT HOLOGRAPHIC CYBER AVATAR TELEPORTATION CONTROLLER
-// ═══════════════════════════════════════════════════════════════════════════
-const cyberAvatarEl = document.getElementById('pond-cyber-avatar');
-
-// 5 tactical points calibrated to the user's annotated areas in the Antigravity Pond:
-// Point 1: Top-Left (x: ~14%, y: ~18%)
-// Point 2: Top-Right (x: ~76%, y: ~18%)
-// Point 3: Center (x: ~45%, y: ~42%)
-// Point 4: Bottom-Left (x: ~14%, y: ~60%)
-// Point 5: Bottom-Right (x: ~76%, y: ~60%)
-const CYBER_SPAWN_POINTS = [
-  { name: 'TOP_LEFT',     leftPct: 14, topPct: 18 },
-  { name: 'TOP_RIGHT',    leftPct: 76, topPct: 18 },
-  { name: 'CENTER',       leftPct: 45, topPct: 40 },
-  { name: 'BOTTOM_LEFT',  leftPct: 14, topPct: 60 },
-  { name: 'BOTTOM_RIGHT', leftPct: 76, topPct: 60 }
-];
-
-const cyberVideoEl = document.getElementById('pond-cyber-video');
-const cyberVoiceBadge = document.getElementById('cyber-voice-badge');
-
-// Interactive Click: Toggle Voice/Audio of Cyber Command Speech
-if (cyberAvatarEl && cyberVideoEl) {
-  cyberAvatarEl.addEventListener('click', (e) => {
-    e.stopPropagation();
-    cyberVideoEl.muted = !cyberVideoEl.muted;
-    if (cyberVoiceBadge) {
-      cyberVoiceBadge.style.display = cyberVideoEl.muted ? 'none' : 'block';
-      cyberVoiceBadge.textContent = cyberVideoEl.muted ? 'MUTED' : 'VOICE ACTIVE';
-      if (!cyberVideoEl.muted) {
-        cyberVideoEl.play().catch(() => {});
-      }
-    }
-  });
-}
-
-let cyberPointIndex = 0;
-let cyberActiveTimer = null;
-let cyberVanishTimer = null;
-let cyberWalkInterval = null;
-
-function spawnCyberAvatar() {
-  if (!cyberAvatarEl || pW <= 0 || pH <= 0) return;
-
-  // Clear previous timers and walking intervals if any
-  if (cyberActiveTimer) clearTimeout(cyberActiveTimer);
-  if (cyberVanishTimer) clearTimeout(cyberVanishTimer);
-  if (cyberWalkInterval) clearInterval(cyberWalkInterval);
-
-  // Pick start point and walking destination waypoint
-  const startPt = CYBER_SPAWN_POINTS[cyberPointIndex];
-  const nextIndex = (cyberPointIndex + 1) % CYBER_SPAWN_POINTS.length;
-  const targetPt = CYBER_SPAWN_POINTS[nextIndex];
-  cyberPointIndex = nextIndex;
-
-  // Initial spawn position (instant teleport without transition)
-  cyberAvatarEl.style.transition = 'none';
-  cyberAvatarEl.style.left = `${startPt.leftPct}%`;
-  cyberAvatarEl.style.top = `${startPt.topPct}%`;
-  cyberAvatarEl.style.display = 'block';
-
-  // Force reflow
-  void cyberAvatarEl.offsetWidth;
-
-  // Trigger materialization animation
-  cyberAvatarEl.className = 'pond-cyber-avatar materializing';
-
-  // Trigger initial water ripples at avatar feet
-  const startFootX = (startPt.leftPct / 100) * pW + 43;
-  const startFootY = (startPt.topPct / 100) * pH + 150;
-  pRipples.push({ x: startFootX, y: startFootY, r: 4, maxR: 55, alpha: 0.95, spd: 1.8, color: [0, 229, 255] });
-  pRipples.push({ x: startFootX, y: startFootY, r: 2, maxR: 35, alpha: 0.8, spd: 1.2, color: [0, 180, 255] });
-
-  // Scatter nearby koi fish away from teleportation point
-  pondFishList.forEach(f => {
-    const d = Math.hypot(f.x - startFootX, f.y - startFootY);
-    if (d < 120) {
-      f.scatter = true;
-      f.scatterTime = 1.5;
-      const ang = Math.atan2(f.y - startFootY, f.x - startFootX);
-      f.scatterVx = Math.cos(ang) * 180;
-      f.scatterVy = Math.sin(ang) * 180;
-    }
-  });
-
-  // After 0.45s spawn beam, initiate 3D video playback and live walking traversal!
-  cyberActiveTimer = setTimeout(() => {
-    cyberAvatarEl.style.transition = 'left 9.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), top 9.2s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-    cyberAvatarEl.className = 'pond-cyber-avatar walking';
-    cyberAvatarEl.style.left = `${targetPt.leftPct}%`;
-    cyberAvatarEl.style.top = `${targetPt.topPct}%`;
-
-    // Reset video to start and play
-    if (cyberVideoEl) {
-      cyberVideoEl.currentTime = 0;
-      cyberVideoEl.play().catch(() => {});
-    }
-
-    // Emit alternating footstep water ripples every 650ms along the 9.2s walking path
-    let stepCount = 0;
-    const walkStartTime = performance.now();
-    const walkDuration = 9200;
-
-    cyberWalkInterval = setInterval(() => {
-      const elapsed = performance.now() - walkStartTime;
-      const progress = Math.min(1, elapsed / walkDuration);
-      
-      const curLeft = startPt.leftPct + (targetPt.leftPct - startPt.leftPct) * progress;
-      const curTop  = startPt.topPct + (targetPt.topPct - startPt.topPct) * progress;
-      
-      const footSide = (stepCount % 2 === 0) ? -8 : 8; // Alternate left/right foot
-      const stepX = (curLeft / 100) * pW + 43 + footSide;
-      const stepY = (curTop / 100) * pH + 150;
-
-      // Concentric water footstep ripple
-      pRipples.push({ x: stepX, y: stepY, r: 2, maxR: 40, alpha: 0.88, spd: 1.5, color: [0, 229, 255] });
-
-      // Reactive koi fish scattering as avatar walks through the pond
-      pondFishList.forEach(f => {
-        const d = Math.hypot(f.x - stepX, f.y - stepY);
-        if (d < 95) {
-          f.scatter = true;
-          f.scatterTime = 1.3;
-          const ang = Math.atan2(f.y - stepY, f.x - stepX);
-          f.scatterVx = Math.cos(ang) * 160;
-          f.scatterVy = Math.sin(ang) * 160;
-        }
-      });
-
-      stepCount++;
-      if (progress >= 1) clearInterval(cyberWalkInterval);
-    }, 650);
-  }, 450);
-
-  // Dematerialize after 10.0 seconds (stays visible and active for 10 full seconds!)
-  cyberVanishTimer = setTimeout(() => {
-    if (cyberWalkInterval) clearInterval(cyberWalkInterval);
-    cyberAvatarEl.className = 'pond-cyber-avatar dematerializing';
-
-    if (cyberVideoEl) {
-      cyberVideoEl.pause();
-    }
-
-    const endFootX = (targetPt.leftPct / 100) * pW + 43;
-    const endFootY = (targetPt.topPct / 100) * pH + 150;
-    pRipples.push({ x: endFootX, y: endFootY, r: 4, maxR: 55, alpha: 0.9, spd: 1.6, color: [0, 229, 255] });
-
-    setTimeout(() => {
-      cyberAvatarEl.className = 'pond-cyber-avatar';
-      cyberAvatarEl.style.display = 'none';
-    }, 400);
-  }, 10000);
-}
-
-// Teleport every 12 seconds (10s active visible sequence + 2s teleportation phase)
-setTimeout(() => {
-  spawnCyberAvatar();
-  setInterval(spawnCyberAvatar, 12000);
-}, 2000);
+// (3.5 Cyber Avatar Engine is dynamically driven above in section 3.5 & drawEmbeddedPond)
 
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2750,7 +3023,7 @@ function openUpdateModal() {
     // Read current version dynamically from snapshot data; fall back to HTML title parse
     const cur = (window.__latestUpdateInfo && window.__latestUpdateInfo.current_version)
       || (document.title.match(/v([\d.]+)/) || [])[1]
-      || '2.6.1';
+      || '2.6.2';
     curVer.textContent = cur.startsWith('v') ? cur : `v${cur}`;
   }
   if (targetVer && window.__latestUpdateInfo) {
@@ -2871,7 +3144,7 @@ if (window.location.protocol.startsWith('http')) {
       <div class="update-meta-row">
         <div class="update-meta-item">
           <span class="update-meta-lbl">CURRENT BUILD</span>
-          <span class="update-meta-val" id="update-cur-ver">v2.6.1</span>
+          <span class="update-meta-val" id="update-cur-ver">v2.6.2</span>
         </div>
         <div class="update-meta-item">
           <span class="update-meta-lbl">TARGET RELEASE</span>
