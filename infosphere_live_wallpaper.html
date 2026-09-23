@@ -14,7 +14,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.6.5</title>
+  <title>InfoSphere · Tactical Cyber Live Wallpaper Engine v2.6.6</title>
   <meta name="description" content="Intelligent Live Cyber Wallpaper for Windows. 60 FPS 10-Fish Antigravity Pond, real-time telemetry, multi-theme CSS, and Go Event Hub."/>
   <link rel="stylesheet" href="css/wallpaper_theme.css"/>
 </head>
@@ -40,7 +40,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
       <img src="img/logo.png" class="brand-logo-img" alt="IS Logo" />
       <div class="brand-title">
         <h1>INFOSPHERE <span>TACTICAL CYBER LIVE ENGINE</span></h1>
-        <div class="brand-subtitle" id="brand-subtitle">v2.6.5 · LOCAL &amp; SECURE · KERNEL SYNC</div>
+        <div class="brand-subtitle" id="brand-subtitle">v2.6.6 · LOCAL &amp; SECURE · KERNEL SYNC</div>
       </div>
     </div>
 
@@ -560,7 +560,7 @@ All HTML, WebGL shaders, CSS themes, and JS logic are pre-calibrated.
     </div>
     <div class="footer-right">
       <span style="width:6px;height:6px;border-radius:50%;background:var(--accent-green);box-shadow:0 0 6px var(--accent-green);display:inline-block;"></span>
-      <span>InfoSphere v2.6.5 · Intelligent Live Engine · 2026</span>
+      <span>InfoSphere v2.6.6 · Intelligent Live Engine · 2026</span>
     </div>
   </footer>
 
@@ -854,7 +854,8 @@ const cyberAvatarState = {
   lastStepIndex: -1,
   waterWakeTimer: 0,
   footX: 0,
-  footY: 0
+  footY: 0,
+  lastRectUpdate: 0
 };
 
 // Interactive Click: Toggle Voice/Audio of Cyber Command Speech
@@ -1063,15 +1064,21 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
     pCtx.fill();
     pCtx.stroke();
     pCtx.restore();
-  }
+  // Strict particle bounds to eliminate array memory bloat
+  if (pRipples.length > 18) pRipples.splice(0, pRipples.length - 18);
+  if (pWaterSplashes.length > 20) pWaterSplashes.splice(0, pWaterSplashes.length - 20);
+  if (pBubbles.length > 20) pBubbles.splice(0, pBubbles.length - 20);
 
-  // ── Permanent Top-Right Tactical Cyber Avatar Kinematics (60 FPS) ──
+  // ── Permanent Top-Right Tactical Cyber Avatar Kinematics (Zero-Reflow) ──
   if (cyberAvatarEl && pCanvas) {
-    const pRect = pCanvas.getBoundingClientRect();
-    const aRect = cyberAvatarEl.getBoundingClientRect();
-    if (pRect.width > 0 && pRect.height > 0) {
-      cyberAvatarState.footX = (aRect.left + aRect.width * 0.5) - pRect.left;
-      cyberAvatarState.footY = Math.max(14, aRect.bottom - pRect.top);
+    if (t_sec - cyberAvatarState.lastRectUpdate > 3.0 || cyberAvatarState.footX === 0) {
+      cyberAvatarState.lastRectUpdate = t_sec;
+      const pRect = pCanvas.getBoundingClientRect();
+      const aRect = cyberAvatarEl.getBoundingClientRect();
+      if (pRect.width > 0 && pRect.height > 0) {
+        cyberAvatarState.footX = (aRect.left + aRect.width * 0.5) - pRect.left;
+        cyberAvatarState.footY = Math.max(14, aRect.bottom - pRect.top);
+      }
     }
 
     // Walking Cadence (natural vertical step bobbing and gentle sway)
@@ -1302,10 +1309,10 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
     pCtx.save();
     
     // Draw Drop Shadow (glowing when playing with avatar!)
-    pCtx.shadowColor = f.isPlayActive ? `rgba(${sc.glow.join(',')}, 0.85)` : 'rgba(0, 0, 0, 0.6)';
-    pCtx.shadowBlur = f.isPlayActive ? 18 : 15;
-    pCtx.shadowOffsetX = 10;
-    pCtx.shadowOffsetY = 15;
+    pCtx.shadowColor = f.isPlayActive ? `rgba(${sc.glow.join(',')}, 0.85)` : 'rgba(0, 0, 0, 0.4)';
+    pCtx.shadowBlur = f.isPlayActive ? 6 : 4;
+    pCtx.shadowOffsetX = 3;
+    pCtx.shadowOffsetY = 5;
     
     pCtx.translate(f.x, f.y);
     
@@ -1354,45 +1361,59 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
 const monthNames = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 const dayNames   = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
 
-let lastLoopTime = performance.now();
+const elTacticalTime = document.getElementById('tactical-time');
+const elHdrClock = document.getElementById('hdr-clock');
+const elTacticalDate = document.getElementById('tactical-date');
+const elTacticalSecBar = document.getElementById('tactical-sec-bar');
+const elTacticalSecVal = document.getElementById('tactical-sec-val');
+const elTacticalNsBar = document.getElementById('tactical-ns-bar');
+const elTacticalNsVal = document.getElementById('tactical-ns-val');
+
+let lastLoopTime = 0;
+let lastRenderedSec = -1;
+let lastRenderedMin = -1;
+const POND_TARGET_INTERVAL = 1000 / 30; // 30 FPS: silky fluid physics, 50% lower CPU/GPU usage
 
 function mainLoop(now_ms) {
   requestAnimationFrame(mainLoop);
 
+  // Strict 30 FPS Frame Throttling to keep CPU <1% and temps cool
+  if (now_ms - lastLoopTime < POND_TARGET_INTERVAL) return;
   const dt = Math.min((now_ms - lastLoopTime) / 1000, 0.05);
   lastLoopTime = now_ms;
-  if (dt <= 0) return;
 
   const t_sec = now_ms / 1000;
   const now   = new Date();
+  const curSec = now.getSeconds();
+  const curMin = now.getMinutes();
 
-  // 1. Clock Updates
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
-  const s = String(now.getSeconds()).padStart(2, '0');
-  const timeStr = `${h}:${m}:${s}`;
+  // 1. Clock Updates: Only update DOM text when second changes (eliminates layout thrashing)
+  if (curSec !== lastRenderedSec) {
+    lastRenderedSec = curSec;
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(curMin).padStart(2, '0');
+    const s = String(curSec).padStart(2, '0');
+    const timeStr = `${h}:${m}:${s}`;
 
+    if (elTacticalTime) elTacticalTime.textContent = timeStr;
+    if (elHdrClock) elHdrClock.textContent = timeStr;
+    if (elTacticalSecVal) elTacticalSecVal.textContent = `${s}s`;
+    if (elTacticalSecBar) elTacticalSecBar.style.width = `${((curSec / 60) * 100).toFixed(1)}%`;
+  }
+
+  if (curMin !== lastRenderedMin) {
+    lastRenderedMin = curMin;
+    if (elTacticalDate) {
+      elTacticalDate.textContent = `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} · ${dayNames[now.getDay()]}`;
+    }
+  }
+
+  // Smooth Nanosecond sub-second gauge
   const ms = now.getMilliseconds();
-  const subMs = (performance.now() % 1);
-  const totalNs = Math.floor((ms + subMs) * 1000000);
-  const nsStr = `${totalNs.toLocaleString()} ns`;
+  if (elTacticalNsBar) elTacticalNsBar.style.width = `${(ms / 10).toFixed(1)}%`;
+  if (elTacticalNsVal) elTacticalNsVal.textContent = `${ms * 1000} µs`;
 
-  // Center Tactical Clock
-  document.getElementById('tactical-time').textContent = timeStr;
-  document.getElementById('hdr-clock').textContent = timeStr;
-  document.getElementById('tactical-date').textContent =
-    `${now.getDate()} ${monthNames[now.getMonth()]} ${now.getFullYear()} · ${dayNames[now.getDay()]}`;
-
-  // Gauge Bars
-  const secPct = (now.getSeconds() + ms / 1000) / 60;
-  document.getElementById('tactical-sec-bar').style.width = `${(secPct * 100).toFixed(1)}%`;
-  document.getElementById('tactical-sec-val').textContent = `${s}s`;
-
-  const nsPct = (ms * 1000000 + subMs * 1000000) / 1000000000;
-  document.getElementById('tactical-ns-bar').style.width = `${(nsPct * 100).toFixed(1)}%`;
-  document.getElementById('tactical-ns-val').textContent = nsStr;
-
-  // 2. Draw Pond
+  // 2. Draw Pond at 30 FPS
   drawEmbeddedPond(now_ms, t_sec, dt);
 }
 requestAnimationFrame(mainLoop);
@@ -2418,11 +2439,17 @@ async function pollSnapshot() {
     pollGlobalMouse();
   })();
 
-  // ── 60 FPS Render Loop ───────────────────────────────────────────────────
+  // ── Throttled 24 FPS Render Loop (Zero GPU heating & low power) ─────────
   let time = 0;
+  let lastGlobeTime = 0;
+  const GLOBE_TARGET_INTERVAL = 1000 / 24; // 24 FPS is cinematic & ultra-efficient
 
-  function render() {
-    time += 0.016;
+  function render(now_ms) {
+    requestAnimationFrame(render);
+    if (now_ms - lastGlobeTime < GLOBE_TARGET_INTERVAL) return;
+    const dt = Math.min((now_ms - lastGlobeTime) / 1000, 0.08);
+    lastGlobeTime = now_ms;
+    time += dt;
     frameCount++;
 
     // FPS & Threat Volume HUD updates (1 Hz)
@@ -2586,7 +2613,7 @@ async function pollSnapshot() {
     if (satProj.z > -0.3) {
       ctx.fillStyle = '#10B981';
       ctx.shadowColor = '#10B981';
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = 3;
       ctx.beginPath();
       ctx.arc(satProj.x, satProj.y, 3.2, 0, Math.PI * 2);
       ctx.fill();
@@ -2672,7 +2699,7 @@ async function pollSnapshot() {
         if (packetProj.z > -0.1) {
           ctx.fillStyle = '#38BDF8';
           ctx.shadowColor = '#00E5FF';
-          ctx.shadowBlur = 10;
+          ctx.shadowBlur = 3;
           ctx.beginPath();
           ctx.arc(packetProj.x, packetProj.y, 2.4, 0, Math.PI * 2);
           ctx.fill();
@@ -2747,7 +2774,7 @@ async function pollSnapshot() {
           if (packetProj.z > -0.15) {
             ctx.fillStyle = arc.color;
             ctx.shadowColor = arc.color;
-            ctx.shadowBlur = 12;
+            ctx.shadowBlur = 4;
             ctx.beginPath();
             ctx.arc(packetProj.x, packetProj.y, 2.8, 0, Math.PI * 2);
             ctx.fill();
@@ -2758,6 +2785,7 @@ async function pollSnapshot() {
           if (packetProgress > 0.95 && p === 0 && Math.random() < 0.20) {
             const targetProj = project(arc.target, cx, cy, radius);
             if (targetProj.z > 0) {
+              if (shieldRipples.length > 6) shieldRipples.splice(0, shieldRipples.length - 6);
               shieldRipples.push({
                 x: targetProj.x,
                 y: targetProj.y,
@@ -2823,7 +2851,7 @@ async function pollSnapshot() {
 
       ctx.fillStyle = '#10B981';
       ctx.shadowColor = '#10B981';
-      ctx.shadowBlur = 14;
+      ctx.shadowBlur = 4;
       ctx.beginPath();
       ctx.arc(hqProj.x, hqProj.y, 4.2, 0, Math.PI * 2);
       ctx.fill();
@@ -2955,7 +2983,7 @@ function openUpdateModal() {
     // Read current version dynamically from snapshot data; fall back to HTML title parse
     const cur = (window.__latestUpdateInfo && window.__latestUpdateInfo.current_version)
       || (document.title.match(/v([\d.]+)/) || [])[1]
-      || '2.6.5';
+      || '2.6.6';
     curVer.textContent = cur.startsWith('v') ? cur : `v${cur}`;
   }
   if (targetVer && window.__latestUpdateInfo) {
@@ -3076,7 +3104,7 @@ if (window.location.protocol.startsWith('http')) {
       <div class="update-meta-row">
         <div class="update-meta-item">
           <span class="update-meta-lbl">CURRENT BUILD</span>
-          <span class="update-meta-val" id="update-cur-ver">v2.6.5</span>
+          <span class="update-meta-val" id="update-cur-ver">v2.6.6</span>
         </div>
         <div class="update-meta-item">
           <span class="update-meta-lbl">TARGET RELEASE</span>

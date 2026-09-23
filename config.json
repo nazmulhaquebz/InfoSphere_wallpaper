@@ -1,7 +1,7 @@
 {
     "_notice": "CORE ENGINE CONFIGURATION. Users do NOT need to edit this file. Customize your HUD via user_information.txt, .env, and Picture/Original Picture/. Do not modify other files.",
     "brand_name":  "InfoSphere Cyber Live Wallpaper Engine",
-    "refresh_interval_seconds":  1.0,
+    "refresh_interval_seconds":  2.0,
     "resolution_width":  "auto",
     "resolution_height":  "auto",
     "display_mode":  "primary",

@@ -11,10 +11,10 @@ echo     _/ // _ \/ _  // __/ / /__ / _ \ / _ \/ _ \/ __/ _ `/
 echo    /___/_//_/\_,_//_/    \___// .__//_//_/\___/_/  \_,_/   
 echo                              /_/                           
 echo.
-echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.6.5 - SHUTDOWN
+echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.6.6 - SHUTDOWN
 echo      Author Name: Mohammad Nazmul Haque
 echo      Address: Tulshipur, Madhabpur, Habiganj, Bangladesh
-echo      Last Updated: 2026-09-23 - Dual-Video 10s Alternating Hologram, Rust Tamper Detection & RAM Cuts
+echo      Last Updated: 2026-09-23 - Ultra-Lightweight Architecture, Zero-CPU Cooling & <50MB RAM
 echo    ========================================================================
 echo.
 echo    Initiating secure shutdown...

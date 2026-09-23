@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"time"
@@ -71,10 +72,15 @@ func (h *Hub) WatchFiles() {
 	var lastSnapMod time.Time
 	var lastCfgMod time.Time
 
-	ticker := time.NewTicker(100 * time.Millisecond) // Fast 10Hz checking
+	ticker := time.NewTicker(1000 * time.Millisecond) // Cool, zero-CPU 1.0Hz checking
 	defer ticker.Stop()
+	var ticks int
 
 	for range ticker.C {
+		ticks++
+		if ticks%30 == 0 {
+			debug.FreeOSMemory() // Return unused heap pages to OS
+		}
 		// Check system_snapshot.json
 		if info, err := os.Stat(snapshotPath); err == nil {
 			if info.ModTime().After(lastSnapMod) {

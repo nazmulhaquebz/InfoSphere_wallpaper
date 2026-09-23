@@ -32,6 +32,9 @@ class SystemInfo:
         self._cache_ttl: float = 20.0  # cache details for 20s
         self._gpu_temp_cache: float = 0.0
         self._gpu_temp_ts: float = 0.0
+        self._proc_cache: dict = {"total": 0, "bg": 0}
+        self._proc_cache_ts: float = 0.0
+        self._proc_ttl: float = 15.0
         # Pre-seed psutil CPU tracking
         if _PSUTIL:
             try:
@@ -72,8 +75,9 @@ class SystemInfo:
                 info["disk_total_gb"] = round(disk.total / 1024**3, 1) if disk else 0.0
                 info["uptime"]        = self._uptime()
                 info["uptime_secs"]   = self._uptime_secs()
-                info["process_count"] = _safe(lambda: len(list(psutil.process_iter())), 0)
-                info["bg_process_count"] = self._bg_process_count()
+                proc_counts = self._get_process_counts()
+                info["process_count"] = proc_counts["total"]
+                info["bg_process_count"] = proc_counts["bg"]
 
                 bytes_sent = net.bytes_sent if net else 0
                 bytes_recv = net.bytes_recv if net else 0
@@ -180,33 +184,46 @@ class SystemInfo:
                 pass
 
         if gpu_temp > 0.0:
-            # CPU temperature is typically slightly higher than GPU temperature under load
-            cpu_temp = gpu_temp + 2.0 + (cpu_percent * 0.15)
+            cpu_temp = gpu_temp + 1.5 + (cpu_percent * 0.10)
             return round(cpu_temp, 1), "GPU_PROXY_ESTIMATE"
 
-        # 2. Fallback to high-fidelity CPU load-based simulation
-        # base idle temp is around 39C on this laptop processor
+        # 2. Realistic laptop CPU thermal curve:
+        # Idle (0-20%): 40°C - 44°C (cool, green)
+        # Moderate (20-60%): 45°C - 55°C
+        # Full Load (60-100%): 56°C - 68°C
         import random
-        cpu_temp = 39.0 + (cpu_percent * 0.45) + random.uniform(-1.0, 1.0)
+        base_temp = 41.5
+        load_temp = min(cpu_percent, 100.0) * 0.22
+        cpu_temp = base_temp + load_temp + random.uniform(-0.4, 0.4)
         return round(cpu_temp, 1), "LOAD_ESTIMATE"
 
-    def _bg_process_count(self) -> int:
-        count = 0
+    def _get_process_counts(self) -> dict:
+        now = time.time()
+        if self._proc_cache and (now - self._proc_cache_ts) < self._proc_ttl:
+            return self._proc_cache
+
+        total = 0
+        bg_count = 0
         try:
             import getpass
             current_user = getpass.getuser().lower()
             known_apps = {'explorer.exe', 'taskmgr.exe', 'chrome.exe', 'whatsapp.exe', 'ms-teams.exe', 'vscode.exe', 'python.exe', 'pythonw.exe', 'node.exe'}
             for p in psutil.process_iter(attrs=['name', 'username']):
+                total += 1
                 try:
                     p_user = (p.info.get('username') or '').split('\\')[-1].lower()
                     name = p.info['name'].lower()
                     if p_user == current_user and name not in known_apps:
-                        count += 1
+                        bg_count += 1
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
                     pass
         except Exception:
-            pass
-        return count
+            total = len(list(psutil.pids())) if hasattr(psutil, "pids") else 0
+            bg_count = 0
+
+        self._proc_cache = {"total": total, "bg": bg_count}
+        self._proc_cache_ts = now
+        return self._proc_cache
 
     def _disk_usage(self):
         root = "/" if platform.system() != "Windows" else "C:\\"

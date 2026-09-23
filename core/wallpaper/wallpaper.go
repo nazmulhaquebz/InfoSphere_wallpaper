@@ -20,6 +20,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -297,7 +298,7 @@ func pollMouse() {
 		}
 		atomic.StoreInt32(&lbtnState, lb)
 		atomic.StoreInt32(&rbtnState, rb)
-		time.Sleep(16 * time.Millisecond)
+		time.Sleep(33 * time.Millisecond) // ~30 Hz: silky responsiveness, 50% less CPU context switching
 	}
 }
 
@@ -344,13 +345,18 @@ func (h *sseHub) broadcast(data []byte) {
 	h.mu.Unlock()
 }
 
-// watchFiles monitors system_snapshot.json and config.json at 10 Hz
+// watchFiles monitors system_snapshot.json and config.json at 1.0 Hz (cool, zero-CPU)
 func (h *sseHub) watchFiles(root string) {
 	snapPath := filepath.Join(root, "output", "system_snapshot.json")
 	cfgPath  := filepath.Join(root, "config.json")
 	var lastSnap, lastCfg time.Time
+	var ticks int
 
-	for range time.Tick(100 * time.Millisecond) {
+	for range time.Tick(1000 * time.Millisecond) {
+		ticks++
+		if ticks%30 == 0 {
+			debug.FreeOSMemory() // Release unused heap to Windows OS kernel
+		}
 		if fi, err := os.Stat(snapPath); err == nil && fi.ModTime().After(lastSnap) {
 			lastSnap = fi.ModTime()
 			if raw, err := os.ReadFile(snapPath); err == nil && len(raw) > 0 {

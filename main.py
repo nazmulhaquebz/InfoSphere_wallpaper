@@ -30,7 +30,7 @@ ARCHITECTURE (No-Freeze Native Mode):
 Run:   python main.py   (or via run_windows.bat / ONE_CLICK_SETUP.bat)
 Stop:  Ctrl+C or stop_engine.bat
 """
-# Optimized v2.6.5: Dual-video 10s crossfade, RAM reduction (user_info/geo caching), GC tuning, FNV1a tamper detection
+# Optimized v2.6.6: Ultra-lightweight architecture, EmptyWorkingSet memory purging, 30FPS throttling, low CPU/thermal cooling
 
 import datetime
 import atexit
@@ -464,7 +464,15 @@ def main() -> None:
                 log.error(f"  [{now_str}] Render error: {exc}")
 
             elapsed = time.perf_counter() - t_start
-            sleep_t = max(0.05, (interval_ms / 1000.0) - elapsed)
+            sleep_t = max(0.1, (interval_ms / 1000.0) - elapsed)
+
+            # Proactive Win32 memory compaction: purge unused pages back to Windows OS
+            if cycle % 10 == 0 and sys.platform == "win32":
+                try:
+                    import ctypes
+                    ctypes.windll.psapi.EmptyWorkingSet(ctypes.windll.kernel32.GetCurrentProcess())
+                except Exception:
+                    pass
 
             # Use event-based sleep so stop_event wakes us up immediately
             stop_event.wait(sleep_t)

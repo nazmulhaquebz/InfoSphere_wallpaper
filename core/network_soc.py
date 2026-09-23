@@ -255,10 +255,11 @@ class NetworkSOC:
                     if i % 32 == 0:
                         time.sleep(0.01)
                 device_count = len(self.active_devices)
-                adaptive_sleep = 5.0 if device_count < 5 else (2.0 if device_count >= 8 else 3.0)
+                # Relaxed keepalive (15s-20s): keeps ARP cache warm while letting Wi-Fi radio & CPU sleep
+                adaptive_sleep = 20.0 if device_count < 5 else (12.0 if device_count >= 8 else 15.0)
                 time.sleep(adaptive_sleep)
             except Exception as e:
-                time.sleep(4.0)
+                time.sleep(10.0)
 
     def scan_network(self) -> Dict[str, Any]:
         """

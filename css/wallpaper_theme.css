@@ -179,7 +179,6 @@ body::before {
   background: var(--panel-bg);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(14px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
   gap: 12px;
   flex-shrink: 0;
@@ -485,7 +484,6 @@ body::before {
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md);
   padding: 10px 14px;
-  backdrop-filter: blur(12px);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
   position: relative;
   overflow: hidden;
@@ -714,7 +712,6 @@ body::before {
   background: linear-gradient(135deg, rgba(2, 14, 32, 0.88) 0%, rgba(5, 24, 48, 0.78) 50%, rgba(2, 14, 32, 0.88) 100%);
   border: 1px solid rgba(0, 229, 255, 0.35);
   border-radius: var(--radius-md);
-  backdrop-filter: blur(14px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 16px rgba(0, 229, 255, 0.12);
   z-index: 15;
   cursor: pointer;
@@ -1095,7 +1092,6 @@ body::before {
   flex-shrink: 0;
   width: 100%;
   box-sizing: border-box;
-  backdrop-filter: blur(12px);
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
 }
 
@@ -1127,7 +1123,6 @@ body::before {
   border-radius: var(--radius-md);
   padding: 6px 10px;
   margin-top: 2px;
-  backdrop-filter: blur(12px);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
@@ -1245,7 +1240,7 @@ body::before {
   font-size: 11px;
   font-weight: 700;
   cursor: pointer;
-  backdrop-filter: blur(8px);
+  background: rgba(4, 9, 24, 0.85);
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
   user-select: none;
@@ -1411,7 +1406,6 @@ body::before {
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md);
   padding: 8px 12px;
-  backdrop-filter: blur(12px);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
   overflow: hidden;
   flex: 1.15;
@@ -1496,7 +1490,6 @@ body::before {
   font-size: 7.5px;
   color: var(--text-secondary);
   letter-spacing: 0.06em;
-  backdrop-filter: blur(6px);
 }
 
 .hud-dot {
@@ -1551,9 +1544,7 @@ body::before {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(2, 6, 16, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(2, 6, 16, 0.94);
   animation: updateFadeIn 0.25s ease;
 }
 
