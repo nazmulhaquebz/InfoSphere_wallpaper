@@ -3,7 +3,7 @@
    Multi-Theme Switcher · Glassmorphism · Glowing HUD Gauges
    ═══════════════════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700;800&display=swap');
+/* Fonts load non-blocking via <link> in HTML head — no @import here to avoid render-blocking */
 
 :root {
   /* Default Theme: Cyber Cyan */
@@ -24,8 +24,8 @@
   --text-secondary:   #94A3B8;
   --text-muted:       #475569;
   --grid-line:        rgba(0, 210, 255, 0.04);
-  --font-mono:        'JetBrains Mono', monospace;
-  --font-sans:        'Inter', -apple-system, sans-serif;
+  --font-mono:        'JetBrains Mono', 'Cascadia Code', 'Cascadia Mono', Consolas, 'Courier New', monospace;
+  --font-sans:        'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --radius-sm:        4px;
   --radius-md:        8px;
   --radius-lg:        12px;
