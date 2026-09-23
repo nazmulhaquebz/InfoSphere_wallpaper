@@ -213,6 +213,19 @@ func findDesktopWorkerW() windows.HWND {
 //   - Right-click shows the native Windows desktop context menu
 //   - Left-click drag on the desktop draws the Windows selection rectangle
 //   - Fish & globe still react to mouse movement via the global Win32 mouse bridge
+// showAllChildWindows recursively ensures all Chromium/D3D sub-windows are visible
+func showAllChildWindows(h windows.HWND) {
+	procShowWindow.Call(uintptr(h), 5) // SW_SHOW = 5
+	var child uintptr
+	for {
+		child, _, _ = procFindWindowEx.Call(uintptr(h), child, 0, 0)
+		if child == 0 {
+			break
+		}
+		showAllChildWindows(windows.HWND(child))
+	}
+}
+
 func positionAsWallpaper(hwnd, workerW windows.HWND) {
 	w := getSystemMetrics(0)
 	h := getSystemMetrics(1)
@@ -241,7 +254,10 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 		setWindowPos(hwnd, 0, 0, 0, int(w), int(h), SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
 		log.Printf("[InfoSphere] Embedded successfully: %dx%d inside WorkerW (desktop icons on top)", w, h)
 
-		// 5. Watchdog: ensure parent and size stay locked even if Explorer restarts
+		// Explicitly show all inner Chromium rendering windows
+		showAllChildWindows(hwnd)
+
+		// 5. Watchdog: ensure parent, visibility, and size stay locked even if Explorer restarts
 		go func() {
 			for {
 				time.Sleep(2 * time.Second)
@@ -254,6 +270,7 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 						procSetParent.Call(uintptr(hwnd), uintptr(workerW))
 						setWindowPos(hwnd, 0, 0, 0, int(w), int(h), SWP_SHOWWINDOW|SWP_NOACTIVATE)
 					}
+					showAllChildWindows(hwnd)
 				}
 			}
 		}()

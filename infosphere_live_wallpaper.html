@@ -1064,6 +1064,8 @@ function drawEmbeddedPond(t_ns, t_sec, dt) {
     pCtx.fill();
     pCtx.stroke();
     pCtx.restore();
+  }
+
   // Strict particle bounds to eliminate array memory bloat
   if (pRipples.length > 18) pRipples.splice(0, pRipples.length - 18);
   if (pWaterSplashes.length > 20) pWaterSplashes.splice(0, pWaterSplashes.length - 20);
