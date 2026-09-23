@@ -19,6 +19,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"runtime"
 	"runtime/debug"
 	"strings"
@@ -213,24 +214,52 @@ func findDesktopWorkerW() windows.HWND {
 //   - Right-click shows the native Windows desktop context menu
 //   - Left-click drag on the desktop draws the Windows selection rectangle
 //   - Fish & globe still react to mouse movement via the global Win32 mouse bridge
-// showAllChildWindows recursively ensures all Chromium/D3D sub-windows are visible
-func showAllChildWindows(h windows.HWND) {
-	procShowWindow.Call(uintptr(h), 5) // SW_SHOW = 5
-	var child uintptr
-	for {
-		child, _, _ = procFindWindowEx.Call(uintptr(h), child, 0, 0)
-		if child == 0 {
-			break
+// ─── True Desktop Wallpaper Embedding (behind desktop icons) ───────────────
+// Embeds the WebView2 window into the WorkerW layer.
+// This puts the desktop icons (SHELLDLL_DefView / SysListView32) ON TOP of our
+// wallpaper, making it a real native Windows wallpaper:
+//   - Desktop icons are visible and fully interactive
+//   - Right-click shows the native Windows desktop context menu
+//   - Left-click drag on the desktop draws the Windows selection rectangle
+//   - Fish & globe still react to mouse movement via the global Win32 mouse bridge
+func makeWebviewVisible(w webview.WebView) {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Printf("[InfoSphere] makeWebviewVisible recover: %v", r)
 		}
-		showAllChildWindows(windows.HWND(child))
+	}()
+	v := reflect.ValueOf(w)
+	if v.Kind() == reflect.Ptr {
+		v = v.Elem()
+	}
+	browserField := v.FieldByName("browser")
+	if !browserField.IsValid() || browserField.IsNil() {
+		return
+	}
+	showMethod := browserField.MethodByName("Show")
+	if showMethod.IsValid() {
+		res := showMethod.Call(nil)
+		log.Printf("[InfoSphere] Called browser.Show() (PutIsVisible true), res=%v", res)
 	}
 }
 
-func positionAsWallpaper(hwnd, workerW windows.HWND) {
+func showChromiumWidgets(hwnd windows.HWND) {
+	pWidget0, _ := windows.UTF16PtrFromString("Chrome_WidgetWin_0")
+	pWidget1, _ := windows.UTF16PtrFromString("Chrome_WidgetWin_1")
+	w0, _, _ := procFindWindowEx.Call(uintptr(hwnd), 0, uintptr(unsafe.Pointer(pWidget0)), 0)
+	if w0 != 0 {
+		procShowWindow.Call(w0, 5) // SW_SHOW
+		w1, _, _ := procFindWindowEx.Call(w0, 0, uintptr(unsafe.Pointer(pWidget1)), 0)
+		if w1 != 0 {
+			procShowWindow.Call(w1, 5) // SW_SHOW
+		}
+	}
+}
+
+func positionAsWallpaper(w webview.WebView, hwnd, workerW windows.HWND) {
 	// Use WorkerW client rect for sizing — this is DPI-correct.
 	// GetSystemMetrics(0/1) returns physical pixels when DPI-aware,
 	// but WorkerW operates in logical (DPI-scaled) coordinate space.
-	// Mismatch causes WebView2 to overflow and render outside the visible area.
 	if workerW == 0 || !isWindow(workerW) {
 		workerW = findDesktopWorkerW()
 	}
@@ -240,17 +269,17 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 		// Get WorkerW's actual client area dimensions
 		var cr RECT
 		procGetClientRect.Call(uintptr(workerW), uintptr(unsafe.Pointer(&cr)))
-		w := int(cr.Right)
-		h := int(cr.Bottom)
+		widthPx := int(cr.Right)
+		heightPx := int(cr.Bottom)
 
 		// Fallback to system metrics if client rect is zero
-		if w == 0 || h == 0 {
-			w = int(getSystemMetrics(0))
-			h = int(getSystemMetrics(1))
-			log.Printf("[InfoSphere] WorkerW client rect was zero, using GetSystemMetrics: %dx%d", w, h)
+		if widthPx == 0 || heightPx == 0 {
+			widthPx = int(getSystemMetrics(0))
+			heightPx = int(getSystemMetrics(1))
+			log.Printf("[InfoSphere] WorkerW client rect was zero, using GetSystemMetrics: %dx%d", widthPx, heightPx)
 		}
 
-		log.Printf("[InfoSphere] Sizing WebView2 to WorkerW client rect: %dx%d", w, h)
+		log.Printf("[InfoSphere] Sizing WebView2 to WorkerW client rect: %dx%d", widthPx, heightPx)
 
 		// 1. Convert to child window of WorkerW
 		style := getWindowLong(hwnd, GWL_STYLE)
@@ -267,16 +296,20 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 		procSetParent.Call(uintptr(hwnd), uintptr(workerW))
 
 		// 4. Position to fill WorkerW client area exactly
-		setWindowPos(hwnd, 0, 0, 0, w, h, SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
-		log.Printf("[InfoSphere] Embedded successfully: %dx%d inside WorkerW (desktop icons on top)", w, h)
+		setWindowPos(hwnd, 0, 0, 0, widthPx, heightPx, SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
+		log.Printf("[InfoSphere] Embedded successfully: %dx%d inside WorkerW (desktop icons on top)", widthPx, heightPx)
 
-		// Explicitly show all inner Chromium rendering windows
-		showAllChildWindows(hwnd)
+		// 5. Update WebView2 controller bounds to match new parent and dimensions
+		if w != nil {
+			w.SetSize(widthPx, heightPx, webview.HintNone)
+			makeWebviewVisible(w)
+		}
+		showChromiumWidgets(hwnd)
 
-		// 5. Watchdog: ensure parent, visibility, and size stay locked even if Explorer restarts
+		// 6. Watchdog: ensure parent, visibility, and size stay locked even if Explorer restarts
 		go func() {
 			for {
-				time.Sleep(2 * time.Second)
+				time.Sleep(3 * time.Second)
 				if !isWindow(hwnd) {
 					return
 				}
@@ -287,23 +320,27 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 					ww := int(cr2.Right)
 					hh := int(cr2.Bottom)
 					if ww == 0 || hh == 0 {
-						ww = w
-						hh = h
+						ww = widthPx
+						hh = heightPx
 					}
 					p, _, _ := procGetParent.Call(uintptr(hwnd))
 					if windows.HWND(p) != workerW {
 						procSetParent.Call(uintptr(hwnd), uintptr(workerW))
 						setWindowPos(hwnd, 0, 0, 0, ww, hh, SWP_SHOWWINDOW|SWP_NOACTIVATE)
+						if w != nil {
+							w.Dispatch(func() {
+								w.SetSize(ww, hh, webview.HintNone)
+							})
+						}
 					}
-					showAllChildWindows(hwnd)
 				}
 			}
 		}()
 	} else {
 		// Fallback for safety (e.g. if Progman couldn't be contacted)
 		log.Printf("[InfoSphere] WorkerW not found, falling back to HWND_BOTTOM")
-		w := int(getSystemMetrics(0))
-		h := int(getSystemMetrics(1))
+		widthPx := int(getSystemMetrics(0))
+		heightPx := int(getSystemMetrics(1))
 		style := getWindowLong(hwnd, GWL_STYLE)
 		style &^= WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
 		setWindowLong(hwnd, GWL_STYLE, style)
@@ -313,8 +350,11 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 		ex |= WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
 		setWindowLong(hwnd, GWL_EXSTYLE, ex)
 
-		setWindowPos(hwnd, HWND_BOTTOM, 0, 0, w, h,
+		setWindowPos(hwnd, HWND_BOTTOM, 0, 0, widthPx, heightPx,
 			SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
+		if w != nil {
+			w.SetSize(widthPx, heightPx, webview.HintNone)
+		}
 	}
 }
 
@@ -661,13 +701,26 @@ func main() {
 	log.Printf("[InfoSphere] Step 2: URL is %s", url)
 
 	log.Printf("[InfoSphere] Step 3: Calling webview.NewWithOptions...")
+	// Get screen size BEFORE creating WebView2 so it starts at full screen size.
+	// Default Width/Height=0 causes go-webview2 to use 640x480, and WebView2's
+	// internal compositor initializes at that size. Even after SetWindowPos to
+	// 1920x1080, the WebView2 controller bounds stay 640x480 → white screen.
+	screenW := int(getSystemMetrics(0))
+	screenH := int(getSystemMetrics(1))
+	if screenW == 0 { screenW = 1920 }
+	if screenH == 0 { screenH = 1080 }
+	log.Printf("[InfoSphere] Screen size for WebView2 init: %dx%d", screenW, screenH)
+
 	w := webview.NewWithOptions(webview.WebViewOptions{
 		Debug:     false,
 		AutoFocus: true,
 		WindowOptions: webview.WindowOptions{
-			Title: "InfoSphere_Live_Wallpaper",
+			Title:  "InfoSphere_Live_Wallpaper",
+			Width:  uint(screenW),
+			Height: uint(screenH),
 		},
 	})
+
 	if w == nil {
 		log.Fatal("[InfoSphere] WebView2 failed — is Edge WebView2 Runtime installed?")
 	}
@@ -677,14 +730,27 @@ func main() {
 	hwnd := windows.HWND(uintptr(w.Window()))
 	log.Printf("[InfoSphere] Step 4: WebView2 HWND: 0x%X", hwnd)
 
-	// ── Wallpaper Lockdown: injected before page script runs ─────────────
-	// Prevents text selection highlight, right-click menu, drag ghosts,
-	// and text I-beam cursor — making it behave like a native OS wallpaper.
+	// ── Real-Time Browser Error Bridge ──────────────────────────────────
+	w.Bind("go_log", func(msg string) {
+		log.Printf("[WebView2] %s", msg)
+	})
+
+	// ── Wallpaper Lockdown & Instant Dark Background ────────────────────
 	w.Init(`
 (function(){
-  var s = document.createElement('style');
-  s.textContent = '*,*::before,*::after{user-select:none!important;-webkit-user-select:none!important;cursor:default!important;-webkit-user-drag:none!important;}';
-  document.head && document.head.appendChild(s);
+  try {
+    if (document.documentElement) document.documentElement.style.backgroundColor = '#030712';
+    if (document.body) document.body.style.backgroundColor = '#030712';
+    var s = document.createElement('style');
+    s.textContent = 'html,body{background-color:#030712!important;margin:0!important;padding:0!important;overflow:hidden!important;} *,*::before,*::after{user-select:none!important;-webkit-user-select:none!important;cursor:default!important;-webkit-user-drag:none!important;}';
+    (document.head || document.documentElement).appendChild(s);
+  } catch(e){}
+  window.addEventListener('error', function(e) {
+    if (window.go_log) window.go_log('JS ERROR: ' + e.message + ' at ' + e.filename + ':' + e.lineno);
+  });
+  window.addEventListener('unhandledrejection', function(e) {
+    if (window.go_log) window.go_log('PROMISE REJECTION: ' + (e.reason ? e.reason.stack || e.reason : 'unknown'));
+  });
   var block = function(e){ e.preventDefault(); e.stopPropagation(); return false; };
   document.addEventListener('contextmenu', block, true);
   document.addEventListener('selectstart', block, true);
@@ -724,7 +790,9 @@ func main() {
 		workerW := findDesktopWorkerW()
 		log.Printf("[InfoSphere] Background goroutine resolved WorkerW: 0x%X", workerW)
 		w.Dispatch(func() {
-			positionAsWallpaper(hwnd, workerW)
+			positionAsWallpaper(w, hwnd, workerW)
+			makeWebviewVisible(w)
+			showChromiumWidgets(hwnd)
 			// Re-navigate after embedding so WebView2 recalculates viewport
 			// size based on the now-correct window dimensions in WorkerW.
 			log.Printf("[InfoSphere] Re-navigating after embed to ensure correct viewport...")
