@@ -227,14 +227,30 @@ func showAllChildWindows(h windows.HWND) {
 }
 
 func positionAsWallpaper(hwnd, workerW windows.HWND) {
-	w := getSystemMetrics(0)
-	h := getSystemMetrics(1)
-
+	// Use WorkerW client rect for sizing — this is DPI-correct.
+	// GetSystemMetrics(0/1) returns physical pixels when DPI-aware,
+	// but WorkerW operates in logical (DPI-scaled) coordinate space.
+	// Mismatch causes WebView2 to overflow and render outside the visible area.
 	if workerW == 0 || !isWindow(workerW) {
 		workerW = findDesktopWorkerW()
 	}
 	if workerW != 0 && isWindow(workerW) {
 		log.Printf("[InfoSphere] Embedding into WorkerW (0x%X) behind desktop icons...", workerW)
+
+		// Get WorkerW's actual client area dimensions
+		var cr RECT
+		procGetClientRect.Call(uintptr(workerW), uintptr(unsafe.Pointer(&cr)))
+		w := int(cr.Right)
+		h := int(cr.Bottom)
+
+		// Fallback to system metrics if client rect is zero
+		if w == 0 || h == 0 {
+			w = int(getSystemMetrics(0))
+			h = int(getSystemMetrics(1))
+			log.Printf("[InfoSphere] WorkerW client rect was zero, using GetSystemMetrics: %dx%d", w, h)
+		}
+
+		log.Printf("[InfoSphere] Sizing WebView2 to WorkerW client rect: %dx%d", w, h)
 
 		// 1. Convert to child window of WorkerW
 		style := getWindowLong(hwnd, GWL_STYLE)
@@ -250,8 +266,8 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 		// 3. SetParent to WorkerW — makes it physically part of desktop layer
 		procSetParent.Call(uintptr(hwnd), uintptr(workerW))
 
-		// 4. Position to fill WorkerW client area
-		setWindowPos(hwnd, 0, 0, 0, int(w), int(h), SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
+		// 4. Position to fill WorkerW client area exactly
+		setWindowPos(hwnd, 0, 0, 0, w, h, SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
 		log.Printf("[InfoSphere] Embedded successfully: %dx%d inside WorkerW (desktop icons on top)", w, h)
 
 		// Explicitly show all inner Chromium rendering windows
@@ -265,10 +281,19 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 					return
 				}
 				if isWindow(workerW) {
+					// Re-read client rect in case WorkerW resized
+					var cr2 RECT
+					procGetClientRect.Call(uintptr(workerW), uintptr(unsafe.Pointer(&cr2)))
+					ww := int(cr2.Right)
+					hh := int(cr2.Bottom)
+					if ww == 0 || hh == 0 {
+						ww = w
+						hh = h
+					}
 					p, _, _ := procGetParent.Call(uintptr(hwnd))
 					if windows.HWND(p) != workerW {
 						procSetParent.Call(uintptr(hwnd), uintptr(workerW))
-						setWindowPos(hwnd, 0, 0, 0, int(w), int(h), SWP_SHOWWINDOW|SWP_NOACTIVATE)
+						setWindowPos(hwnd, 0, 0, 0, ww, hh, SWP_SHOWWINDOW|SWP_NOACTIVATE)
 					}
 					showAllChildWindows(hwnd)
 				}
@@ -277,6 +302,8 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 	} else {
 		// Fallback for safety (e.g. if Progman couldn't be contacted)
 		log.Printf("[InfoSphere] WorkerW not found, falling back to HWND_BOTTOM")
+		w := int(getSystemMetrics(0))
+		h := int(getSystemMetrics(1))
 		style := getWindowLong(hwnd, GWL_STYLE)
 		style &^= WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX
 		setWindowLong(hwnd, GWL_STYLE, style)
@@ -286,7 +313,7 @@ func positionAsWallpaper(hwnd, workerW windows.HWND) {
 		ex |= WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
 		setWindowLong(hwnd, GWL_EXSTYLE, ex)
 
-		setWindowPos(hwnd, HWND_BOTTOM, 0, 0, int(w), int(h),
+		setWindowPos(hwnd, HWND_BOTTOM, 0, 0, w, h,
 			SWP_SHOWWINDOW|SWP_NOACTIVATE|SWP_FRAMECHANGED)
 	}
 }
@@ -698,6 +725,10 @@ func main() {
 		log.Printf("[InfoSphere] Background goroutine resolved WorkerW: 0x%X", workerW)
 		w.Dispatch(func() {
 			positionAsWallpaper(hwnd, workerW)
+			// Re-navigate after embedding so WebView2 recalculates viewport
+			// size based on the now-correct window dimensions in WorkerW.
+			log.Printf("[InfoSphere] Re-navigating after embed to ensure correct viewport...")
+			w.Navigate(url)
 		})
 	}()
 
