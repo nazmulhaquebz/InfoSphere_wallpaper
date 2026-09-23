@@ -36,8 +36,8 @@ if (-not $Quiet) {
     else { Write-Host "[OK] Stopped $stopped owned process(es)." }
 }
 
-# Ensure all InfoSphere wallpaper and WebView2 child processes are cleaned up
+# Ensure all InfoSphere wallpaper and child processes are cleaned up
 if (-not $Quiet) { Write-Host "[INFO] Cleaning up InfoSphere wallpaper and WebView processes..." }
 Get-Process -Name "infosphere_wallpaper" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
-Get-Process -Name "msedgewebview2" -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
+Get-CimInstance Win32_Process -Filter "Name = 'msedgewebview2.exe'" -ErrorAction SilentlyContinue | Where-Object { $_.CommandLine -like "*InfoSphere*" } | ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
 if (-not $Quiet) { Write-Host "[OK] InfoSphere engine fully stopped." }

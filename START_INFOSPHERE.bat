@@ -14,7 +14,7 @@ echo.
 echo      TACTICAL CYBER LIVE WALLPAPER ENGINE v2.6.6 (Go-Native)
 echo      Author Name: Mohammad Nazmul Haque
 echo      Address: Tulshipur, Madhabpur, Habiganj, Bangladesh
-echo      Last Updated: 2026-09-23 - Ultra-Lightweight Architecture, Zero-CPU Cooling & <50MB RAM
+echo      Last Updated: 2026-09-23 - Ultra-Lightweight Architecture, Zero-CPU Cooling, Low RAM (under 50MB)
 echo    ========================================================================
 echo.
 
@@ -22,8 +22,6 @@ echo.
 echo    [1/3] Stopping any previous instances...
 taskkill /F /IM infosphere_wallpaper.exe /T >nul 2>&1
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0stop_engine.ps1" -Quiet >nul 2>&1
-powershell.exe -NoProfile -ExecutionPolicy Bypass -Command ^
-  "Get-Process -Name msedgewebview2 -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue" >nul 2>&1
 powershell.exe -NoProfile -Command "Start-Sleep -Seconds 1"
 echo           Done.
 
@@ -50,7 +48,7 @@ echo        - Desktop icons          : 100%% visible and interactive on top
 echo        - Mouse and Desktop clicks : Native Windows desktop behavior
 echo        - Taskbar                : hidden (real wallpaper behavior)
 echo        - Python telemetry       : background (main.py via pythonw)
-echo        - Automated Updates      : 1-Click In-App Updater & GitHub Release Sync
+echo        - Automated Updates      : 1-Click In-App Updater and GitHub Release Sync
 echo      Zero console windows - runs silently in background.
 echo    ========================================================================
 echo.

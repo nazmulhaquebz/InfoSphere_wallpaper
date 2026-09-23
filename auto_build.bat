@@ -41,7 +41,7 @@ powershell -Command "$now = Get-Date; Get-Item 'main.py', 'install_autostart_win
 
 echo [5/5] Recompiling and launching live wallpaper engine...
 pushd core\wallpaper
-go build -ldflags="-H=windowsgui -s -w" -buildvcs=false -o ..\..\infosphere_wallpaper.exe . >nul 2>&1
+go build -ldflags="-s -w" -buildvcs=false -o ..\..\infosphere_wallpaper.exe . >nul 2>&1
 popd
 wscript.exe "%~dp0launch_hidden.vbs"
 

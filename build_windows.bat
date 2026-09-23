@@ -46,7 +46,7 @@ powershell -Command "$now = Get-Date; Get-Item 'main.py', 'START_INFOSPHERE.bat'
 
 echo [6/6] Recompiling Go live wallpaper and restarting live engine...
 pushd core\wallpaper
-go build -ldflags="-H=windowsgui -s -w" -buildvcs=false -o ..\..\infosphere_wallpaper.exe . >nul 2>&1
+go build -ldflags="-s -w" -buildvcs=false -o ..\..\infosphere_wallpaper.exe . >nul 2>&1
 popd
 wscript.exe "%~dp0launch_hidden.vbs"
 

@@ -51,5 +51,5 @@ WScript.Sleep 1500
 ' 6. Launch Go Live Wallpaper Engine (WebView2 behind desktop icons)
 wallpaperExe = projectDir & "\infosphere_wallpaper.exe"
 If fso.FileExists(wallpaperExe) Then
-    WshShell.Run Chr(34) & wallpaperExe & Chr(34), 1, False
+    WshShell.Run Chr(34) & wallpaperExe & Chr(34), 0, False
 End If
