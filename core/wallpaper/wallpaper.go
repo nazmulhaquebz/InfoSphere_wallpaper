@@ -297,7 +297,7 @@ func pollMouse() {
 		}
 		atomic.StoreInt32(&lbtnState, lb)
 		atomic.StoreInt32(&rbtnState, rb)
-		time.Sleep(16 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
@@ -350,7 +350,7 @@ func (h *sseHub) watchFiles(root string) {
 	cfgPath  := filepath.Join(root, "config.json")
 	var lastSnap, lastCfg time.Time
 
-	for range time.Tick(100 * time.Millisecond) {
+	for range time.Tick(500 * time.Millisecond) {
 		if fi, err := os.Stat(snapPath); err == nil && fi.ModTime().After(lastSnap) {
 			lastSnap = fi.ModTime()
 			if raw, err := os.ReadFile(snapPath); err == nil && len(raw) > 0 {
@@ -539,7 +539,7 @@ func startServer(root string, port int, hub *sseHub) error {
 			log.Printf("[InfoSphere] Server notice: %v", err)
 		}
 	}()
-	time.Sleep(200 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 	return nil
 }
 

@@ -1,7 +1,7 @@
 {
     "_notice": "CORE ENGINE CONFIGURATION. Users do NOT need to edit this file. Customize your HUD via user_information.txt, .env, and Picture/Original Picture/. Do not modify other files.",
     "brand_name":  "InfoSphere Cyber Live Wallpaper Engine",
-    "refresh_interval_seconds":  1.0,
+    "refresh_interval_seconds":  3.0,
     "resolution_width":  "auto",
     "resolution_height":  "auto",
     "display_mode":  "primary",
@@ -25,7 +25,7 @@
     "accessibility":  {
                           "theme":  "default",
                           "density":  "comfortable",
-                          "reduce_motion":  false,
+                          "reduce_motion":  true,
                           "font_scale":  1
                       },
     "weather_city":  "auto",
@@ -34,13 +34,13 @@
                    "ip":  "192.168.0.1",
                    "username":  "",
                    "password_env":  "INFOSPHERE_ROUTER_PASSWORD",
-                   "refresh_secs":  10,
+                   "refresh_secs":  60,
                    "_note":  "Set INFOSPHERE_ROUTER_PASSWORD in .env or your environment. Leave blank for passive ARP discovery."
                },
     "speedtest":  {
-                      "enabled":  true,
-                      "ping_interval_s":  5,
-                      "speed_interval_s":  15,
+                      "enabled":  false,
+                      "ping_interval_s":  30,
+                      "speed_interval_s":  300,
                       "ping_host":  "8.8.8.8",
                       "ping_port":  53,
                       "_note":  "Real-time 15-second network speed test and ping monitor."
